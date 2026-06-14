@@ -878,7 +878,8 @@ function renderAnnouncements(rows) {
     list.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No announcements right now.</p>';
     return;
   }
-  list.innerHTML = rows.slice(0, 5).map(r => `
+  const cleanAnn = rows.filter(r => r.TITLE && !r.TITLE.includes('ADD YOUR'));
+  list.innerHTML = cleanAnn.slice(0, 5).map(r => `
     <div class="ann-item">
       <div class="ann-dot" style="background:${dotColor(r.TAG)}"></div>
       <div class="ann-body">
@@ -897,7 +898,8 @@ function renderEvents(rows) {
     list.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:16px">No upcoming events.</p>';
     return;
   }
-  list.innerHTML = rows.slice(0, 5).map(r => `
+  const cleanEvt = rows.filter(r => r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY !== '0');
+  list.innerHTML = cleanEvt.slice(0, 5).map(r => `
     <div class="ev-row">
       <div class="ev-date">
         <div class="ev-mo">${r.MONTH}</div>
@@ -912,29 +914,44 @@ function renderEvents(rows) {
 }
 
 // ── Render key dates bar ──
+const DATE_EMOJIS = {
+  'final exam':'📅','exam':'📅','last day':'🎓','graduation':'🏆',
+  'first day':'🏫','school':'🏫','holiday':'🎉','break':'⛷️',
+  'prom':'🎊','spirit':'🎽','awards':'🏅','meeting':'📋',
+};
+function dateEmoji(label) {
+  const l = (label||'').toLowerCase();
+  for (const [key,emoji] of Object.entries(DATE_EMOJIS)) { if (l.includes(key)) return emoji; }
+  return '📅';
+}
 function renderDates(rows) {
   const bar = document.getElementById('dates-bar');
-  if (!rows.length) { bar.innerHTML = ''; return; }
-  bar.innerHTML = rows.map(r =>
-    `<div class="date-chip">${r.EMOJI || '📅'} <span><strong>${r.DATE}</strong> &nbsp;${r.LABEL}</span></div>`
-  ).join('') + `<span class="dates-updated">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
+  const clean = rows.filter(r => r.DATE && r.LABEL && !r.LABEL.includes('ADD YOUR') && r.DATE !== 'Mon DD');
+  if (!clean.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = clean.map(r => {
+    const emoji = r.EMOJI && r.EMOJI.trim() && !r.EMOJI.includes('ADD') ? r.EMOJI : dateEmoji(r.LABEL);
+    return `<div class="date-chip">${emoji} <span><strong>${r.DATE}</strong> &nbsp;${r.LABEL}</span></div>`;
+  }).join('') + `<span class="dates-updated">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
 }
 
 // ── Render quick links ──
 function renderQuickLinks(rows) {
   const list = document.getElementById('quick-links-list');
   if (!rows.length) { list.innerHTML = ''; return; }
-  list.innerHTML = rows.map(r => `
-    <button class="ql" onclick="window.open('${r.URL}','_blank')">
-      <span class="ql-ico">${r.EMOJI || '🔗'}</span>${r.LABEL}<span class="ql-arr">→</span>
-    </button>
-  `).join('');
+  const cleanQl = rows.filter(r => r.LABEL && r.URL && !r.URL.includes('PASTE YOUR'));
+  list.innerHTML = cleanQl.map(r => {
+    const emoji = r.EMOJI && r.EMOJI.trim() ? r.EMOJI : '🔗';
+    return `<button class="ql" onclick="window.open('${r.URL}','_blank')">${emoji ? '<span class="ql-ico">' + emoji + '</span>' : ''}${r.LABEL}<span class="ql-arr">→</span></button>`;
+  }).join('');
 }
 
 // ── Render countdown ──
 function setupCountdown(rows) {
   if (!rows.length) return;
-  const r = rows[0];
+  // Use first row that has a valid TARGET_DATE
+  const validRows = rows.filter(r => r.TARGET_DATE && r.TARGET_DATE.match(/\d{4}-\d{2}-\d{2}/));
+  if (!validRows.length) return;
+  const r = validRows[0];
   document.getElementById('cd-label').textContent = r.LABEL || 'Countdown';
   const target = new Date(r.TARGET_DATE + 'T23:59:00');
   function tick() {
