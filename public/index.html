@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OBHS Student Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:#F5F5F7;color:#111;-webkit-font-smoothing:antialiased;}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;}
+img{max-width:100%;}
+
+/* ── Tokens ── */
+:root{
+  --ink:#111111;
+  --purple:#1A0A3D;
+  --purple-mid:#2D1B69;
+  --purple-ui:#3D2680;
+  --silver:#C0C0C0;
+  --silver-lt:#E8E8EC;
+  --page:#F5F5F7;
+  --card:#FFFFFF;
+  --muted:#6E6E80;
+  --faint:#AEAEBA;
+  --rule:rgba(0,0,0,0.08);
+  --r:10px;
+}
+
+/* ── SP Chrome ── */
+.sp-chrome{background:#111;padding:7px 24px;display:flex;align-items:center;gap:14px;}
+.sp-logo{font-weight:700;font-size:11px;color:#00a4ef;letter-spacing:.02em;}
+.sp-search{flex:1;max-width:320px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:5px 12px;color:#fff;font-size:11px;font-family:'DM Sans',sans-serif;}
+.sp-search::placeholder{color:rgba(255,255,255,.35);}
+.sp-name{margin-left:auto;font-size:11px;color:rgba(255,255,255,.25);}
+
+/* ── Nav ── */
+.site-nav{background:var(--purple);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:14px 0;margin-right:32px;white-space:nowrap;display:flex;align-items:center;gap:10px;}
+.nav-brand-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);opacity:.6;}
+.nav-btn{padding:16px 14px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);background:none;border:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;letter-spacing:.01em;}
+.nav-btn:hover{color:rgba(255,255,255,.85);}
+.nav-btn.active{color:#fff;border-bottom-color:var(--silver);}
+.nav-edit{margin-left:auto;font-size:11px;color:rgba(255,255,255,.2);background:none;border:none;display:none;}
+
+/* ── Page visibility ── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ══════════════════════════════════════
+   HOME
+══════════════════════════════════════ */
+.hero{background:var(--purple);display:flex;align-items:stretch;min-height:210px;position:relative;overflow:hidden;}
+.hero-rule{width:1px;background:linear-gradient(to bottom,transparent,var(--silver) 30%,var(--silver) 70%,transparent);opacity:.35;flex-shrink:0;align-self:stretch;margin:0 32px 0 40px;}
+.hero-body{padding:42px 40px 36px 0;flex:1;position:relative;z-index:2;}
+.hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.65;margin-bottom:10px;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:700;line-height:.95;text-transform:uppercase;letter-spacing:.02em;color:#fff;}
+.hero-title em{font-style:normal;color:var(--silver);font-weight:300;letter-spacing:.06em;}
+.hero-sub{margin-top:14px;font-size:12px;font-weight:300;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;}
+.hero-bg{position:absolute;right:-10px;bottom:-24px;font-family:'Barlow Condensed',sans-serif;font-size:150px;font-weight:700;color:rgba(255,255,255,.025);text-transform:uppercase;letter-spacing:-.04em;line-height:1;pointer-events:none;user-select:none;z-index:1;}
+
+/* Dates bar */
+.dates-bar{background:#0D0620;padding:10px 40px;display:flex;align-items:center;gap:32px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.05);}
+.date-chip{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.45);}
+.date-chip strong{color:rgba(255,255,255,.8);font-weight:500;}
+.dates-updated{margin-left:auto;font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.06em;text-transform:uppercase;}
+.dates-loading{font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.06em;}
+
+/* Portal row */
+.portal-row{display:grid;grid-template-columns:1fr 1fr;}
+.portal-card{background:var(--purple-mid);padding:28px 36px;display:flex;flex-direction:column;border:none;text-align:left;transition:background .2s;position:relative;overflow:hidden;}
+.portal-card:first-child{border-right:1px solid rgba(255,255,255,.06);}
+.portal-card:hover{background:var(--purple-ui);}
+.portal-vline{position:absolute;left:0;top:20%;bottom:20%;width:1px;background:var(--silver);opacity:.15;}
+.portal-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:8px;}
+.portal-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:10px;}
+.portal-desc{font-size:12px;font-weight:300;color:rgba(255,255,255,.52);line-height:1.6;margin-bottom:14px;}
+.portal-links{display:flex;flex-direction:column;gap:5px;margin-bottom:20px;}
+.portal-link{font-size:12px;color:rgba(255,255,255,.68);display:flex;align-items:center;gap:8px;}
+.portal-link::before{content:'';width:12px;height:1px;background:var(--silver);opacity:.35;flex-shrink:0;}
+.portal-cta{margin-top:auto;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);opacity:.65;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
+.portal-card:hover .portal-cta{opacity:1;}
+
+/* Home body */
+.home-body{display:grid;grid-template-columns:1fr 280px;}
+.home-main{padding:28px 36px;}
+.home-sidebar{background:#EDEDF2;border-left:1px solid var(--rule);padding:22px 18px;display:flex;flex-direction:column;gap:22px;}
+
+/* Shared block head */
+.blk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.blk-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);}
+.blk-link{font-size:11px;color:var(--purple-ui);font-weight:500;background:none;border:none;padding:0;letter-spacing:.02em;}
+
+/* Announcements */
+.ann-list{display:flex;flex-direction:column;gap:6px;}
+.ann-item{background:var(--card);border-radius:var(--r);padding:13px 16px;display:flex;align-items:flex-start;gap:12px;border-left:2px solid transparent;transition:border-color .15s;cursor:pointer;}
+.ann-item:hover{border-left-color:var(--purple);}
+.ann-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.ann-body{flex:1;}
+.ann-t{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;margin-bottom:3px;}
+.ann-m{font-size:11px;color:var(--faint);}
+.ann-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;flex-shrink:0;white-space:nowrap;letter-spacing:.04em;align-self:flex-start;margin-top:2px;}
+.ann-skeleton{background:var(--card);border-radius:var(--r);height:60px;opacity:.5;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:.6;}}
+
+/* Events */
+.event-card{background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--rule);}
+.ev-row{display:flex;align-items:flex-start;gap:14px;padding:11px 16px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .12s;}
+.ev-row:last-child{border-bottom:none;}
+.ev-row:hover{background:var(--page);}
+.ev-date{width:38px;flex-shrink:0;text-align:center;background:var(--purple);border-radius:6px;padding:5px 4px;}
+.ev-mo{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);opacity:.8;}
+.ev-dy{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1;}
+.ev-t{font-size:13px;font-weight:500;color:var(--ink);}
+.ev-sub{font-size:11px;color:var(--faint);margin-top:2px;}
+
+/* Countdown */
+.countdown{background:var(--purple);border-radius:var(--r);padding:18px 14px;text-align:center;}
+.cd-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--silver);opacity:.45;margin-bottom:12px;}
+.cd-nums{display:flex;justify-content:center;align-items:flex-end;gap:5px;}
+.cd-unit{text-align:center;}
+.cd-n{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;color:#fff;line-height:1;}
+.cd-u{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);opacity:.35;margin-top:3px;}
+.cd-sep{font-size:24px;color:rgba(255,255,255,.12);padding-bottom:6px;}
+
+/* Quick links */
+.ql-list{display:flex;flex-direction:column;gap:5px;}
+.ql{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:9px 13px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;color:var(--ink);transition:border-color .15s,color .15s;text-align:left;width:100%;}
+.ql:hover{border-color:var(--purple-ui);color:var(--purple-ui);}
+.ql-ico{font-size:14px;width:20px;text-align:center;}
+.ql-arr{margin-left:auto;color:var(--faint);font-size:11px;}
+
+/* Flyer grid */
+.flyer-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ft{aspect-ratio:8.5/11;border-radius:6px;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s;display:flex;align-items:flex-end;padding:6px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);}
+.ft:hover{border-color:var(--silver);}
+.ft1{background:linear-gradient(150deg,#2D1B69,#0D0620);}
+.ft2{background:linear-gradient(150deg,#1a1a3a,#0D0620);}
+.ft3{background:linear-gradient(150deg,#2a1a2a,#0D0620);}
+
+/* ══════════════════════════════════════
+   STUDENT / FACULTY SUB-PAGES
+══════════════════════════════════════ */
+.sub-hero{background:var(--purple);display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.06);}
+.sub-hero-rule{width:1px;background:linear-gradient(to bottom,transparent,var(--silver) 30%,var(--silver) 70%,transparent);opacity:.28;flex-shrink:0;margin:0 28px 0 36px;align-self:stretch;}
+.sub-hero-body{padding:28px 36px 24px 0;}
+.sub-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.45;margin-bottom:6px;}
+.sub-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;line-height:1;}
+.sub-desc{font-size:12px;font-weight:300;color:rgba(255,255,255,.42);margin-top:6px;letter-spacing:.03em;}
+
+/* Sub nav */
+.sub-nav{background:var(--card);border-bottom:1px solid var(--rule);padding:0 36px;display:flex;overflow-x:auto;}
+.sub-nav::-webkit-scrollbar{display:none;}
+.sn{padding:13px 16px 11px;font-size:12px;font-weight:500;color:var(--faint);background:none;border:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;letter-spacing:.01em;}
+.sn:hover{color:var(--ink);}
+.sn.active{color:var(--ink);border-bottom-color:var(--purple);}
+
+/* Sub body */
+.sub-body{padding:28px 36px;}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px;}
+.fc{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:18px 18px 16px;cursor:pointer;transition:box-shadow .15s,transform .15s,border-color .15s;display:flex;flex-direction:column;}
+.fc:hover{box-shadow:0 4px 20px rgba(26,10,61,.08);transform:translateY(-2px);border-color:rgba(26,10,61,.15);}
+.fc-ico{font-size:22px;margin-bottom:10px;}
+.fc-ttl{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.fc-dsc{font-size:11px;color:var(--muted);line-height:1.5;flex:1;}
+.fc-tag{display:inline-block;margin-top:10px;font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;letter-spacing:.04em;align-self:flex-start;}
+
+/* 2-col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.cs{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;}
+.cs-ttl{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--rule);}
+
+/* Info strip */
+.info-strip{background:var(--purple);border-radius:7px;padding:11px 14px;margin-bottom:14px;}
+.info-strip-t{font-size:12px;font-weight:600;color:var(--silver);margin-bottom:3px;}
+.info-strip-d{font-size:11px;color:rgba(255,255,255,.45);line-height:1.5;}
+
+/* Committee tiles */
+.comm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:16px;}
+.ct{border-radius:7px;padding:12px 14px;background:#F0EEF8;border:1px solid rgba(26,10,61,.08);cursor:pointer;transition:background .15s;}
+.ct:hover{background:#E4E0F5;}
+.ct-t{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:3px;}
+.ct-d{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* Form link rows */
+.flr{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);cursor:pointer;}
+.flr:last-child{border-bottom:none;}
+.flr:hover .flr-t{color:var(--purple-ui);}
+.flr-ico{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:#F0EEF8;}
+.flr-t{font-size:13px;font-weight:500;color:var(--ink);transition:color .15s;}
+.flr-d{font-size:11px;color:var(--faint);}
+.flr-arr{margin-left:auto;color:var(--faint);font-size:13px;}
+
+/* CTA button */
+.cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--purple);color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:12px;font-weight:600;letter-spacing:.04em;margin-top:14px;transition:background .15s;}
+.cta-btn:hover{background:var(--purple-ui);}
+
+/* Embed placeholder */
+.embed-box{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.embed-bar{background:var(--purple);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+.embed-bar-t{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);opacity:.8;}
+.embed-frame{width:100%;height:640px;border:none;display:block;}
+
+/* Footer */
+.site-footer{background:#0D0620;padding:24px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:40px;}
+.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:11px;color:rgba(255,255,255,.25);background:none;border:none;cursor:pointer;transition:color .15s;}
+.footer-link:hover{color:rgba(255,255,255,.6);}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .portal-row{grid-template-columns:1fr;}
+  .portal-card:first-child{border-right:none;border-bottom:1px solid rgba(255,255,255,.06);}
+  .home-body{grid-template-columns:1fr;}
+  .home-sidebar{border-left:none;border-top:1px solid var(--rule);}
+  .two-col{grid-template-columns:1fr;}
+  .hero-title{font-size:40px;}
+  .hero-bg{display:none;}
+  .hero-rule{margin:0 20px 0 20px;}
+  .hero-body{padding:32px 20px 28px 0;}
+  .sub-body,.sub-nav,.home-main{padding-left:20px;padding-right:20px;}
+  .dates-bar{padding:10px 20px;gap:16px;}
+  .portal-card{padding:22px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SharePoint chrome simulation -->
+<div class="sp-chrome">
+  <span class="sp-logo">SharePoint</span>
+  <input class="sp-search" placeholder="🔍  Search this site" readonly>
+  <span class="sp-name">OBHS Daily Activities Page</span>
+</div>
+
+<!-- Nav -->
+<nav class="site-nav">
+  <div class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    OBHS Student Life
+  </div>
+  <button class="nav-btn active" onclick="nav('home',this)">Home</button>
+  <button class="nav-btn" id="s-tab" onclick="nav('student',this)">Student Hub</button>
+  <button class="nav-btn" id="f-tab" onclick="nav('faculty',this)">Faculty Hub</button>
+  <button class="nav-edit">Edit navigation</button>
+</nav>
+
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="page-home" class="page active">
+
+  <div class="hero">
+    <div class="hero-rule"></div>
+    <div class="hero-body">
+      <p class="hero-eyebrow">Old Bridge High School &nbsp;·&nbsp; Student Life</p>
+      <h1 class="hero-title">Your School.<br><em>Your Story.</em></h1>
+      <p class="hero-sub">Events &nbsp;·&nbsp; Clubs &nbsp;·&nbsp; Announcements &nbsp;·&nbsp; Resources</p>
+    </div>
+    <div class="hero-bg">Knights</div>
+  </div>
+
+  <!-- Key dates — loaded from Google Sheet -->
+  <div class="dates-bar" id="dates-bar">
+    <span class="dates-loading">Loading key dates…</span>
+  </div>
+
+  <!-- Portal cards -->
+  <div class="portal-row">
+    <button class="portal-card" onclick="nav('student',document.getElementById('s-tab'))">
+      <div class="portal-vline"></div>
+      <div class="portal-tag">For students</div>
+      <div class="portal-title">Student Hub</div>
+      <div class="portal-desc">Clubs, community service, events, leadership committees, Battle of the Classes, and everything student life at OBHS.</div>
+      <div class="portal-links">
+        <span class="portal-link">Club directory &amp; flyer generator</span>
+        <span class="portal-link">Community service hours</span>
+        <span class="portal-link">Battle of the Classes</span>
+        <span class="portal-link">Senior leadership committees</span>
+        <span class="portal-link">Event sign-ups &amp; spirit wear</span>
+      </div>
+      <div class="portal-cta">Enter Student Hub &nbsp;→</div>
+    </button>
+    <button class="portal-card" onclick="nav('faculty',document.getElementById('f-tab'))">
+      <div class="portal-vline"></div>
+      <div class="portal-tag">For faculty</div>
+      <div class="portal-title">Faculty Hub</div>
+      <div class="portal-desc">Field trip forms, early dismissals, club advisor resources, help desk, announcements, and document library — all in one place.</div>
+      <div class="portal-links">
+        <span class="portal-link">Field trip &amp; early dismissal forms</span>
+        <span class="portal-link">Submit a daily announcement</span>
+        <span class="portal-link">Club advisor resources</span>
+        <span class="portal-link">Help desk &amp; IT support</span>
+        <span class="portal-link">Document library</span>
+      </div>
+      <div class="portal-cta">Enter Faculty Hub &nbsp;→</div>
+    </button>
+  </div>
+
+  <!-- Main content -->
+  <div class="home-body">
+    <div class="home-main">
+
+      <!-- Announcements -->
+      <div style="margin-bottom:32px">
+        <div class="blk-head">
+          <span class="blk-title">Announcements</span>
+          <button class="blk-link" onclick="nav('student',document.getElementById('s-tab'))">See all →</button>
+        </div>
+        <div class="ann-list" id="ann-list">
+          <div class="ann-skeleton" style="height:58px;border-radius:10px;"></div>
+          <div class="ann-skeleton" style="height:58px;border-radius:10px;margin-top:6px;"></div>
+          <div class="ann-skeleton" style="height:58px;border-radius:10px;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <!-- Events -->
+      <div>
+        <div class="blk-head">
+          <span class="blk-title">Upcoming Events</span>
+          <button class="blk-link">Full calendar →</button>
+        </div>
+        <div class="event-card" id="events-list">
+          <div class="ann-skeleton" style="height:52px;border-radius:0;"></div>
+          <div class="ann-skeleton" style="height:52px;border-radius:0;margin-top:1px;"></div>
+          <div class="ann-skeleton" style="height:52px;border-radius:0;margin-top:1px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="home-sidebar">
+
+      <div>
+        <div class="blk-head"><span class="blk-title" style="font-size:11px">Countdown</span></div>
+        <div class="countdown">
+          <div class="cd-lbl" id="cd-label">Loading…</div>
+          <div class="cd-nums">
+            <div class="cd-unit"><div class="cd-n" id="cd-d">--</div><div class="cd-u">days</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-unit"><div class="cd-n" id="cd-h">--</div><div class="cd-u">hrs</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-unit"><div class="cd-n" id="cd-m">--</div><div class="cd-u">min</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="blk-head"><span class="blk-title" style="font-size:11px">Quick Links</span></div>
+        <div class="ql-list" id="quick-links-list">
+          <div class="ann-skeleton" style="height:38px;border-radius:8px;"></div>
+          <div class="ann-skeleton" style="height:38px;border-radius:8px;margin-top:5px;"></div>
+          <div class="ann-skeleton" style="height:38px;border-radius:8px;margin-top:5px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="blk-head"><span class="blk-title" style="font-size:11px">Recent Flyers</span></div>
+        <div class="flyer-row">
+          <div class="ft ft1">Debate</div>
+          <div class="ft ft2">Choir</div>
+          <div class="ft ft3">Summer</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">OBHS Student Life &nbsp;·&nbsp; Old Bridge High School</span>
+    <div class="footer-links">
+      <button class="footer-link" onclick="nav('student',document.getElementById('s-tab'))">Student Hub</button>
+      <button class="footer-link" onclick="nav('faculty',document.getElementById('f-tab'))">Faculty Hub</button>
+      <button class="footer-link">Contact Student Life</button>
+    </div>
+  </footer>
+
+</div><!-- /home -->
+
+
+<!-- ══════════════ STUDENT HUB ══════════════ -->
+<div id="page-student" class="page">
+
+  <div class="sub-hero">
+    <div class="sub-hero-rule"></div>
+    <div class="sub-hero-body">
+      <p class="sub-eyebrow">OBHS Student Life</p>
+      <h1 class="sub-title">Student Hub</h1>
+      <p class="sub-desc">Clubs, events, service hours, leadership committees, and everything student life.</p>
+    </div>
+  </div>
+
+  <div class="sub-nav" id="s-subnav">
+    <button class="sn active" onclick="sSub(this,'s-overview')">Overview</button>
+    <button class="sn" onclick="sSub(this,'s-clubs')">Clubs &amp; Activities</button>
+    <button class="sn" onclick="sSub(this,'s-service')">Community Service</button>
+    <button class="sn" onclick="sSub(this,'s-events')">Events &amp; Sign-Ups</button>
+    <button class="sn" onclick="sSub(this,'s-committees')">Committees</button>
+    <button class="sn" onclick="sSub(this,'s-botc')">Battle of the Classes</button>
+    <button class="sn" onclick="sSub(this,'s-spirit')">Spirit Wear</button>
+  </div>
+
+  <!-- Overview -->
+  <div id="s-overview" class="sub-body">
+    <div class="feat-grid">
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')">
+        <div class="fc-ico">🏆</div>
+        <div class="fc-ttl">Battle of the Classes</div>
+        <div class="fc-dsc">Sign up, pay your $10, and represent your class in the biggest event of the year.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">Sign-ups open</span>
+      </div>
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')">
+        <div class="fc-ico">🤝</div>
+        <div class="fc-ttl">Community Service</div>
+        <div class="fc-dsc">Log hours, upload verification, and track your progress toward the 10-hour graduation requirement.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">10 hrs required</span>
+      </div>
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')">
+        <div class="fc-ico">📋</div>
+        <div class="fc-ttl">Club Hub</div>
+        <div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">70+ clubs</span>
+      </div>
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-committees')">
+        <div class="fc-ico">🗳️</div>
+        <div class="fc-ttl">Student Committees</div>
+        <div class="fc-dsc">Join a leadership committee and help shape school culture for 2026–27.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">New · 2026–27</span>
+      </div>
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-events')">
+        <div class="fc-ico">📅</div>
+        <div class="fc-ttl">Event Sign-Ups</div>
+        <div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">New flow</span>
+      </div>
+      <div class="fc" onclick="sSub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')">
+        <div class="fc-ico">🎽</div>
+        <div class="fc-ttl">Spirit Wear</div>
+        <div class="fc-dsc">Browse and buy OBHS Knights gear. Pick up in the Student Life office.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">In-office pickup</span>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="cs">
+        <div class="cs-ttl">🗳️ Leadership Committees &nbsp;<span style="font-weight:300;letter-spacing:0;text-transform:none;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--faint)">2026–27</span></div>
+        <div class="comm-grid">
+          <div class="ct"><div class="ct-t">Community Service</div><div class="ct-d">Manage the 10-hr requirement &amp; approved org list</div></div>
+          <div class="ct"><div class="ct-t">Student Events</div><div class="ct-d">Plan and run school events &amp; activities</div></div>
+          <div class="ct"><div class="ct-t">School Spirit</div><div class="ct-d">Pep rallies, gear, and spirit campaigns</div></div>
+          <div class="ct"><div class="ct-t">Cell Phone Policy</div><div class="ct-d">Student voice on policy proposals</div></div>
+          <div class="ct"><div class="ct-t">Communications</div><div class="ct-d">Announcements, Instagram &amp; social media</div></div>
+        </div>
+        <button class="cta-btn">Join a committee →</button>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">🤝 Community Service</div>
+        <div class="info-strip">
+          <div class="info-strip-t">Class of 2030 onward — 10 hrs/year required</div>
+          <div class="info-strip-d">Complete hours at any district-approved organization and submit your verification form here.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">📝</div><div><div class="flr-t">Submit service hours</div><div class="flr-d">Upload verification &amp; log hours</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">View my hours</div><div class="flr-d">Check your running total</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Approved organizations list</div><div class="flr-d">See what qualifies for credit</div></div><div class="flr-arr">→</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clubs sub-page -->
+  <div id="s-clubs" class="sub-body" style="display:none">
+    <div class="embed-box">
+      <div class="embed-bar">
+        <span style="font-size:16px">📋</span>
+        <span class="embed-bar-t">OBHS Club Hub — Directory, Flyer Generator &amp; Submit a Club</span>
+      </div>
+      <iframe class="embed-frame" src="https://obhs-student-life.vercel.app" title="OBHS Club Hub" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <!-- Community Service sub-page -->
+  <div id="s-service" class="sub-body" style="display:none">
+    <div class="two-col" style="margin-bottom:16px">
+      <div class="cs">
+        <div class="cs-ttl">🤝 Submit Your Hours</div>
+        <div class="info-strip">
+          <div class="info-strip-t">Class of 2030 onward — 10 hrs/year required</div>
+          <div class="info-strip-d">Phase-in begins with the Class of 2030. Complete hours at any district-approved organization and submit verification within 2 weeks.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">📝</div><div><div class="flr-t">Submit service hours form</div><div class="flr-d">Upload your supervisor verification</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">View my running total</div><div class="flr-d">Track progress toward 10 hrs</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Approved organizations list</div><div class="flr-d">District-approved service opportunities</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">🏆</div><div><div class="flr-t">Recognition &amp; cords</div><div class="flr-d">Students exceeding hours earn recognition at Senior Awards Night</div></div><div class="flr-arr">→</div></div>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">📋 What Counts as Service?</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+          <p style="margin-bottom:8px">Service hours must be completed at a <strong style="color:var(--ink)">district-approved organization</strong>. Students may also propose an independent opportunity for approval.</p>
+          <p style="margin-bottom:12px">Examples of eligible activities:</p>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>🏫</span> School-sponsored volunteer events</div>
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>🍽️</span> Food banks &amp; community pantries</div>
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>🌱</span> Environmental cleanups</div>
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>📚</span> Tutoring &amp; mentoring programs</div>
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>🐾</span> Animal shelters</div>
+            <div class="flr-d" style="display:flex;align-items:center;gap:8px"><span>👴</span> Senior care facilities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events sub-page -->
+  <div id="s-events" class="sub-body" style="display:none">
+    <div class="cs" style="margin-bottom:16px">
+      <div class="cs-ttl">📅 Event Sign-Ups</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Register for school events right here in Student Life — no trip to the Main Office needed. Sign-ups open when each event is announced.</p>
+      <div class="flr"><div class="flr-ico">🎉</div><div><div class="flr-t">Upcoming event sign-ups</div><div class="flr-d">View and register for open events</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🏆</div><div><div class="flr-t">Battle of the Classes</div><div class="flr-d">Class-vs-class sign-up &amp; payment</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🎓</div><div><div class="flr-t">Senior events</div><div class="flr-d">Senior tailgate, awards night, parking passes</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🎽</div><div><div class="flr-t">Pep rallies &amp; spirit events</div><div class="flr-d">School spirit committee events</div></div><div class="flr-arr">→</div></div>
+    </div>
+  </div>
+
+  <!-- Committees sub-page -->
+  <div id="s-committees" class="sub-body" style="display:none">
+    <div class="two-col">
+      <div class="cs">
+        <div class="cs-ttl">🗳️ Senior Leadership Committees</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Seniors are directly involved in improving school culture through five leadership committees. Each committee meets monthly with Student Life staff and can present recommendations to administration.</p>
+        <div class="comm-grid">
+          <div class="ct"><div class="ct-t">Community Service</div><div class="ct-d">Manage hours requirement &amp; org list</div></div>
+          <div class="ct"><div class="ct-t">Student Events</div><div class="ct-d">Plan &amp; run school events</div></div>
+          <div class="ct"><div class="ct-t">School Spirit</div><div class="ct-d">Pep rallies &amp; spirit campaigns</div></div>
+          <div class="ct"><div class="ct-t">Cell Phone Policy</div><div class="ct-d">Student voice on policy</div></div>
+          <div class="ct"><div class="ct-t">Communications</div><div class="ct-d">Announcements &amp; Instagram</div></div>
+        </div>
+        <button class="cta-btn">Join a committee →</button>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">📋 How It Works</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;display:flex;flex-direction:column;gap:12px;">
+          <div><strong style="color:var(--ink)">Who can join?</strong><br>Rising seniors (current Class of 2027) are eligible to apply for all five committees.</div>
+          <div><strong style="color:var(--ink)">How often do we meet?</strong><br>Once a month during a scheduled period with Student Life staff.</div>
+          <div><strong style="color:var(--ink)">What's the commitment?</strong><br>Attend monthly meetings, work on committee projects, and present to administration when needed.</div>
+          <div><strong style="color:var(--ink)">What do I get?</strong><br>Leadership experience, a line on college applications, and the chance to actually change things at OBHS.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTC sub-page -->
+  <div id="s-botc" class="sub-body" style="display:none">
+    <div class="two-col">
+      <div class="cs">
+        <div class="cs-ttl">🏆 What Is Battle of the Classes?</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Battle of the Classes is one of the most exciting traditions at OBHS — a competition where each grade goes head-to-head in athletic events and performs a dance. Whether you're competing or cheering, <strong style="color:var(--ink)">everyone plays a role.</strong></p>
+        <div class="info-strip">
+          <div class="info-strip-t">Sign up &amp; pay your $10 to lock in your spot</div>
+          <div class="info-strip-d">After signing up, pay your Class Advisor $10. This covers your t-shirt, which is also your ticket to the event.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Class of 2026 sign-up</div><div class="flr-d">Seniors</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Class of 2027 sign-up</div><div class="flr-d">Juniors</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Class of 2028 sign-up</div><div class="flr-d">Sophomores</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Class of 2029 sign-up</div><div class="flr-d">Freshmen</div></div><div class="flr-arr">→</div></div>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">👥 Advisors &amp; Deadlines</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">
+          <strong style="color:var(--ink);display:block;margin-bottom:8px">Class Advisors</strong>
+          Class of 2026: Ms. Fuentes &amp; Mr. Post<br>
+          Class of 2027: Mrs. Mackey &amp; Ms. Czysz<br>
+          Class of 2028: Ms. Hertman &amp; Ms. Ianucilli<br>
+          Class of 2029: Mrs. Celentano &amp; Mrs. Borriello
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--ink);display:block;margin-bottom:8px">Student Life Coordinator</strong>
+          Mr. Beverly
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spirit Wear sub-page -->
+  <div id="s-spirit" class="sub-body" style="display:none">
+    <div class="cs">
+      <div class="cs-ttl">🎽 Spirit Wear</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Browse and purchase OBHS Knights gear through Student Life. All items available for in-office pickup.</p>
+      <div class="flr"><div class="flr-ico">👕</div><div><div class="flr-t">View current inventory</div><div class="flr-d">T-shirts, hoodies, hats &amp; more</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🛒</div><div><div class="flr-t">Place an order</div><div class="flr-d">Submit your size &amp; item selection</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📍</div><div><div class="flr-t">Pickup information</div><div class="flr-d">Student Life office — Room 845</div></div><div class="flr-arr">→</div></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">OBHS Student Life &nbsp;·&nbsp; Old Bridge High School</span>
+    <div class="footer-links">
+      <button class="footer-link" onclick="nav('home',document.querySelector('.nav-btn'))">Home</button>
+      <button class="footer-link" onclick="nav('faculty',document.getElementById('f-tab'))">Faculty Hub</button>
+      <button class="footer-link">Contact Student Life</button>
+    </div>
+  </footer>
+
+</div><!-- /student -->
+
+
+<!-- ══════════════ FACULTY HUB ══════════════ -->
+<div id="page-faculty" class="page">
+
+  <div class="sub-hero">
+    <div class="sub-hero-rule"></div>
+    <div class="sub-hero-body">
+      <p class="sub-eyebrow">OBHS Student Life</p>
+      <h1 class="sub-title">Faculty Hub</h1>
+      <p class="sub-desc">Forms, resources, and tools to keep your school year running smoothly.</p>
+    </div>
+  </div>
+
+  <div class="sub-nav" id="f-subnav">
+    <button class="sn active" onclick="fSub(this,'f-overview')">Overview</button>
+    <button class="sn" onclick="fSub(this,'f-forms')">Field Trips &amp; Dismissals</button>
+    <button class="sn" onclick="fSub(this,'f-clubs')">Club Advisor Resources</button>
+    <button class="sn" onclick="fSub(this,'f-announce')">Announcements</button>
+    <button class="sn" onclick="fSub(this,'f-helpdesk')">Help Desk</button>
+    <button class="sn" onclick="fSub(this,'f-docs')">Document Library</button>
+  </div>
+
+  <!-- Overview -->
+  <div id="f-overview" class="sub-body">
+    <div class="feat-grid">
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')">
+        <div class="fc-ico">🚌</div>
+        <div class="fc-ttl">Field Trip Request</div>
+        <div class="fc-dsc">Submit a field trip request. Minimum 2-week advance notice required.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">Microsoft Form</span>
+      </div>
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')">
+        <div class="fc-ico">🚶</div>
+        <div class="fc-ttl">Early Dismissal</div>
+        <div class="fc-dsc">Request early dismissal for a student activity or school event.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">Microsoft Form</span>
+      </div>
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')">
+        <div class="fc-ico">🏫</div>
+        <div class="fc-ttl">Club Advisor Resources</div>
+        <div class="fc-dsc">Flyer generator, meeting logs, student roster tools, and budget request forms.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">Club Hub</span>
+      </div>
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-announce')">
+        <div class="fc-ico">📢</div>
+        <div class="fc-ttl">Submit an Announcement</div>
+        <div class="fc-dsc">Get a message on the daily bulletin or announcements TV screen.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">Deadline 7 AM</span>
+      </div>
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')">
+        <div class="fc-ico">🛟</div>
+        <div class="fc-ttl">Help Desk</div>
+        <div class="fc-dsc">IT requests, room setup, AV equipment reservations, and tech support.</div>
+        <span class="fc-tag" style="background:#F5F5F5;color:#555">IT Support</span>
+      </div>
+      <div class="fc" onclick="fSub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')">
+        <div class="fc-ico">📁</div>
+        <div class="fc-ttl">Document Library</div>
+        <div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div>
+        <span class="fc-tag" style="background:#F0EEF8;color:#3D2680">SharePoint Library</span>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="cs">
+        <div class="cs-ttl">📋 Submit a Form</div>
+        <div class="flr"><div class="flr-ico">🚌</div><div><div class="flr-t">Field Trip Request</div><div class="flr-d">Minimum 2 weeks notice required</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">🚶</div><div><div class="flr-t">Early Dismissal</div><div class="flr-d">Student events &amp; activities</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📢</div><div><div class="flr-t">Daily Announcement</div><div class="flr-d">Submit by 7 AM for same-day posting</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">🏫</div><div><div class="flr-t">New Club Registration</div><div class="flr-d">Register a new club for next year</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">Budget Request</div><div class="flr-d">Activity &amp; club funding requests</div></div><div class="flr-arr">→</div></div>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">🏫 Club Advisor Resources</div>
+        <div class="info-strip">
+          <div class="info-strip-t">Club Hub is live at obhs-student-life.vercel.app</div>
+          <div class="info-strip-d">Generate flyers, update your club listing, and manage the directory — embedded right inside this page.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">🖨️</div><div><div class="flr-t">Generate a club flyer</div><div class="flr-d">Print-ready PDF in under 60 seconds</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Update your club listing</div><div class="flr-d">Edit meeting time, room &amp; contact info</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📖</div><div><div class="flr-t">Advisor handbook</div><div class="flr-d">Policies, deadlines &amp; budget guidelines</div></div><div class="flr-arr">→</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field Trips sub-page -->
+  <div id="f-forms" class="sub-body" style="display:none">
+    <div class="two-col">
+      <div class="cs">
+        <div class="cs-ttl">🚌 Field Trip Request</div>
+        <div class="info-strip">
+          <div class="info-strip-t">Minimum 2-week advance notice required</div>
+          <div class="info-strip-d">Submit your request early. Trips requiring buses need additional lead time for transportation scheduling.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">📝</div><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Opens Microsoft Form</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">View my pending requests</div><div class="flr-d">Check approval status</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
+      </div>
+      <div class="cs">
+        <div class="cs-ttl">🚶 Early Dismissal</div>
+        <div class="info-strip">
+          <div class="info-strip-t">Submit at least 48 hours in advance</div>
+          <div class="info-strip-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div>
+        </div>
+        <div class="flr"><div class="flr-ico">📝</div><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Opens Microsoft Form</div></div><div class="flr-arr">→</div></div>
+        <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Eligibility &amp; approval process</div></div><div class="flr-arr">→</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Club Advisor sub-page -->
+  <div id="f-clubs" class="sub-body" style="display:none">
+    <div class="embed-box">
+      <div class="embed-bar">
+        <span style="font-size:16px">🏫</span>
+        <span class="embed-bar-t">OBHS Club Hub — Flyer Generator, Directory &amp; Admin</span>
+      </div>
+      <iframe class="embed-frame" src="https://obhs-student-life.vercel.app" title="OBHS Club Hub" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <!-- Announcements sub-page -->
+  <div id="f-announce" class="sub-body" style="display:none">
+    <div class="cs">
+      <div class="cs-ttl">📢 Submit a Daily Announcement</div>
+      <div class="info-strip">
+        <div class="info-strip-t">Daily deadline: 7:00 AM for same-day posting</div>
+        <div class="info-strip-d">Announcements submitted after 7 AM will appear the following school day. For urgent matters, contact Student Life directly.</div>
+      </div>
+      <div class="flr"><div class="flr-ico">📝</div><div><div class="flr-t">Submit an announcement</div><div class="flr-d">Opens submission form</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📺</div><div><div class="flr-t">Request a TV announcement</div><div class="flr-d">For hallway screens &amp; digital signage</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Announcement guidelines</div><div class="flr-d">Content policies &amp; formatting tips</div></div><div class="flr-arr">→</div></div>
+    </div>
+  </div>
+
+  <!-- Help Desk sub-page -->
+  <div id="f-helpdesk" class="sub-body" style="display:none">
+    <div class="cs">
+      <div class="cs-ttl">🛟 Help Desk</div>
+      <div class="flr"><div class="flr-ico">💻</div><div><div class="flr-t">Submit an IT request</div><div class="flr-d">Hardware, software, network issues</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🏫</div><div><div class="flr-t">Room setup request</div><div class="flr-d">Furniture, seating arrangements</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📽️</div><div><div class="flr-t">AV equipment reservation</div><div class="flr-d">Projectors, microphones, screens</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">🖨️</div><div><div class="flr-t">Printing &amp; copying support</div><div class="flr-d">Large print jobs &amp; supply requests</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d">Room 845 · Mr. Beverly</div></div><div class="flr-arr">→</div></div>
+    </div>
+  </div>
+
+  <!-- Document Library sub-page -->
+  <div id="f-docs" class="sub-body" style="display:none">
+    <div class="cs">
+      <div class="cs-ttl">📁 Document Library</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">All standard Student Life forms and policy documents in one place. Click any document to open or download.</p>
+      <div class="flr"><div class="flr-ico">📄</div><div><div class="flr-t">Permission slip template</div><div class="flr-d">Standard field trip permission form</div></div><div class="flr-arr">↓</div></div>
+      <div class="flr"><div class="flr-ico">📄</div><div><div class="flr-t">Club budget request form</div><div class="flr-d">Annual funding request template</div></div><div class="flr-arr">↓</div></div>
+      <div class="flr"><div class="flr-ico">📄</div><div><div class="flr-t">Community service verification form</div><div class="flr-d">Supervisor sign-off sheet for students</div></div><div class="flr-arr">↓</div></div>
+      <div class="flr"><div class="flr-ico">📄</div><div><div class="flr-t">Club advisor handbook 2026–27</div><div class="flr-d">Policies, deadlines, responsibilities</div></div><div class="flr-arr">↓</div></div>
+      <div class="flr"><div class="flr-ico">📄</div><div><div class="flr-t">Student Life policy guide</div><div class="flr-d">Full policies for students &amp; staff</div></div><div class="flr-arr">↓</div></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">OBHS Student Life &nbsp;·&nbsp; Old Bridge High School</span>
+    <div class="footer-links">
+      <button class="footer-link" onclick="nav('home',document.querySelector('.nav-btn'))">Home</button>
+      <button class="footer-link" onclick="nav('student',document.getElementById('s-tab'))">Student Hub</button>
+      <button class="footer-link">Contact Student Life</button>
+    </div>
+  </footer>
+
+</div><!-- /faculty -->
+
+
+<script>
+// ── CONFIG — paste your Google Sheet CSV URL here ──
+const SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7o0_FUyuW1Amalefxm-Yam4UHRbUbv619USaliAnL27vs22hCb5SDozsfq9CSDTMyDkLfKxlmAQkX/pub?gid=1447819289&single=true&output=csv';
+// Sheet must have tabs: "Announcements", "Events", "Dates", "QuickLinks", "Countdown"
+// See the included Google Sheets template for exact column format
+
+// ── Navigation ──
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Student sub-nav ──
+const sSubPages = ['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit'];
+function sSub(btn, id) {
+  document.querySelectorAll('#s-subnav .sn').forEach(b => b.classList.remove('active'));
+  if (btn && btn.classList) btn.classList.add('active');
+  sSubPages.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.style.display = p === id ? 'block' : 'none';
+  });
+}
+
+// ── Faculty sub-nav ──
+const fSubPages = ['f-overview','f-forms','f-clubs','f-announce','f-helpdesk','f-docs'];
+function fSub(btn, id) {
+  document.querySelectorAll('#f-subnav .sn').forEach(b => b.classList.remove('active'));
+  if (btn && btn.classList) btn.classList.add('active');
+  fSubPages.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.style.display = p === id ? 'block' : 'none';
+  });
+}
+
+// ── CSV parser ──
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  function splitLine(line) {
+    const res = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { res.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    res.push(cur.trim());
+    return res;
+  }
+  const hdrs = splitLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const vals = splitLine(line).map(v => v.replace(/^"|"$/g,'').trim());
+    const obj = {};
+    hdrs.forEach((h, i) => { obj[h] = vals[i] || ''; });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+// ── Fetch sheet tab ──
+async function fetchTab(tabName, gid) {
+  const url = SHEET.replace('gid=0', `gid=${gid}`);
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('fetch failed');
+  return parseCSV(await r.text());
+}
+
+// ── Badge color helper ──
+const BADGE_COLORS = {
+  'all students': 'background:#F0EEF8;color:#3D2680',
+  'seniors':      'background:#F0EEF8;color:#3D2680',
+  'juniors':      'background:#F0EEF8;color:#3D2680',
+  'sophomores':   'background:#F0EEF8;color:#3D2680',
+  'freshmen':     'background:#F0EEF8;color:#3D2680',
+  'club':         'background:#F5F5F5;color:#555',
+  'deadline':     'background:#F5F5F5;color:#555',
+  'faculty':      'background:#EDEDF2;color:#444',
+};
+function badgeStyle(tag) {
+  return BADGE_COLORS[(tag||'').toLowerCase()] || 'background:#F5F5F5;color:#555';
+}
+// Dot color per category
+const DOT_COLORS = {
+  'all students': '#3D2680', 'seniors': '#3D2680', 'juniors': '#2D1B69',
+  'sophomores': '#6B42C8', 'freshmen': '#9370DB',
+  'club': '#C0C0C0', 'deadline': '#888', 'faculty': '#444',
+};
+function dotColor(tag) {
+  return DOT_COLORS[(tag||'').toLowerCase()] || '#999';
+}
+
+// ── Render announcements ──
+function renderAnnouncements(rows) {
+  const list = document.getElementById('ann-list');
+  if (!rows.length) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No announcements right now.</p>';
+    return;
+  }
+  list.innerHTML = rows.slice(0, 5).map(r => `
+    <div class="ann-item">
+      <div class="ann-dot" style="background:${dotColor(r.TAG)}"></div>
+      <div class="ann-body">
+        <div class="ann-t">${r.TITLE}</div>
+        <div class="ann-m">${r.DATE}${r.SOURCE ? ' &nbsp;·&nbsp; ' + r.SOURCE : ''}</div>
+      </div>
+      <span class="ann-badge" style="${badgeStyle(r.TAG)}">${r.TAG}</span>
+    </div>
+  `).join('');
+}
+
+// ── Render events ──
+function renderEvents(rows) {
+  const list = document.getElementById('events-list');
+  if (!rows.length) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:16px">No upcoming events.</p>';
+    return;
+  }
+  list.innerHTML = rows.slice(0, 5).map(r => `
+    <div class="ev-row">
+      <div class="ev-date">
+        <div class="ev-mo">${r.MONTH}</div>
+        <div class="ev-dy">${r.DAY}</div>
+      </div>
+      <div>
+        <div class="ev-t">${r.TITLE}</div>
+        <div class="ev-sub">${r.TIME}${r.LOCATION ? ' &nbsp;·&nbsp; ' + r.LOCATION : ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Render key dates bar ──
+function renderDates(rows) {
+  const bar = document.getElementById('dates-bar');
+  if (!rows.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = rows.map(r =>
+    `<div class="date-chip">${r.EMOJI || '📅'} <span><strong>${r.DATE}</strong> &nbsp;${r.LABEL}</span></div>`
+  ).join('') + `<span class="dates-updated">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
+}
+
+// ── Render quick links ──
+function renderQuickLinks(rows) {
+  const list = document.getElementById('quick-links-list');
+  if (!rows.length) { list.innerHTML = ''; return; }
+  list.innerHTML = rows.map(r => `
+    <button class="ql" onclick="window.open('${r.URL}','_blank')">
+      <span class="ql-ico">${r.EMOJI || '🔗'}</span>${r.LABEL}<span class="ql-arr">→</span>
+    </button>
+  `).join('');
+}
+
+// ── Render countdown ──
+function setupCountdown(rows) {
+  if (!rows.length) return;
+  const r = rows[0];
+  document.getElementById('cd-label').textContent = r.LABEL || 'Countdown';
+  const target = new Date(r.TARGET_DATE + 'T23:59:00');
+  function tick() {
+    const diff = target - new Date();
+    if (diff <= 0) {
+      ['cd-d','cd-h','cd-m'].forEach(id => document.getElementById(id).textContent = '00');
+      return;
+    }
+    document.getElementById('cd-d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+    document.getElementById('cd-h').textContent = String(Math.floor(diff%86400000/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick, 30000);
+}
+
+// ── Fallback data (shown if Sheet not yet connected) ──
+function loadFallback() {
+  renderAnnouncements([
+    {TITLE:'Final Exam Schedule — Rooms & Procedures', DATE:'Jun 10', SOURCE:'Student Life', TAG:'All Students'},
+    {TITLE:'Hope Squad Final Meeting — Today at 12:40 PM', DATE:'Jun 10', SOURCE:'Clubs', TAG:'Club'},
+    {TITLE:'Senior Awards Night — Volunteer Sign-Ups Open', DATE:'Jun 9', SOURCE:'Student Life', TAG:'Seniors'},
+    {TITLE:'Class Ring Orders Due June 13th', DATE:'Jun 8', SOURCE:'Juniors', TAG:'Deadline'},
+  ]);
+  renderEvents([
+    {MONTH:'JUN', DAY:'10', TITLE:'Hope Squad Final Meeting', TIME:'12:40 PM', LOCATION:'Student Life Office'},
+    {MONTH:'JUN', DAY:'15', TITLE:'Final Exams Begin', TIME:'All day', LOCATION:'Various rooms'},
+    {MONTH:'JUN', DAY:'19', TITLE:'Last Day of School (B-Day)', TIME:'Regular schedule', LOCATION:''},
+    {MONTH:'JUN', DAY:'23', TITLE:'Graduation Ceremony', TIME:'TBD', LOCATION:'Main Gymnasium'},
+  ]);
+  renderDates([
+    {EMOJI:'📅', DATE:'Jun 15–18', LABEL:'Final Exams'},
+    {EMOJI:'🎓', DATE:'Jun 19', LABEL:'Last Day of School'},
+    {EMOJI:'🏆', DATE:'Jun 23', LABEL:'Graduation'},
+  ]);
+  renderQuickLinks([
+    {EMOJI:'🤝', LABEL:'Submit service hours', URL:'#'},
+    {EMOJI:'🚌', LABEL:'Field trip forms', URL:'#'},
+    {EMOJI:'📋', LABEL:'Sign up for events', URL:'#'},
+    {EMOJI:'🎽', LABEL:'Spirit wear', URL:'#'},
+    {EMOJI:'🛟', LABEL:'Help desk', URL:'#'},
+  ]);
+  setupCountdown([{LABEL:'Days until last day of school', TARGET_DATE:'2026-06-19'}]);
+}
+
+// ── Main load ──
+// GIDs are the tab IDs in your Google Sheet — update these after creating the sheet
+const GIDS = {
+  announcements: '1447819289',
+  events:        '424739582',
+  dates:         '979441454',
+  quicklinks:    '605046719',
+  countdown:     '1732793405',
+};
+
+async function loadFromSheet() {
+  try {
+    const [ann, evt, dates, ql, cd] = await Promise.all([
+      fetchTab('Announcements', GIDS.announcements),
+      fetchTab('Events',        GIDS.events),
+      fetchTab('Dates',         GIDS.dates),
+      fetchTab('QuickLinks',    GIDS.quicklinks),
+      fetchTab('Countdown',     GIDS.countdown),
+    ]);
+    renderAnnouncements(ann);
+    renderEvents(evt);
+    renderDates(dates);
+    renderQuickLinks(ql);
+    setupCountdown(cd);
+  } catch(e) {
+    console.warn('Sheet not connected — using fallback data', e);
+    loadFallback();
+  }
+}
+
+// Load on start
+if (SHEET.includes('YOUR_SHEET_ID')) {
+  loadFallback();
+} else {
+  loadFromSheet();
+}
+</script>
+</body>
+</html>
