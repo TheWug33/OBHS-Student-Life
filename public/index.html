@@ -361,11 +361,14 @@ img{max-width:100%;}
       </div>
 
       <div>
-        <div class="blk-head"><span class="blk-title" style="font-size:11px">Recent Flyers</span></div>
-        <div class="flyer-row">
-          <div class="ft ft1">Debate</div>
-          <div class="ft ft2">Choir</div>
-          <div class="ft ft3">Summer</div>
+        <div class="blk-head">
+          <span class="blk-title" style="font-size:11px">Recent Flyers</span>
+          <button class="blk-link" onclick="window.open('FLYER_FORM_URL','_blank')">Submit a flyer →</button>
+        </div>
+        <div class="flyer-row" id="flyer-row">
+          <div class="ft ft1">Loading…</div>
+          <div class="ft ft2"></div>
+          <div class="ft ft3"></div>
         </div>
       </div>
 
@@ -947,10 +950,30 @@ function renderDates(rows) {
 function renderQuickLinks(rows) {
   const list = document.getElementById('quick-links-list');
   if (!rows.length) { list.innerHTML = ''; return; }
-  const cleanQl = rows.filter(r => r.LABEL && r.URL && !r.URL.includes('PASTE YOUR'));
+  // Filter out placeholders AND the MS Forms DesignPage editing URLs (not share links)
+  const cleanQl = rows.filter(r =>
+    r.LABEL && r.URL &&
+    !r.URL.includes('PASTE YOUR') &&
+    !r.URL.includes('DesignPageV2') &&
+    r.URL.trim() !== '' && r.URL.trim() !== '#'
+  );
+  const QL_EMOJIS = {
+    'service':'🤝','community':'🤝','hours':'🤝',
+    'field trip':'🚌','trip':'🚌',
+    'event':'📋','sign up':'📋','signup':'📋',
+    'spirit':'🎽','wear':'🎽',
+    'help':'🛟','desk':'🛟','it':'🛟',
+    'announcement':'📢','meeting':'📢',
+    'club':'🏫','flyer':'🖨️',
+  };
+  function qlEmoji(label) {
+    const l = (label||'').toLowerCase();
+    for (const [k,e] of Object.entries(QL_EMOJIS)) { if (l.includes(k)) return e; }
+    return '🔗';
+  }
   list.innerHTML = cleanQl.map(r => {
-    const emoji = r.EMOJI && r.EMOJI.trim() ? r.EMOJI : '🔗';
-    return `<button class="ql" onclick="window.open('${r.URL}','_blank')">${emoji ? '<span class="ql-ico">' + emoji + '</span>' : ''}${r.LABEL}<span class="ql-arr">→</span></button>`;
+    const emoji = (r.EMOJI && r.EMOJI.trim() && r.EMOJI.length <= 4) ? r.EMOJI : qlEmoji(r.LABEL);
+    return `<button class="ql" onclick="window.open('${r.URL}','_blank')"><span class="ql-ico">${emoji}</span>${r.LABEL}<span class="ql-arr">→</span></button>`;
   }).join('');
 }
 
@@ -1070,26 +1093,55 @@ const GIDS = {
   dates:         '979441454',
   quicklinks:    '605046719',
   countdown:     '1732793405',
+  flyers:        'FLYERS_GID', // ← replace with your Flyers tab GID after adding it
 };
 
 async function loadFromSheet() {
   try {
-    const [ann, evt, dates, ql] = await Promise.all([
+    const [ann, evt, dates, ql, flyers] = await Promise.all([
       fetchTab('Announcements', GIDS.announcements),
       fetchTab('Events',        GIDS.events),
       fetchTab('Dates',         GIDS.dates),
       fetchTab('QuickLinks',    GIDS.quicklinks),
+      fetchTab('Flyers',        GIDS.flyers),
     ]);
     renderAnnouncements(ann);
     renderEvents(evt);
     renderDates(dates);
     renderQuickLinks(ql);
+    renderFlyers(flyers);
     // Fetch countdown tab raw — parse manually to avoid header detection issues
     await fetchCountdownRaw(GIDS.countdown);
   } catch(e) {
     console.warn('Sheet not connected — using fallback data', e);
     loadFallback();
   }
+}
+
+// ── Render flyers ──
+function renderFlyers(rows) {
+  const row = document.getElementById('flyer-row');
+  if (!row) return;
+  // Filter valid rows — need at least a TITLE and IMAGE_URL
+  const clean = rows.filter(r =>
+    r.TITLE && !r.TITLE.includes('ADD') &&
+    r.IMAGE_URL && r.IMAGE_URL.startsWith('http')
+  ).slice(0, 6); // max 6 flyers shown
+  if (!clean.length) {
+    row.innerHTML = '<div class="ft ft1" style="font-size:10px;padding:8px">Flyers appear here once submitted</div>';
+    return;
+  }
+  row.style.gridTemplateColumns = `repeat(${Math.min(clean.length, 3)}, 1fr)`;
+  row.innerHTML = clean.map(r => `
+    <div class="ft" style="background:#1a1a2e;cursor:pointer;padding:0;overflow:hidden;position:relative"
+         onclick="window.open('${r.LINK_URL || r.IMAGE_URL}','_blank')"
+         title="${r.TITLE}">
+      <img src="${r.IMAGE_URL}" alt="${r.TITLE}"
+           style="width:100%;height:100%;object-fit:cover;display:block"
+           onerror="this.parentElement.innerHTML='<div style=\'padding:8px;font-size:9px\'>${r.TITLE}</div>'">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 6px 4px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,0.7)">${r.TITLE}</div>
+    </div>
+  `).join('');
 }
 
 // Load on start
