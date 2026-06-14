@@ -955,6 +955,37 @@ function renderQuickLinks(rows) {
 }
 
 // ── Render countdown ──
+// ── Fetch countdown tab raw ──
+// Reads the CSV directly, finds the first row that looks like YYYY-MM-DD
+async function fetchCountdownRaw(gid) {
+  try {
+    const url = SHEET.replace('gid=1447819289', 'gid=' + gid);
+    const r = await fetch(url);
+    const text = await r.text();
+    console.log('[Countdown] raw CSV:', text);
+    const lines = text.trim().split('\n').map(l => l.replace(/"/g,'').trim());
+    console.log('[Countdown] lines:', lines);
+    // Find a line containing a date pattern YYYY-MM-DD
+    for (const line of lines) {
+      const dateMatch = line.match(/(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        const parts = line.split(',').map(p => p.trim().replace(/"/g,''));
+        const label = parts[0] || 'Countdown';
+        const dateStr = dateMatch[1];
+        console.log('[Countdown] found date:', dateStr, 'label:', label);
+        setupCountdown([{ LABEL: label, TARGET_DATE: dateStr }]);
+        return;
+      }
+    }
+    console.warn('[Countdown] no date found in CSV');
+    // Fallback
+    setupCountdown([{ LABEL: 'Days until Graduation', TARGET_DATE: '2026-06-23' }]);
+  } catch(e) {
+    console.error('[Countdown] fetch error:', e);
+    setupCountdown([{ LABEL: 'Days until Graduation', TARGET_DATE: '2026-06-23' }]);
+  }
+}
+
 function setupCountdown(rows) {
   console.log('[Countdown] raw rows:', JSON.stringify(rows));
   if (!rows.length) { console.warn('[Countdown] no rows received'); return; }
@@ -1043,18 +1074,18 @@ const GIDS = {
 
 async function loadFromSheet() {
   try {
-    const [ann, evt, dates, ql, cd] = await Promise.all([
+    const [ann, evt, dates, ql] = await Promise.all([
       fetchTab('Announcements', GIDS.announcements),
       fetchTab('Events',        GIDS.events),
       fetchTab('Dates',         GIDS.dates),
       fetchTab('QuickLinks',    GIDS.quicklinks),
-      fetchTab('Countdown',     GIDS.countdown),
     ]);
     renderAnnouncements(ann);
     renderEvents(evt);
     renderDates(dates);
     renderQuickLinks(ql);
-    setupCountdown(cd);
+    // Fetch countdown tab raw — parse manually to avoid header detection issues
+    await fetchCountdownRaw(GIDS.countdown);
   } catch(e) {
     console.warn('Sheet not connected — using fallback data', e);
     loadFallback();
