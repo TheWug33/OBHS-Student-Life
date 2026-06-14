@@ -816,6 +816,9 @@ function fSub(btn, id) {
 }
 
 // ── CSV parser ──
+// Auto-detects the real header row, skipping title/subtitle banner rows above it
+const KNOWN_HEADERS = ['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION',
+                       'EMOJI','LABEL','URL','TARGET_DATE'];
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
@@ -830,15 +833,21 @@ function parseCSV(text) {
     res.push(cur.trim());
     return res;
   }
-  const hdrs = splitLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(line => {
-    const vals = splitLine(line).map(v => v.replace(/^"|"$/g,'').trim());
+  function clean(v) { return v.replace(/^"|"$/g,'').trim(); }
+  // Find header row — first row where any cell matches a known column name
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(lines.length, 8); i++) {
+    const cells = splitLine(lines[i]).map(clean);
+    if (cells.some(c => KNOWN_HEADERS.includes(c))) { headerIdx = i; break; }
+  }
+  const hdrs = splitLine(lines[headerIdx]).map(clean);
+  return lines.slice(headerIdx + 1).map(line => {
+    const vals = splitLine(line).map(clean);
     const obj = {};
     hdrs.forEach((h, i) => { obj[h] = vals[i] || ''; });
     return obj;
   }).filter(r => Object.values(r).some(v => v));
 }
-
 // ── Fetch sheet tab ──
 async function fetchTab(tabName, gid) {
   const url = SHEET.replace('gid=0', `gid=${gid}`);
