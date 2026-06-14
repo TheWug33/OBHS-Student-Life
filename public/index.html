@@ -38,10 +38,11 @@ img{max-width:100%;}
 .sp-name{margin-left:auto;font-size:11px;color:rgba(255,255,255,.25);}
 
 /* ── Nav ── */
-.site-nav{background:var(--purple);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.06);}
-.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:14px 0;margin-right:32px;white-space:nowrap;display:flex;align-items:center;gap:10px;}
+.site-nav{background:var(--purple);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:14px 0;margin-right:24px;white-space:nowrap;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .nav-brand-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);opacity:.6;}
-.nav-btn{padding:16px 14px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);background:none;border:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;letter-spacing:.01em;}
+.nav-btn{padding:16px 14px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);background:none;border:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;letter-spacing:.01em;flex-shrink:0;}
 .nav-btn:hover{color:rgba(255,255,255,.85);}
 .nav-btn.active{color:#fff;border-bottom-color:var(--silver);}
 .nav-edit{margin-left:auto;font-size:11px;color:rgba(255,255,255,.2);background:none;border:none;display:none;}
@@ -241,10 +242,10 @@ img{max-width:100%;}
 
 <!-- Nav -->
 <nav class="site-nav">
-  <div class="nav-brand">
+  <button class="nav-brand" onclick="nav('home',document.querySelector('.nav-btn'))" style="background:none;border:none;text-align:left;padding:14px 0;cursor:pointer;">
     <div class="nav-brand-dot"></div>
     OBHS Student Life
-  </div>
+  </button>
   <button class="nav-btn active" onclick="nav('home',this)">Home</button>
   <button class="nav-btn" id="s-tab" onclick="nav('student',this)">Student Hub</button>
   <button class="nav-btn" id="f-tab" onclick="nav('faculty',this)">Faculty Hub</button>
@@ -951,12 +952,16 @@ function renderQuickLinks(rows) {
   const list = document.getElementById('quick-links-list');
   if (!rows.length) { list.innerHTML = ''; return; }
   // Filter out placeholders AND the MS Forms DesignPage editing URLs (not share links)
-  const cleanQl = rows.filter(r =>
-    r.LABEL && r.URL &&
-    !r.URL.includes('PASTE YOUR') &&
-    !r.URL.includes('DesignPageV2') &&
-    r.URL.trim() !== '' && r.URL.trim() !== '#'
-  );
+  // Also handle Google Sheets hyperlink cells which may export as "label (url)" format
+  const cleanQl = rows.filter(r => {
+    if (!r.LABEL) return false;
+    let url = (r.URL || '').trim();
+    // Google Sheets sometimes exports hyperlinks as "Display Text" with no URL column
+    // In that case the URL col may contain the display text — skip those
+    if (!url || url === '#' || url.includes('PASTE YOUR') || url.includes('DesignPageV2')) return false;
+    if (!url.startsWith('http')) return false;
+    return true;
+  });
   const QL_EMOJIS = {
     'service':'🤝','community':'🤝','hours':'🤝',
     'field trip':'🚌','trip':'🚌',
@@ -970,6 +975,16 @@ function renderQuickLinks(rows) {
     const l = (label||'').toLowerCase();
     for (const [k,e] of Object.entries(QL_EMOJIS)) { if (l.includes(k)) return e; }
     return '🔗';
+  }
+  if (!cleanQl.length) {
+    // Sheet connected but no valid links — show hardcoded fallback
+    list.innerHTML = `
+      <button class="ql" onclick="window.open('${CS_URL}','_blank')"><span class="ql-ico">🤝</span>Submit service hours<span class="ql-arr">→</span></button>
+      <button class="ql" style="opacity:0.4;cursor:default"><span class="ql-ico">🚌</span>Field trip forms<span class="ql-arr" style="font-size:10px">Soon</span></button>
+      <button class="ql" style="opacity:0.4;cursor:default"><span class="ql-ico">🎽</span>Spirit wear<span class="ql-arr" style="font-size:10px">Soon</span></button>
+      <button class="ql" style="opacity:0.4;cursor:default"><span class="ql-ico">🛟</span>Help desk<span class="ql-arr" style="font-size:10px">Soon</span></button>
+    `.replace('${CS_URL}', 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7bKCJrldMUOOD8M0xrkhaIu1IRdxhJtFsyzwNwmeVSJUM0hISURUSEpFUE8yV0FDVkRCQlhCNEo3SC4u');
+    return;
   }
   list.innerHTML = cleanQl.map(r => {
     const emoji = (r.EMOJI && r.EMOJI.trim() && r.EMOJI.length <= 4) ? r.EMOJI : qlEmoji(r.LABEL);
