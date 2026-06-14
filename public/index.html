@@ -956,13 +956,38 @@ function renderQuickLinks(rows) {
 
 // ── Render countdown ──
 function setupCountdown(rows) {
-  if (!rows.length) return;
-  // Use first row that has a valid TARGET_DATE
-  const validRows = rows.filter(r => r.TARGET_DATE && r.TARGET_DATE.match(/\d{4}-\d{2}-\d{2}/));
-  if (!validRows.length) return;
-  const r = validRows[0];
+  console.log('[Countdown] raw rows:', JSON.stringify(rows));
+  if (!rows.length) { console.warn('[Countdown] no rows received'); return; }
+
+  // Try to find a row with TARGET_DATE — accept with or without dashes, trim whitespace
+  let r = null;
+  for (const row of rows) {
+    console.log('[Countdown] checking row:', JSON.stringify(row));
+    const keys = Object.keys(row);
+    // Find the TARGET_DATE value regardless of key casing or extra spaces
+    const tdKey = keys.find(k => k.replace(/\s/g,'').toUpperCase() === 'TARGET_DATE');
+    const lbKey = keys.find(k => k.replace(/\s/g,'').toUpperCase() === 'LABEL');
+    if (tdKey && row[tdKey] && row[tdKey].trim()) {
+      r = { LABEL: lbKey ? row[lbKey] : '', TARGET_DATE: row[tdKey].trim() };
+      break;
+    }
+  }
+
+  if (!r) { console.warn('[Countdown] no valid TARGET_DATE found in any row'); return; }
+  console.log('[Countdown] using:', JSON.stringify(r));
+
   document.getElementById('cd-label').textContent = r.LABEL || 'Countdown';
-  const target = new Date(r.TARGET_DATE + 'T23:59:00');
+
+  // Parse date — handle YYYY-MM-DD or MM/DD/YYYY or any format Date can read
+  const dateStr = r.TARGET_DATE.includes('-') ? r.TARGET_DATE + 'T23:59:00' : r.TARGET_DATE;
+  const target = new Date(dateStr);
+  console.log('[Countdown] target date:', target.toString());
+
+  if (isNaN(target.getTime())) {
+    console.error('[Countdown] invalid date:', r.TARGET_DATE);
+    return;
+  }
+
   function tick() {
     const diff = target - new Date();
     if (diff <= 0) {
