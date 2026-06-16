@@ -334,10 +334,10 @@ img{max-width:100%;display:block;}
     <div class="hero-inner">
       <p class="hero-eyebrow">Old Bridge High School · Student Life</p>
       <h1 class="hero-title">
-        <span class="l1">Your School.</span>
-        <span class="l2"><span>Your Story.</span></span>
+        <span class="l1" id="hero-l1">Your School.</span>
+        <span class="l2" id="hero-l2"><span>Your Story.</span></span>
       </h1>
-      <p class="hero-sub">Events · Clubs · Announcements · Resources</p>
+      <p class="hero-sub" id="hero-sub">Events · Clubs · Announcements · Resources</p>
     </div>
   </section>
 
@@ -449,8 +449,8 @@ img{max-width:100%;display:block;}
     <div class="sub-hero-rule"></div>
     <div class="sub-hero-body">
       <p class="sub-eyebrow">OBHS Student Life</p>
-      <h1 class="sub-title"><span class="metal">Student</span> Hub</h1>
-      <p class="sub-desc">Clubs, events, service hours, leadership committees, and everything student life.</p>
+      <h1 class="sub-title"><span class="metal">Student</span> <span id="s-hub-title">Hub</span></h1>
+      <p class="sub-desc" id="s-hub-desc">Clubs, events, service hours, leadership committees, and everything student life.</p>
     </div>
   </section>
 
@@ -487,7 +487,7 @@ img{max-width:100%;display:block;}
       </div>
       <div class="cs">
         <div class="cs-ttl">🤝 Community Service</div>
-        <div class="info"><div class="info-t">Class of 2030 onward — 10 hrs/year required</div><div class="info-d">Complete hours at any district-approved organization and submit your verification form here.</div></div>
+        <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span> onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Complete hours at any district-approved organization and submit your verification form here.</div></div>
         <div class="flr" onclick="window.open(CS_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Submit service hours</div><div class="flr-d">Upload verification &amp; log hours</div></div><div class="flr-arr">→</div></div>
         <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">View my hours</div><div class="flr-d">Check your running total</div></div><div class="flr-arr">→</div></div>
         <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Approved organizations list</div><div class="flr-d">See what qualifies for credit</div></div><div class="flr-arr">→</div></div>
@@ -506,7 +506,7 @@ img{max-width:100%;display:block;}
     <div class="two">
       <div class="cs">
         <div class="cs-ttl">🤝 Submit Your Hours</div>
-        <div class="info"><div class="info-t">Class of 2030 onward — 10 hrs/year required</div><div class="info-d">Phase-in begins with the Class of 2030. Complete hours at any district-approved organization and submit verification within 2 weeks.</div></div>
+        <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span> onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Phase-in begins with the Class of 2030. Complete hours at any district-approved organization and submit verification within 2 weeks.</div></div>
         <div class="flr" onclick="window.open(CS_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Submit service hours form</div><div class="flr-d">Upload your supervisor verification</div></div><div class="flr-arr">→</div></div>
         <div class="flr"><div class="flr-ico">📊</div><div><div class="flr-t">View my running total</div><div class="flr-d">Track progress toward 10 hrs</div></div><div class="flr-arr">→</div></div>
         <div class="flr"><div class="flr-ico">🏆</div><div><div class="flr-t">Recognition &amp; cords</div><div class="flr-d">Students exceeding hours earn recognition at Senior Awards Night</div></div><div class="flr-arr">→</div></div>
@@ -616,8 +616,8 @@ img{max-width:100%;display:block;}
     <div class="sub-hero-rule"></div>
     <div class="sub-hero-body">
       <p class="sub-eyebrow">OBHS Student Life</p>
-      <h1 class="sub-title"><span class="metal">Faculty</span> Hub</h1>
-      <p class="sub-desc">Forms, resources, and tools to keep your school year running smoothly.</p>
+      <h1 class="sub-title"><span class="metal">Faculty</span> <span id="f-hub-title">Hub</span></h1>
+      <p class="sub-desc" id="f-hub-desc">Forms, resources, and tools to keep your school year running smoothly.</p>
     </div>
   </section>
 
@@ -698,7 +698,7 @@ img{max-width:100%;display:block;}
       <div class="flr" onclick="window.open(IT_URL,'_blank')"><div class="flr-ico">💻</div><div><div class="flr-t">Submit an IT work order</div><div class="flr-d">Hardware, software, network issues</div></div><div class="flr-arr">→</div></div>
       <div class="flr"><div class="flr-ico">🏫</div><div><div class="flr-t">Room setup request</div><div class="flr-d">Furniture, seating arrangements</div></div><div class="flr-arr">→</div></div>
       <div class="flr"><div class="flr-ico">📽️</div><div><div class="flr-t">AV equipment reservation</div><div class="flr-d">Projectors, microphones, screens</div></div><div class="flr-arr">→</div></div>
-      <div class="flr"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d">Room 845 · Mr. Beverly</div></div><div class="flr-arr">→</div></div>
+      <div class="flr"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d contact-info">Room 845 · Mr. Beverly</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
 
@@ -722,17 +722,97 @@ img{max-width:100%;display:block;}
 
 
 <script>
-// ── CONFIG ──
+// ══════════════════════════════════════════════════════
+// SITE SETTINGS — edit these without touching anything else
+// ══════════════════════════════════════════════════════
+
+// ── GOOGLE SHEET CONNECTION ──
+// The published CSV URL for your Google Sheet (Announcements tab)
 const SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7o0_FUyuW1Amalefxm-Yam4UHRbUbv619USaliAnL27vs22hCb5SDozsfq9CSDTMyDkLfKxlmAQkX/pub?gid=1447819289&single=true&output=csv';
-const GIDS = {announcements:'1447819289',events:'424739582',dates:'979441454',quicklinks:'605046719',countdown:'1732793405',flyers:'FLYERS_GID'};
-const CS_URL = 'https://forms.cloud.microsoft/r/AWSrYfCzya';
-const EVT_URL = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';
-const IT_URL = 'https://nj8.mlworkorders.com/Login.aspx';
-const CLUB_URL = 'https://obhs-student-life-6p9z.vercel.app';
+
+// Tab GIDs — find these in the URL when you click each tab in Google Sheets
+const GIDS = {
+  announcements: '1447819289',
+  events:        '424739582',
+  dates:         '979441454',
+  quicklinks:    '605046719',
+  countdown:     '1732793405',
+  flyers:        'FLYERS_GID', // ← replace after setting up flyer tab
+};
+
+// ── FORM LINKS ──
+// Replace any of these with new URLs as needed — no other code changes required
+const CS_URL        = 'https://forms.cloud.microsoft/r/AWSrYfCzya';   // Community service hours form
+const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty event/meeting submission
+const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
+const CLUB_URL      = 'https://obhs-student-life-6p9z.vercel.app';     // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
+
+// ── HERO TEXT ──
+// The big heading and tagline on the homepage
+const HERO_LINE1 = 'Your School.';
+const HERO_LINE2 = 'Your Story.';
+const HERO_SUB   = 'Events · Clubs · Announcements · Resources';
+
+// ── SITE NAME ──
+// Appears in the nav bar and browser tab
+const SITE_NAME = 'OBHS Student Life';
+const SITE_FULL = 'Old Bridge High School · Student Life';
+
+// ── STUDENT HUB ──
+const S_HUB_TITLE = 'Student Hub';
+const S_HUB_DESC  = 'Clubs, events, service hours, leadership committees, and everything student life.';
+
+// ── FACULTY HUB ──
+const F_HUB_TITLE = 'Faculty Hub';
+const F_HUB_DESC  = 'Forms, resources, and tools to keep your school year running smoothly.';
+
+// ── CONTACT ──
+// Shown on the Help Desk page and footer links
+const CONTACT_ROOM    = 'Room 845';
+const CONTACT_NAME    = 'Mr. Beverly';
+
+// ── COMMUNITY SERVICE ──
+const CS_CLASS_START  = 'Class of 2030'; // First class required to complete service hours
+const CS_HOURS        = '10';            // Hours required per year
+
+// ══════════════════════════════════════════════════════
+// END OF SETTINGS — don't edit below unless you're comfortable with code
+// ══════════════════════════════════════════════════════
+
+// ── Apply settings to DOM ──
+function applySettings() {
+  // Hero text
+  const l1 = document.getElementById('hero-l1');
+  const l2 = document.getElementById('hero-l2');
+  const sub = document.getElementById('hero-sub');
+  if (l1) l1.textContent = HERO_LINE1;
+  if (l2) l2.textContent = HERO_LINE2;
+  if (sub) sub.textContent = HERO_SUB;
+  // Site name
+  document.querySelectorAll('.nav-wordmark').forEach(el => el.textContent = SITE_NAME);
+  document.querySelectorAll('.hero-eyebrow').forEach(el => el.textContent = SITE_FULL);
+  document.title = SITE_NAME;
+  // Hub titles/descs
+  const st = document.getElementById('s-hub-title');
+  const sd = document.getElementById('s-hub-desc');
+  const ft = document.getElementById('f-hub-title');
+  const fd = document.getElementById('f-hub-desc');
+  if (st) st.textContent = S_HUB_TITLE;
+  if (sd) sd.textContent = S_HUB_DESC;
+  if (ft) ft.textContent = F_HUB_TITLE;
+  if (fd) fd.textContent = F_HUB_DESC;
+  // Contact info
+  document.querySelectorAll('.contact-info').forEach(el =>
+    el.textContent = CONTACT_ROOM + ' · ' + CONTACT_NAME);
+  // Community service wording
+  document.querySelectorAll('.cs-class-start').forEach(el => el.textContent = CS_CLASS_START);
+  document.querySelectorAll('.cs-hours').forEach(el => el.textContent = CS_HOURS + ' hrs');
+}
 
 // ── Veil dismiss ──
 window.addEventListener('load', () => {
+  applySettings();
   setTimeout(() => document.getElementById('veil').classList.add('gone'), 500);
 });
 
