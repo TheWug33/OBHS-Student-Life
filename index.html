@@ -893,21 +893,33 @@ function renderEv(rows){
 
   // Parse each row into a sortable date and filter out past events
   const upcoming=clean.map(r=>{
-    const mo=MONTH_NUM[(r.MONTH||'').trim().toUpperCase()];
-    const dy=parseInt(r.DAY)||1;
-    // Guess the year — if this month/day has already passed this year, assume next year
-    let yr=currentYear;
-    if(mo!==undefined){
-      const evDate=new Date(yr,mo,dy);
-      if(evDate<today) yr=currentYear+1;
-      r._date=new Date(yr,mo,dy);
-    } else {
-      r._date=new Date(9999,0,1); // unknown date — push to end
+    // DAY might be a full date string like "6/19/2026" — extract just the day number
+    const rawDay = (r.DAY||'').toString().trim();
+    const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
+    // MONTH might be missing if column alignment is off — try to recover from DAY string
+    let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
+    if(!rawMonth && rawDay.includes('/')) {
+      // Full date in DAY column — extract month from it
+      const mNum = parseInt(rawDay.split('/')[0]) - 1;
+      rawMonth = Object.keys(MONTH_NUM).find(k => MONTH_NUM[k] === mNum) || '';
     }
+    const mo = MONTH_NUM[rawMonth];
+    let yr = currentYear;
+    if(mo !== undefined){
+      const evDate = new Date(yr, mo, dy);
+      if(evDate < today) yr = currentYear + 1;
+      r._date = new Date(yr, mo, dy);
+      // Fix display values in case they came in wrong
+      if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,3);
+      if(rawDay.includes('/')) r.DAY = String(dy);
+    } else {
+      r._date = new Date(9999, 0, 1);
+    }
+    console.log('[Events] row:', r.TITLE, '| MONTH:', r.MONTH, '| DAY:', r.DAY, '| date:', r._date, '| past:', r._date < today);
     return r;
-  }).filter(r=>r._date>=today)
-    .sort((a,b)=>a._date-b._date)
-    .slice(0,8); // show next 8
+  }).filter(r => r._date >= today)
+    .sort((a,b) => a._date - b._date)
+    .slice(0, 8); // show next 8
 
   if(!upcoming.length){
     el.innerHTML='<div class="ev" style="padding:16px"><div style="font-size:13px;color:var(--faint)">No upcoming events. Check back soon.</div></div>';
