@@ -900,7 +900,20 @@ function parseCSV(text){
   const hdrs=split(lines[hi]).map(clean);
   return lines.slice(hi+1).map(line=>{const vals=split(line).map(clean);const o={};hdrs.forEach((h,i)=>o[h]=vals[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
 }
-async function fetchTab(gid){const url=SHEET.replace('gid=1447819289','gid='+gid);const r=await fetch(url);if(!r.ok)throw new Error('fail');return parseCSV(await r.text());}
+async function fetchTab(gid){
+  try{
+    const url=SHEET.replace('gid=1447819289','gid='+gid);
+    const r=await fetch(url);
+    if(!r.ok){console.warn('[fetchTab] HTTP error for gid='+gid+' status='+r.status);return[];}
+    const text=await r.text();
+    const rows=parseCSV(text);
+    console.log('[fetchTab] gid='+gid+' rows='+rows.length);
+    return rows;
+  }catch(e){
+    console.warn('[fetchTab] failed for gid='+gid,e);
+    return[];
+  }
+}
 
 // ── Renderers ──
 const DOT={'all students':'#5B3FC0','seniors':'#5B3FC0','juniors':'#3D2680','sophomores':'#7B5FD0','freshmen':'#9B7FE0','club':'#C7C9D1','deadline':'#8A8C98','faculty':'#6E6E80'};
@@ -1033,18 +1046,23 @@ function setupCD(label,dateStr){
 }
 
 // ── Load ──
+// Each tab fetches independently — one failure won't blank the others
 async function load(){
-  try{
-    const[ann,evt,dates,ql,flyers]=await Promise.all([fetchTab(GIDS.announcements),fetchTab(GIDS.events),fetchTab(GIDS.dates),fetchTab(GIDS.quicklinks),GIDS.flyers!=='FLYERS_GID'?fetchTab(GIDS.flyers):Promise.resolve([])]);
-    console.log('[Load] ann rows:',ann.length,'evt rows:',evt.length,'dates:',dates.length,'ql:',ql.length);
-    if(evt.length) console.log('[Load] first event row:', JSON.stringify(evt[0]));
-    renderAnn(ann);renderEv(evt);renderDates(dates);renderQL(ql);renderFlyers(flyers);
-    await fetchCountdown(GIDS.countdown);
-  }catch(e){
-    console.warn('Sheet load failed',e);
-    renderAnn([]);renderEv([]);renderDates([]);renderQL([]);renderFlyers([]);
-    setupCD('Days until Graduation','2026-06-23');
-  }
+  const [ann,evt,dates,ql,flyers] = await Promise.all([
+    fetchTab(GIDS.announcements),
+    fetchTab(GIDS.events),
+    fetchTab(GIDS.dates),
+    fetchTab(GIDS.quicklinks),
+    GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([])
+  ]);
+  console.log('[Load] ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
+  if(evt.length) console.log('[Load] first event row:', JSON.stringify(evt[0]));
+  try{renderAnn(ann);}catch(e){console.warn('[render] ann failed',e);}
+  try{renderEv(evt);}catch(e){console.warn('[render] ev failed',e);}
+  try{renderDates(dates);}catch(e){console.warn('[render] dates failed',e);}
+  try{renderQL(ql);}catch(e){console.warn('[render] ql failed',e);}
+  try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers failed',e);}
+  try{await fetchCountdown(GIDS.countdown);}catch(e){console.warn('[render] countdown failed',e);setupCD('Days until Graduation','2026-06-23');}
 }
 load();
 observeReveal();
