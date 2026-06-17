@@ -385,7 +385,7 @@ img{max-width:100%;display:block;}
         </div>
       </div>
       <div class="reveal">
-        <div class="blk-head"><span class="blk-title">Upcoming Events</span><button class="blk-link">Full calendar →</button></div>
+        <div class="blk-head"><span class="blk-title">Upcoming Events</span><button class="blk-link" onclick="openCal()">Full calendar →</button></div>
         <div class="ev-card" id="ev-list">
           <div class="skel" style="height:56px"></div>
           <div class="skel" style="height:56px"></div>
@@ -745,7 +745,7 @@ const GIDS = {
 const CS_URL        = 'https://forms.cloud.microsoft/r/AWSrYfCzya';   // Community service hours form
 const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty event/meeting submission
 const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
-const CLUB_URL      = 'https://obhs-student-life-6p9z.vercel.app';     // Club Hub
+const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 
 // ── HERO TEXT ──
@@ -843,6 +843,42 @@ function fsub(btn,id){document.querySelectorAll('#f-subnav .sn').forEach(b=>b.cl
 
 // ── Scroll reveal ──
 let revealObserver;
+// Full Calendar
+function openCal(){
+  const modal = document.getElementById('cal-modal');
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // Render ALL upcoming events (no slice limit)
+  const el = document.getElementById('cal-list');
+  if(!window._allEvents || !window._allEvents.length){
+    el.innerHTML = '<div style="font-size:13px;color:var(--faint);padding:16px">No upcoming events found.</div>';
+    return;
+  }
+  el.innerHTML = window._allEvents.map(r => `
+    <div style="background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:16px;">
+      <div style="width:48px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,#3D2680,#1A0A3D);border:1px solid var(--line-bright);border-radius:9px;padding:6px 4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);">${r.MONTH||''}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;">${r.DAY||''}</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;color:#fff;">${r.TITLE||''}</div>
+        <div style="font-size:11px;color:var(--faint);margin-top:2px;">${r.TIME||''}${r.LOCATION?' · '+r.LOCATION:''}</div>
+      </div>
+      ${r.ROSTER_URL && r.ROSTER_URL.startsWith('http') ?
+        `<a href="${r.ROSTER_URL}" target="_blank" style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--silver);opacity:.65;white-space:nowrap;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.65">Roster →</a>`
+        : ''}
+    </div>
+  `).join('');
+}
+function closeCal(){
+  document.getElementById('cal-modal').style.display='none';
+  document.body.style.overflow='';
+}
+// Close on background click
+document.getElementById('cal-modal').addEventListener('click', function(e){
+  if(e.target === this) closeCal();
+});
+
 function observeReveal(){
   if(!revealObserver){
     revealObserver=new IntersectionObserver((entries)=>{
@@ -853,7 +889,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -907,7 +943,10 @@ function renderEv(rows){
     let yr = currentYear;
     if(mo !== undefined){
       const evDate = new Date(yr, mo, dy);
-      if(evDate < today) yr = currentYear + 1;
+      // Only push to next year if event was more than 1 day ago
+      // This prevents yesterday's events from wrapping to next year
+      const oneDayAgo = new Date(today); oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      if(evDate < oneDayAgo) yr = currentYear + 1;
       r._date = new Date(yr, mo, dy);
       // Fix display values in case they came in wrong
       if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,3);
@@ -918,15 +957,17 @@ function renderEv(rows){
     console.log('[Events] row:', r.TITLE, '| MONTH:', r.MONTH, '| DAY:', r.DAY, '| date:', r._date, '| past:', r._date < today);
     return r;
   }).filter(r => r._date >= today)
-    .sort((a,b) => a._date - b._date)
-    .slice(0, 8); // show next 8
+    .sort((a,b) => a._date - b._date);
+  // Store all upcoming for the Full Calendar modal
+  window._allEvents = upcoming;
+  const upcoming8 = upcoming.slice(0, 8);
 
-  if(!upcoming.length){
+  if(!upcoming8.length){
     el.innerHTML='<div class="ev" style="padding:16px"><div style="font-size:13px;color:var(--faint)">No upcoming events. Check back soon.</div></div>';
     return;
   }
 
-  el.innerHTML=upcoming.map(r=>`
+  el.innerHTML=upcoming8.map(r=>`
     <div class="ev">
       <div class="ev-date">
         <div class="ev-mo">${r.MONTH||''}</div>
@@ -995,6 +1036,8 @@ function setupCD(label,dateStr){
 async function load(){
   try{
     const[ann,evt,dates,ql,flyers]=await Promise.all([fetchTab(GIDS.announcements),fetchTab(GIDS.events),fetchTab(GIDS.dates),fetchTab(GIDS.quicklinks),GIDS.flyers!=='FLYERS_GID'?fetchTab(GIDS.flyers):Promise.resolve([])]);
+    console.log('[Load] ann rows:',ann.length,'evt rows:',evt.length,'dates:',dates.length,'ql:',ql.length);
+    if(evt.length) console.log('[Load] first event row:', JSON.stringify(evt[0]));
     renderAnn(ann);renderEv(evt);renderDates(dates);renderQL(ql);renderFlyers(flyers);
     await fetchCountdown(GIDS.countdown);
   }catch(e){
@@ -1006,5 +1049,22 @@ async function load(){
 load();
 observeReveal();
 </script>
+
+<!-- Full Calendar Modal -->
+<div id="cal-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(10,4,24,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+        <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff">Full Calendar</h2>
+      </div>
+      <button onclick="closeCal()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;transition:background .2s;">✕ Close</button>
+    </div>
+    <div id="cal-list" style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:13px;color:var(--faint);padding:16px">Loading events…</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
