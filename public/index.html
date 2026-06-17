@@ -1267,8 +1267,7 @@ function chGetField(obj) {
 }
 
 function chParseCSV(text) {
-  const lines = text.trim().split('
-');
+  const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
   function splitLine(line) {
     const r = []; let cur = '', inQ = false;
