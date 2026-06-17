@@ -984,9 +984,7 @@ function go(id, btn) {
 
 // ── Sub-nav ──
 const sPages=['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit'];
-function ssub(btn,id){document.querySelectorAll('#s-subnav .sn').forEach(b=>b.classList.remove('active'));if(btn&&btn.classList)btn.classList.add('active');sPages.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display=p===id?'block':'none';});window.scrollTo({top:0,behavior:'instant'});}
 const fPages=['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
-function fsub(btn,id){document.querySelectorAll('#f-subnav .sn').forEach(b=>b.classList.remove('active'));if(btn&&btn.classList)btn.classList.add('active');fPages.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display=p===id?'block':'none';});window.scrollTo({top:0,behavior:'instant'});}
 
 // ── Scroll reveal ──
 let revealObserver;
@@ -1202,23 +1200,7 @@ function setupCD(label,dateStr){
 
 // ── Load ──
 // Each tab fetches independently — one failure won't blank the others
-async function load(){
-  const [ann,evt,dates,ql,flyers] = await Promise.all([
-    fetchTab(GIDS.announcements),
-    fetchTab(GIDS.events),
-    fetchTab(GIDS.dates),
-    fetchTab(GIDS.quicklinks),
-    GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([])
-  ]);
-  console.log('[Load] ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
-  if(evt.length) console.log('[Load] first event row:', JSON.stringify(evt[0]));
-  try{renderAnn(ann);}catch(e){console.warn('[render] ann failed',e);}
-  try{renderEv(evt);}catch(e){console.warn('[render] ev failed',e);}
-  try{renderDates(dates);}catch(e){console.warn('[render] dates failed',e);}
-  try{renderQL(ql);}catch(e){console.warn('[render] ql failed',e);}
-  try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers failed',e);}
-  try{await fetchCountdown(GIDS.countdown);}catch(e){console.warn('[render] countdown failed',e);setupCD('Days until Graduation','2026-06-23');}
-}
+
 async function load(){
   for(let attempt=1; attempt<=4; attempt++){
     const [ann,evt,dates,ql,flyers] = await Promise.all([
