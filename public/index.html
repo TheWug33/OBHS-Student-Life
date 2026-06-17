@@ -875,8 +875,10 @@ function closeCal(){
   document.body.style.overflow='';
 }
 // Close on background click
-document.getElementById('cal-modal').addEventListener('click', function(e){
-  if(e.target === this) closeCal();
+// cal-modal click-outside listener attached after DOM ready
+window.addEventListener('load', function(){
+  var cm = document.getElementById('cal-modal');
+  if(cm) cm.addEventListener('click', function(e){ if(e.target===this) closeCal(); });
 });
 
 function observeReveal(){
@@ -1070,6 +1072,45 @@ async function load(){
   try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers failed',e);}
   try{await fetchCountdown(GIDS.countdown);}catch(e){console.warn('[render] countdown failed',e);setupCD('Days until Graduation','2026-06-23');}
 }
+async function load(){
+  for(let attempt=1; attempt<=4; attempt++){
+    const [ann,evt,dates,ql,flyers] = await Promise.all([
+      fetchTab(GIDS.announcements),
+      fetchTab(GIDS.events),
+      fetchTab(GIDS.dates),
+      fetchTab(GIDS.quicklinks),
+      GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([])
+    ]);
+    const gotData = ann.length || evt.length || dates.length || ql.length;
+    console.log('[Load] attempt='+attempt+' ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
+    if(!gotData && attempt < 4){
+      await new Promise(r=>setTimeout(r, attempt*800));
+      continue;
+    }
+    window._lastAnn=ann; window._lastEvt=evt; window._lastDates=dates; window._lastQL=ql;
+    window._dataLoaded=true;
+    try{renderAnn(ann);}catch(e){console.warn('[render] ann',e);}
+    try{renderEv(evt);}catch(e){console.warn('[render] ev',e);}
+    try{renderDates(dates);}catch(e){console.warn('[render] dates',e);}
+    try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
+    try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers',e);}
+    try{await fetchCountdown(GIDS.countdown);}catch(e){setupCD('Days until Graduation','2026-06-23');}
+    break;
+  }
+}
+
+// Re-render cached data when navigating back to home
+const _goOrig=go;
+function go(id,btn){
+  _goOrig(id,btn);
+  if(id==='home'&&window._dataLoaded){
+    try{renderAnn(window._lastAnn||[]);}catch(e){}
+    try{renderEv(window._lastEvt||[]);}catch(e){}
+    try{renderDates(window._lastDates||[]);}catch(e){}
+    try{renderQL(window._lastQL||[]);}catch(e){}
+  }
+}
+
 load();
 observeReveal();
 </script>
