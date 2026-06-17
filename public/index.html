@@ -833,6 +833,13 @@ function go(id, btn) {
   else document.querySelector('[data-page='+id+']').classList.add('active');
   window.scrollTo({top:0,behavior:'instant'});
   setTimeout(observeReveal, 50);
+  // Re-render cached data when returning to home
+  if(id==='home' && window._dataLoaded){
+    try{renderAnn(window._lastAnn||[]);}catch(e){}
+    try{renderEv(window._lastEvt||[]);}catch(e){}
+    try{renderDates(window._lastDates||[]);}catch(e){}
+    try{renderQL(window._lastQL||[]);}catch(e){}
+  }
 }
 
 // ── Sub-nav ──
@@ -1099,17 +1106,7 @@ async function load(){
   }
 }
 
-// Re-render cached data when navigating back to home
-const _goOrig=go;
-function go(id,btn){
-  _goOrig(id,btn);
-  if(id==='home'&&window._dataLoaded){
-    try{renderAnn(window._lastAnn||[]);}catch(e){}
-    try{renderEv(window._lastEvt||[]);}catch(e){}
-    try{renderDates(window._lastDates||[]);}catch(e){}
-    try{renderQL(window._lastQL||[]);}catch(e){}
-  }
-}
+
 
 load();
 observeReveal();
