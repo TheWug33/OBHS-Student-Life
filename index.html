@@ -901,18 +901,47 @@ function parseCSV(text){
   return lines.slice(hi+1).map(line=>{const vals=split(line).map(clean);const o={};hdrs.forEach((h,i)=>o[h]=vals[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
 }
 async function fetchTab(gid){
+  const sheetUrl=SHEET.replace('gid=1447819289','gid='+gid);
+  // Strategy 1: direct fetch
   try{
-    const url=SHEET.replace('gid=1447819289','gid='+gid);
-    const r=await fetch(url);
-    if(!r.ok){console.warn('[fetchTab] HTTP error for gid='+gid+' status='+r.status);return[];}
-    const text=await r.text();
-    const rows=parseCSV(text);
-    console.log('[fetchTab] gid='+gid+' rows='+rows.length);
-    return rows;
-  }catch(e){
-    console.warn('[fetchTab] failed for gid='+gid,e);
-    return[];
-  }
+    const r=await fetch(sheetUrl,{cache:'no-store'});
+    if(r.ok){
+      const text=await r.text();
+      if(text&&text.length>10&&!text.includes('<!DOCTYPE')){
+        const rows=parseCSV(text);
+        console.log('[fetchTab] direct ok gid='+gid+' rows='+rows.length);
+        return rows;
+      }
+    }
+  }catch(e){console.warn('[fetchTab] direct failed gid='+gid,e.message);}
+  // Strategy 2: allorigins proxy
+  try{
+    const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(sheetUrl);
+    const r=await fetch(proxy,{cache:'no-store'});
+    if(r.ok){
+      const text=await r.text();
+      if(text&&text.length>10&&!text.includes('<!DOCTYPE')){
+        const rows=parseCSV(text);
+        console.log('[fetchTab] proxy ok gid='+gid+' rows='+rows.length);
+        return rows;
+      }
+    }
+  }catch(e){console.warn('[fetchTab] proxy failed gid='+gid,e.message);}
+  // Strategy 3: corsproxy.io
+  try{
+    const proxy2='https://corsproxy.io/?'+encodeURIComponent(sheetUrl);
+    const r=await fetch(proxy2,{cache:'no-store'});
+    if(r.ok){
+      const text=await r.text();
+      if(text&&text.length>10&&!text.includes('<!DOCTYPE')){
+        const rows=parseCSV(text);
+        console.log('[fetchTab] proxy2 ok gid='+gid+' rows='+rows.length);
+        return rows;
+      }
+    }
+  }catch(e){console.warn('[fetchTab] proxy2 failed gid='+gid,e.message);}
+  console.warn('[fetchTab] all strategies failed gid='+gid);
+  return[];
 }
 
 // ── Renderers ──
