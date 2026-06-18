@@ -498,98 +498,106 @@ img{max-width:100%;display:block;}
   </div>
 
   <div id="s-clubs" class="subbody" style="display:none">
-  <div id="club-hub-root">
-    <!-- Club Hub Sub-nav -->
-    <div style="display:flex;gap:4px;margin-bottom:24px;background:rgba(0,0,0,0.2);padding:4px;border-radius:10px;width:fit-content;">
-      <button class="ch-tab active" onclick="chTab(this,'ch-directory')" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--purple-ui);color:#fff;transition:background .2s;">Directory</button>
-      <button class="ch-tab" onclick="chTab(this,'ch-submit')" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Submit a Club</button>
-      <button class="ch-tab" onclick="chTab(this,'ch-flyer')" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Flyer Generator</button>
-    </div>
 
-    <!-- Directory -->
-    <div id="ch-directory" class="ch-panel">
-      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-total" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Total clubs</div>
-        <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-cats" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Categories</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <input id="ch-search" type="text" placeholder="Search clubs..." oninput="chFilter()" style="flex:1;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
-        <select id="ch-catsel" onchange="chFilter()" style="padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"><option value="">All categories</option></select>
-      </div>
-      <div id="ch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
-        <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--faint);font-size:13px;">Loading clubs…</div>
-      </div>
-    </div>
+  <!-- Club Hub sub-nav -->
+  <div style="display:flex;gap:4px;margin-bottom:22px;background:rgba(0,0,0,0.25);padding:4px;border-radius:10px;width:fit-content;">
+    <button class="ch-tab ch-tab-active" onclick="chShowSection('ch-directory',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--purple-ui);color:#fff;transition:background .2s,color .2s;">Club Directory</button>
+    <button class="ch-tab" onclick="chShowSection('ch-submit',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Submit a Club</button>
+    <button class="ch-tab" onclick="chShowSection('ch-flyer',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Flyer Generator</button>
+  </div>
 
-    <!-- Submit a Club -->
-    <div id="ch-submit" class="ch-panel" style="display:none">
-      <div style="max-width:560px">
-        <div class="blk-title" style="margin-bottom:16px">Submit a New Club</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Fill out this form and a student life advisor will review your request within 5 school days.</p>
-        <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;">
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="ch-f-name" type="text" placeholder="e.g. Robotics Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category</label><select id="ch-f-cat" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"><option>Academic</option><option>Arts</option><option>Athletics</option><option>Community Service</option><option>Cultural</option><option>STEM</option><option>Other</option></select></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day</label><select id="ch-f-day" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="ch-f-advisor" type="text" placeholder="Ms. Smith" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="ch-f-room" type="text" placeholder="Room 204" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          </div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Description</label><textarea id="ch-f-desc" rows="3" placeholder="What does this club do? Who should join?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name &amp; Student ID</label><input id="ch-f-student" type="text" placeholder="Jane Doe · #12345" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact Email</label><input id="ch-f-email" type="email" placeholder="you@obhs.edu" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          </div>
-          <button onclick="chSubmit()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">Submit for Review →</button>
-          <p style="font-size:11px;color:var(--faint);text-align:center">Submissions reviewed by student life within 5 school days.</p>
+  <!-- DIRECTORY -->
+  <div id="ch-directory">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-total" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Total clubs</div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-cats" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Categories</div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <input id="ch-search" type="text" placeholder="Search clubs by name or advisor..." oninput="chFilter()" style="width:100%;max-width:480px;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+    </div>
+    <div id="ch-cattabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="ch-cat-tab ch-cat-active" onclick="chSelectCat('',this)" style="padding:5px 14px;font-size:12px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid var(--line);background:var(--purple-ui);color:#fff;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;">All Clubs</button>
+    </div>
+    <div id="ch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading clubs…</div>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div id="ch-submit" style="display:none">
+    <div class="blk-title" style="margin-bottom:6px">Submit a New Club</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6">Submissions are sent to Mr. Scott Beverly, Student Life Coordinator, and reviewed within 5 school days.</div>
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:580px;display:flex;flex-direction:column;gap:13px;">
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="ch-f-name" type="text" placeholder="e.g. Robotics Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category</label>
+          <select id="ch-f-cat" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option>Academic</option><option>Arts</option><option>Athletics &amp; Fitness</option><option>Community Service</option><option>Cultural</option><option>Identity &amp; Affinity</option><option>STEM</option><option>Other</option>
+          </select>
+        </div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day</label>
+          <select id="ch-f-day" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+          </select>
         </div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="ch-f-advisor" type="text" placeholder="Ms. Smith" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="ch-f-room" type="text" placeholder="Room 204" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      </div>
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Description</label><textarea id="ch-f-desc" rows="3" placeholder="What does this club do? Who should join?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name &amp; Student ID</label><input id="ch-f-student" type="text" placeholder="Jane Doe #12345" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact Email</label><input id="ch-f-email" type="email" placeholder="you@obhs.edu" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      </div>
+      <button onclick="chSubmitForm()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">Submit for Review →</button>
+      <p style="font-size:11px;color:var(--faint);text-align:center">Reviewed within 5 school days.</p>
     </div>
+  </div>
 
-    <!-- Flyer Generator -->
-    <div id="ch-flyer" class="ch-panel" style="display:none">
-      <div class="blk-title" style="margin-bottom:16px">Flyer Generator</div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Fill in your club's details and print or save as a PDF.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-        <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;">
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="fl-name" type="text" value="Art Club" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Tagline</label><input id="fl-tag" type="text" value="Where creativity comes to life" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day &amp; Time</label><input id="fl-when" type="text" value="Tuesdays, 3:00–4:30 PM" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="fl-where" type="text" value="Room 109" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="fl-advisor" type="text" value="Ms. Carter" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">About This Club</label><textarea id="fl-about" rows="3" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;">Open to all students who love drawing, painting, and design. No experience needed — just creativity!</textarea></div>
-          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact / Instagram</label><input id="fl-contact" type="text" value="@OBHSArtClub" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-          <button onclick="chPrintFlyer()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">🖨️ Print / Save as PDF</button>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Live Preview</div>
-          <div id="ch-flyer-output" style="border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;font-family:Georgia,serif;">
-            <div style="background:#26215C;color:#EEEDFE;padding:18px 16px;text-align:center;">
-              <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Old Bridge High School · Go Knights!</div>
-              <div id="fp-name" style="font-size:22px;font-weight:700;margin-bottom:4px;line-height:1.2;">Art Club</div>
-              <div id="fp-tag" style="font-size:12px;opacity:.75;font-style:italic;">Where creativity comes to life</div>
-            </div>
-            <div style="height:4px;background:linear-gradient(90deg,#534AB7,#AFA9EC,#D3D1C7);"></div>
-            <div style="padding:16px;background:#fff;color:#222;">
-              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">About us</div>
-              <p id="fp-about" style="font-size:12px;line-height:1.6;color:#333;margin-bottom:10px;">Open to all students who love drawing, painting, and design. No experience needed — just creativity!</p>
-              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">When &amp; where</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-                <span id="fp-when" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Tuesdays, 3:00–4:30 PM</span>
-                <span id="fp-where" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Room 109</span>
-              </div>
-              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Faculty advisor</div>
-              <p id="fp-advisor" style="font-size:12px;color:#333;margin-bottom:10px;">Ms. Carter</p>
-              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Find us</div>
-              <p id="fp-contact" style="font-size:12px;color:#333;">@OBHSArtClub</p>
-            </div>
-            <div style="background:#3C3489;color:#AFA9EC;padding:10px 16px;font-size:10px;text-align:center;font-family:'DM Sans',sans-serif;">Old Bridge High School — Student Life</div>
+  <!-- FLYER GENERATOR -->
+  <div id="ch-flyer" style="display:none">
+    <div class="blk-title" style="margin-bottom:6px">Flyer Generator</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Fill in your club's details and print or save as a PDF.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="fl-name" type="text" value="Art Club" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Tagline / Motto</label><input id="fl-tag" type="text" value="Where creativity comes to life" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day &amp; Time</label><input id="fl-when" type="text" value="Tuesdays, 3:00-4:30 PM" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="fl-where" type="text" value="Room 109" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="fl-advisor" type="text" value="Ms. Carter" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">About This Club</label><textarea id="fl-about" rows="3" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;">Open to all students who love drawing, painting, and design. No experience needed - just creativity!</textarea></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact / Instagram</label><input id="fl-contact" type="text" value="@OBHSArtClub" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <button onclick="chPrintFlyer()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">🖨️ Print / Save as PDF</button>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:600;margin-bottom:12px;">Live Preview</div>
+        <div id="ch-flyer-output" style="border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;font-family:Georgia,serif;">
+          <div style="background:#26215C;color:#EEEDFE;padding:18px 16px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Old Bridge High School &nbsp;·&nbsp; Go Knights!</div>
+            <div id="fp-name" style="font-size:22px;font-weight:700;margin-bottom:4px;line-height:1.2;">Art Club</div>
+            <div id="fp-tag" style="font-size:12px;opacity:.75;font-style:italic;">Where creativity comes to life</div>
           </div>
+          <div style="height:4px;background:linear-gradient(90deg,#534AB7,#AFA9EC,#D3D1C7);"></div>
+          <div style="padding:16px;background:#fff;color:#222;">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">About us</div>
+            <p id="fp-about" style="font-size:12px;line-height:1.6;color:#333;margin-bottom:10px;">Open to all students who love drawing, painting, and design. No experience needed - just creativity!</p>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">When &amp; where</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+              <span id="fp-when" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Tuesdays, 3:00-4:30 PM</span>
+              <span id="fp-where" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Room 109</span>
+            </div>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Faculty advisor</div>
+            <p id="fp-advisor" style="font-size:12px;color:#333;margin-bottom:10px;">Ms. Carter</p>
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Find us</div>
+            <p id="fp-contact" style="font-size:12px;color:#333;">@OBHSArtClub</p>
+          </div>
+          <div style="background:#3C3489;color:#AFA9EC;padding:10px 16px;font-size:10px;text-align:center;font-family:'DM Sans',sans-serif;">Old Bridge High School — Student Life</div>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
   <div id="s-service" class="subbody" style="display:none">
@@ -985,8 +993,7 @@ function go(id, btn) {
 }
 
 // ── Sub-nav ──
-const sPages=['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit'];
-const fPages=['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
+
 
 // ── Scroll reveal ──
 let revealObserver;
@@ -1233,182 +1240,203 @@ async function load(){
 
 
 
-// ══════════════════════════════════════════════════════
-// CLUB HUB — inlined directory, flyer generator, submit
-// ══════════════════════════════════════════════════════
-const CH_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5ZbiAKCcnRVp6t7re8yKSwFvNUc8VQOd1ukIso_loJSfS_ATRepCgJENmEaiaZE_ioVy9RZS37hB3/pub?gid=0&single=true&output=csv';
-let chAllClubs = [];
-let chLoaded = false;
 
-function chTab(btn, id) {
+// ══════════════════════════════════════════════════════
+// CLUB HUB — directory, flyer generator, submit
+// ══════════════════════════════════════════════════════
+const CH_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5ZbiAKCcnRVp6t7re8yKSwFvNUc8VQOd1ukIso_loJSfS_ATRepCgJENmEaiaZE_ioVy9RZS37hB3/pub?gid=0&single=true&output=csv';
+let chAllClubs = [], chActiveCategory = '', chLoaded = false;
+
+const CH_CATEGORY_RULES = [
+  ['stem',     'STEM',               'cat-stem',     ['bioinformatics','biomedical','engineering','robotics','math','science','chess','technology','computer','coding','physics','chemistry']],
+  ['arts',     'Arts',               'cat-arts',     ['art','drama','theater','theatre','music','dance','film','photography','creative','literary','writing','poetry','band','choir','orchestra','yearbook','newspaper','journalism','knightlife']],
+  ['athletics','Athletics & Fitness','cat-athletics', ['athletic','sport','fitness','volleyball','basketball','soccer','baseball','softball','football','tennis','swim','track','cross country','cheer','lacrosse','wrestling','golf']],
+  ['service',  'Community Service',  'cat-service',  ['service','volunteer','community','charity','feed','environment','green','sustainability','social justice','advocacy','awareness','bring change','mind']],
+  ['cultural', 'Cultural',           'cat-cultural', ['asian','black','african','hispanic','latino','chinese','korean','indian','caribbean','italian','french','spanish','international','culture','heritage']],
+  ['identity', 'Identity & Affinity','cat-identity', ['women','gender','lgbtq','pride','diversity','equity','inclusion','feminist','student union','affinity','minority']],
+  ['academic', 'Academic',           'cat-academic', ['academic','honor','national','society','debate','model un','mock trial','law','history','language','book','reading','tutoring','scholar','gifted','business','finance','economics','investment','leadership','student government','class council','animal advisory']],
+];
+
+function chAssignCategory(name) {
+  const lower = name.toLowerCase();
+  for (const [key, label, cls, kws] of CH_CATEGORY_RULES) {
+    if (kws.some(k => lower.includes(k))) return { key, label, cls };
+  }
+  return { key: 'other', label: 'Other', cls: 'cat-other' };
+}
+
+function chShowSection(id, btn) {
+  ['ch-directory','ch-submit','ch-flyer'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = s === id ? 'block' : 'none';
+  });
   document.querySelectorAll('.ch-tab').forEach(b => {
     b.style.background = 'none'; b.style.color = 'var(--muted)';
   });
-  btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff';
-  document.querySelectorAll('.ch-panel').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'block';
-}
-function fchTab(btn, id) {
-  document.querySelectorAll('.fch-tab').forEach(b => {
-    b.style.background = 'none'; b.style.color = 'var(--muted)';
-  });
-  btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff';
-  document.querySelectorAll('.fch-panel').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'block';
+  if (btn) { btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff'; }
 }
 
-function chGetField(obj) {
-  const keys = Object.keys(obj).map(k => k.toLowerCase().trim());
-  return (...names) => {
-    for (const n of names) {
-      const k = keys.find(k => k.includes(n));
-      if (k) return Object.values(obj)[keys.indexOf(k)] || '';
-    }
-    return '';
-  };
+function chSelectCat(cat, el) {
+  chActiveCategory = cat;
+  document.querySelectorAll('.ch-cat-tab').forEach(t => {
+    t.style.background = 'none'; t.style.color = 'var(--muted)'; t.style.borderColor = 'var(--line)';
+  });
+  if (el) { el.style.background = 'var(--purple-ui)'; el.style.color = '#fff'; el.style.borderColor = 'var(--purple-ui)'; }
+  chFilter();
+}
+
+function chSplitCSVLine(line) {
+  const vals = []; let inQ = false, cur = '';
+  for (const c of line) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { vals.push(cur); cur = ''; }
+    else cur += c;
+  }
+  vals.push(cur);
+  return vals;
 }
 
 function chParseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
-  function splitLine(line) {
-    const r = []; let cur = '', inQ = false;
-    for (const ch of line) {
-      if (ch === '"') inQ = !inQ;
-      else if (ch === ',' && !inQ) { r.push(cur.trim()); cur = ''; }
-      else cur += ch;
-    }
-    r.push(cur.trim()); return r;
-  }
-  const headers = splitLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
+  const headers = chSplitCSVLine(lines[0]).map(h => h.trim());
   return lines.slice(1).map(line => {
-    const vals = splitLine(line).map(v => v.replace(/^"|"$/g,'').trim());
+    const vals = chSplitCSVLine(line);
     const obj = {};
-    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    headers.forEach((h, i) => { obj[h] = (vals[i] || '').trim(); });
     return obj;
-  }).filter(r => Object.values(r).some(v => v));
+  }).filter(r => r['CLUB']);
 }
 
-function chRenderGrid(clubs, gridId, catSelId) {
-  const grid = document.getElementById(gridId);
+const CAT_BADGE_COLORS = {
+  'cat-stem':     'color:#0891B2;background:#ECFEFF',
+  'cat-arts':     'color:#9333EA;background:#FAF5FF',
+  'cat-athletics':'color:#DC2626;background:#FEF2F2',
+  'cat-service':  'color:#16A34A;background:#F0FDF4',
+  'cat-cultural': 'color:#D97706;background:#FFFBEB',
+  'cat-identity': 'color:#DB2777;background:#FDF2F8',
+  'cat-academic': 'color:#2563EB;background:#EFF6FF',
+  'cat-other':    'color:#5F5E5A;background:#F3F3F1',
+};
+
+function chRenderClubs(clubs) {
+  const grid = document.getElementById('ch-grid');
   if (!grid) return;
   if (!clubs.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--faint);font-size:13px;">No clubs match your search.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">No clubs match your search.</div>';
     return;
   }
   grid.innerHTML = clubs.map(c => {
-    const g = chGetField(c);
-    const name    = g('club','name','title') || 'Unnamed Club';
-    const cat     = g('category','type','cat');
-    const advisor = g('advisor','faculty','teacher','contact');
-    const day     = g('day','meeting','when','time');
-    const room    = g('room','location','where','place');
-    const desc    = g('description','desc','about','details');
-    return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='var(--line-bright)';this.style.background='rgba(91,63,192,0.15)'" onmouseout="this.style.borderColor='var(--line)';this.style.background='var(--card)'">
-      ${cat ? `<span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--purple-glow);background:rgba(91,63,192,0.2);display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:8px;">${cat}</span>` : ''}
-      <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">${name}</div>
-      ${advisor ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">👤 ${advisor}</div>` : ''}
-      ${desc ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px;">${desc.length>100?desc.slice(0,100)+'…':desc}</div>` : ''}
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${day ? `<span style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);">📅 ${day}</span>` : ''}
-        ${room ? `<span style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);">📍 ${room}</span>` : ''}
-      </div>
-    </div>`;
+    const name    = c['CLUB'] || 'Unnamed Club';
+    const advisor = c['ADVISOR'] || '';
+    const email   = c['ADVISOR EMAIL'] || '';
+    const reps    = c['STUDENT REPRESENTATIVES'] || '';
+    const cat     = c._cat;
+    const badge   = CAT_BADGE_COLORS[cat.cls] || CAT_BADGE_COLORS['cat-other'];
+    return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:border-color .2s;" onmouseover="this.style.borderColor=\'var(--line-bright)\'" onmouseout="this.style.borderColor=\'var(--line)\'">'
+      + '<span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:8px;' + badge + '">' + cat.label + '</span>'
+      + '<div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:6px;">' + name + '</div>'
+      + (advisor ? '<div style="font-size:12px;color:var(--muted);margin-bottom:3px;">👤 ' + advisor + (email ? ' · <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:none;">' + email + '</a>' : '') + '</div>' : '')
+      + (reps ? '<div style="font-size:11px;color:var(--faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--line);"><strong style="color:var(--muted);">Student Reps:</strong> ' + reps + '</div>' : '')
+      + '</div>';
   }).join('');
 }
 
 function chFilter() {
-  const q = (document.getElementById('ch-search')?.value||'').toLowerCase();
-  const cat = document.getElementById('ch-catsel')?.value||'';
+  const q = (document.getElementById('ch-search')?.value || '').toLowerCase();
   const filtered = chAllClubs.filter(c => {
-    const g = chGetField(c);
-    return g('club','name','title').toLowerCase().includes(q) && (!cat || g('category','type','cat') === cat);
+    const name    = (c['CLUB'] || '').toLowerCase();
+    const advisor = (c['ADVISOR'] || '').toLowerCase();
+    return (!q || name.includes(q) || advisor.includes(q)) && (!chActiveCategory || c._cat.key === chActiveCategory);
   });
-  chRenderGrid(filtered, 'ch-grid', 'ch-catsel');
+  chRenderClubs(filtered);
 }
 
-function fchFilter() {
-  const q = (document.getElementById('fch-search')?.value||'').toLowerCase();
-  const cat = document.getElementById('fch-catsel')?.value||'';
-  const filtered = chAllClubs.filter(c => {
-    const g = chGetField(c);
-    return g('club','name','title').toLowerCase().includes(q) && (!cat || g('category','type','cat') === cat);
+function chBuildCategoryTabs(clubs) {
+  const counts = {};
+  clubs.forEach(c => { const k = c._cat.key; counts[k] = (counts[k] || 0) + 1; });
+  const ordered = CH_CATEGORY_RULES.filter(([k]) => counts[k]).map(([k, label]) => ({ key: k, label, count: counts[k] }));
+  if (counts['other']) ordered.push({ key: 'other', label: 'Other', count: counts['other'] });
+  document.getElementById('ch-cats').textContent = ordered.length;
+  const container = document.getElementById('ch-cattabs');
+  if (!container) return;
+  ordered.forEach(({ key, label, count }) => {
+    const btn = document.createElement('button');
+    btn.className = 'ch-cat-tab';
+    btn.textContent = label + ' (' + count + ')';
+    btn.style.cssText = 'padding:5px 14px;font-size:12px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid var(--line);background:none;color:var(--muted);font-family:\'DM Sans\',sans-serif;white-space:nowrap;transition:all .15s;';
+    btn.onclick = () => chSelectCat(key, btn);
+    container.appendChild(btn);
   });
-  chRenderGrid(filtered, 'fch-grid', 'fch-catsel');
 }
 
 async function chLoadClubs() {
   if (chLoaded) return;
   try {
-    const r = await fetch('/api/sheet?url=' + encodeURIComponent(CH_CSV), {cache:'no-store'});
+    const r = await fetch('/api/sheet?url=' + encodeURIComponent(CH_CSV_URL), { cache: 'no-store' });
     let text = '';
     if (r.ok) text = await r.text();
     if (!text || text.includes('<!DOCTYPE')) {
-      // Fallback: direct fetch (Club Hub has its own sheet, not the site sheet)
-      const r2 = await fetch(CH_CSV, {cache:'no-store'});
+      const r2 = await fetch(CH_CSV_URL, { cache: 'no-store' });
       if (r2.ok) text = await r2.text();
     }
     if (!text) throw new Error('no data');
-    chAllClubs = chParseCSV(text);
+    const raw = chParseCSV(text);
+    chAllClubs = raw.map(c => ({ ...c, _cat: chAssignCategory(c['CLUB'] || '') }));
+    chAllClubs.sort((a, b) => a['CLUB'].localeCompare(b['CLUB']));
     chLoaded = true;
-
-    const cats = [...new Set(chAllClubs.map(c => chGetField(c)('category','type','cat')).filter(Boolean))].sort();
-
-    // Populate student directory
     const tot = document.getElementById('ch-total');
-    const catN = document.getElementById('ch-cats');
     if (tot) tot.textContent = chAllClubs.length;
-    if (catN) catN.textContent = cats.length || '—';
-    const sel = document.getElementById('ch-catsel');
-    if (sel) cats.forEach(cat => { const o=document.createElement('option'); o.value=cat; o.textContent=cat; sel.appendChild(o); });
-    chRenderGrid(chAllClubs, 'ch-grid');
-
-    // Populate faculty directory
-    const fsel = document.getElementById('fch-catsel');
-    if (fsel) cats.forEach(cat => { const o=document.createElement('option'); o.value=cat; o.textContent=cat; fsel.appendChild(o); });
-    chRenderGrid(chAllClubs, 'fch-grid');
-
+    chBuildCategoryTabs(chAllClubs);
+    chRenderClubs(chAllClubs);
   } catch(e) {
     console.warn('[ClubHub] load failed', e);
-    const msg = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--faint);font-size:13px;">Could not load club data.</div>';
-    const g1 = document.getElementById('ch-grid'); if(g1) g1.innerHTML = msg;
-    const g2 = document.getElementById('fch-grid'); if(g2) g2.innerHTML = msg;
+    const g = document.getElementById('ch-grid');
+    if (g) g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">Could not load club data. Please try again.</div>';
   }
 }
 
-// Load clubs when user clicks into either club section
-function ssub(btn, id) {
-  document.querySelectorAll('#s-subnav .sn').forEach(b=>b.classList.remove('active'));
-  if(btn&&btn.classList) btn.classList.add('active');
-  sPages.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display=p===id?'block':'none';});
-  window.scrollTo({top:0,behavior:'instant'});
-  if(id==='s-clubs') chLoadClubs();
-}
-function fsub(btn, id) {
-  document.querySelectorAll('#f-subnav .sn').forEach(b=>b.classList.remove('active'));
-  if(btn&&btn.classList) btn.classList.add('active');
-  fPages.forEach(p=>{const el=document.getElementById(p);if(el)el.style.display=p===id?'block':'none';});
-  window.scrollTo({top:0,behavior:'instant'});
-  if(id==='f-clubs') chLoadClubs();
-}
-
-// Submit a Club
-function chSubmit() {
+function chSubmitForm() {
   const name = document.getElementById('ch-f-name')?.value.trim();
   if (!name) { alert('Please enter a club name.'); return; }
   const fields = {
     'Club Name': name,
-    'Category': document.getElementById('ch-f-cat')?.value,
-    'Meeting Day': document.getElementById('ch-f-day')?.value,
-    'Advisor': document.getElementById('ch-f-advisor')?.value,
-    'Room': document.getElementById('ch-f-room')?.value,
-    'Description': document.getElementById('ch-f-desc')?.value,
-    'Submitted by': document.getElementById('ch-f-student')?.value,
-    'Email': document.getElementById('ch-f-email')?.value,
+    'Category': document.getElementById('ch-f-cat')?.value || '',
+    'Meeting Day': document.getElementById('ch-f-day')?.value || '',
+    'Advisor': document.getElementById('ch-f-advisor')?.value || '',
+    'Room': document.getElementById('ch-f-room')?.value || '',
+    'Description': document.getElementById('ch-f-desc')?.value || '',
+    'Submitted by': document.getElementById('ch-f-student')?.value || '',
+    'Email': document.getElementById('ch-f-email')?.value || '',
   };
-  const body = Object.entries(fields).map(([k,v])=>`${k}: ${v}`).join('\n');
-  window.open(`mailto:studentlife@obhs.edu?subject=${encodeURIComponent('New Club Submission: '+name)}&body=${encodeURIComponent(body)}`);
+  const body = Object.entries(fields).map(([k,v]) => k + ': ' + v).join('\n');
+  window.open('mailto:sbeverly@obps.org?subject=' + encodeURIComponent('New Club Submission: ' + name) + '&body=' + encodeURIComponent(body));
 }
+
+
+
+
+
+// Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
+const sPages = ['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit'];
+const fPages = ['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
+
+function ssub(btn, id) {
+  document.querySelectorAll('#s-subnav .sn').forEach(b => b.classList.remove('active'));
+  if (btn && btn.classList) btn.classList.add('active');
+  sPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
+  window.scrollTo({top:0,behavior:'instant'});
+  if (id === 's-clubs') chLoadClubs();
+}
+
+function fsub(btn, id) {
+  document.querySelectorAll('#f-subnav .sn').forEach(b => b.classList.remove('active'));
+  if (btn && btn.classList) btn.classList.add('active');
+  fPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+
 
 // Flyer helpers
 function chFlyerPrintHTML(ids) {
