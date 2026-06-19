@@ -462,11 +462,13 @@ img{max-width:100%;display:block;}
     <button class="sn" onclick="ssub(this,'s-committees')">Committees</button>
     <button class="sn" onclick="ssub(this,'s-botc')">Battle of the Classes</button>
     <button class="sn" onclick="ssub(this,'s-spirit')">Spirit Wear</button>
+    <button class="sn" onclick="ssub(this,'s-classes')">Class Pages</button>
     <button class="sn" onclick="window.open('https://knightlifeob.com','_blank')">📰 Knight Life</button>
   </div>
 
   <div id="s-overview" class="subbody">
     <div class="feat">
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-classes')"><div class="fc-ico">🎓</div><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
       <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ico">📰</div><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
       <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ico">🏆</div><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign up, pay your $10, and represent your class in the biggest event of the year.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Sign-ups open</span></div>
       <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ico">🤝</div><div class="fc-ttl">Community Service</div><div class="fc-dsc">Log hours, upload verification, and track progress toward the 10-hour graduation requirement.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
@@ -595,6 +597,128 @@ img{max-width:100%;display:block;}
           <div style="background:#3C3489;color:#AFA9EC;padding:10px 16px;font-size:10px;text-align:center;font-family:'DM Sans',sans-serif;">Old Bridge High School — Student Life</div>
         </div>
       </div>
+    </div>
+  </div>
+
+</div>
+
+  <div id="s-classes" class="subbody" style="display:none">
+
+  <!-- Class sub-nav -->
+  <div style="display:flex;gap:4px;margin-bottom:22px;background:rgba(0,0,0,0.25);padding:4px;border-radius:10px;width:fit-content;flex-wrap:wrap;">
+    <button class="cls-tab cls-tab-active" onclick="clsShow('cls-2027',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--purple-ui);color:#fff;transition:background .2s,color .2s;">Class of 2027</button>
+    <button class="cls-tab" onclick="clsShow('cls-2028',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Class of 2028</button>
+    <button class="cls-tab" onclick="clsShow('cls-2029',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Class of 2029</button>
+    <button class="cls-tab" onclick="clsShow('cls-2030',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Class of 2030</button>
+  </div>
+
+  <!-- CLASS OF 2027 -->
+  <div id="cls-2027">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple-ui),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎓</div>
+      <div>
+        <div style="font-size:22px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff;">CLASS OF 2027</div>
+        <div style="font-size:13px;color:var(--muted);">Seniors · Graduating June 2027</div>
+      </div>
+    </div>
+    <!-- Advisors -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;max-width:560px;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Cheryl Mackey</div>
+        <a href="mailto:cmackey@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">cmackey@obps.org</a>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Nicole Czysz</div>
+        <a href="mailto:nczysz@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">nczysz@obps.org</a>
+      </div>
+    </div>
+    <!-- Posts/Resources from Sheet -->
+    <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
+    <div id="cls-2027-posts" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
+    </div>
+  </div>
+
+  <!-- CLASS OF 2028 -->
+  <div id="cls-2028" style="display:none">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple-ui),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎓</div>
+      <div>
+        <div style="font-size:22px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff;">CLASS OF 2028</div>
+        <div style="font-size:13px;color:var(--muted);">Juniors · Graduating June 2028</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;max-width:560px;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Jess Hertman</div>
+        <a href="mailto:jhertman@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">jhertman@obps.org</a>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Amanda Ianucilli</div>
+        <a href="mailto:aianuicilli@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">aianuicilli@obps.org</a>
+      </div>
+    </div>
+    <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
+    <div id="cls-2028-posts" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
+    </div>
+  </div>
+
+  <!-- CLASS OF 2029 -->
+  <div id="cls-2029" style="display:none">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple-ui),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎓</div>
+      <div>
+        <div style="font-size:22px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff;">CLASS OF 2029</div>
+        <div style="font-size:13px;color:var(--muted);">Sophomores · Graduating June 2029</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;max-width:560px;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Kristen Celentano</div>
+        <a href="mailto:kcelentano@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">kcelentano@obps.org</a>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Erin Borriello</div>
+        <a href="mailto:eborriello@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">eborriello@obps.org</a>
+      </div>
+    </div>
+    <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
+    <div id="cls-2029-posts" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
+    </div>
+  </div>
+
+  <!-- CLASS OF 2030 -->
+  <div id="cls-2030" style="display:none">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple-ui),var(--purple-glow));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎓</div>
+      <div>
+        <div style="font-size:22px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff;">CLASS OF 2030</div>
+        <div style="font-size:13px;color:var(--muted);">Freshmen · Graduating June 2030</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;max-width:560px;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Lori Obdyke</div>
+        <a href="mailto:lobdyke@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">lobdyke@obps.org</a>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Class Advisor</div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">Matt Tiplady</div>
+        <a href="mailto:mtiplady@obps.org" style="font-size:12px;color:var(--muted);text-decoration:none;">mtiplady@obps.org</a>
+      </div>
+    </div>
+    <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
+    <div id="cls-2030-posts" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
     </div>
   </div>
 
@@ -888,6 +1012,10 @@ const GIDS = {
   quicklinks:    '605046719',
   countdown:     '1732793405',
   flyers:        'FLYERS_GID', // ← replace after setting up flyer tab
+  class2027:     'CLASS2027_GID', // ← add Google Sheet tab GID for Class of 2027
+  class2028:     'CLASS2028_GID',
+  class2029:     'CLASS2029_GID',
+  class2030:     'CLASS2030_GID',
 };
 
 // ── FORM LINKS ──
@@ -1418,7 +1546,7 @@ function chSubmitForm() {
 
 
 // Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
-const sPages = ['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit'];
+const sPages = ['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit','s-classes'];
 const fPages = ['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
 
 function ssub(btn, id) {
@@ -1427,6 +1555,7 @@ function ssub(btn, id) {
   sPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
   window.scrollTo({top:0,behavior:'instant'});
   if (id === 's-clubs') chLoadClubs();
+  if (id === 's-classes') clsLoadPosts('2027');
 }
 
 function fsub(btn, id) {
@@ -1493,6 +1622,73 @@ function fchPrintFlyer() {
   w.document.write(chFlyerPrintHTML({name:'ffl-name',tag:'ffl-tag',about:'ffl-about',when:'ffl-when',where:'ffl-where',advisor:'ffl-advisor',contact:'ffl-contact'}));
   w.document.close(); setTimeout(()=>w.print(),400);
 }
+
+
+// ══════════════════════════════════════════════════════
+// CLASS PAGES — per-grade announcements & resources
+// ══════════════════════════════════════════════════════
+const CLS_LOADED = {};
+
+function clsShow(id, btn) {
+  ['cls-2027','cls-2028','cls-2029','cls-2030'].forEach(c => {
+    const el = document.getElementById(c);
+    if (el) el.style.display = c === id ? 'block' : 'none';
+  });
+  document.querySelectorAll('.cls-tab').forEach(b => {
+    b.style.background = 'none'; b.style.color = 'var(--muted)';
+  });
+  if (btn) { btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff'; }
+  const yr = id.replace('cls-', '');
+  clsLoadPosts(yr);
+}
+
+function clsRenderPosts(yr, rows) {
+  const el = document.getElementById('cls-' + yr + '-posts');
+  if (!el) return;
+  if (!rows.length) {
+    el.innerHTML = '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;font-size:13px;color:var(--muted);">No posts yet — check back soon!</div>';
+    return;
+  }
+  el.innerHTML = rows.map(r => {
+    const title = r['TITLE'] || r['Title'] || r['title'] || '';
+    const body  = r['BODY'] || r['Body'] || r['body'] || r['DESCRIPTION'] || r['Description'] || '';
+    const date  = r['DATE'] || r['Date'] || r['date'] || '';
+    const link  = r['LINK'] || r['Link'] || r['link'] || r['URL'] || r['Url'] || '';
+    const type  = (r['TYPE'] || r['Type'] || r['type'] || 'post').toLowerCase();
+    const icon  = type.includes('event') ? '📅' : type.includes('resource') ? '📎' : type.includes('form') ? '📋' : '📣';
+    return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;transition:border-color .2s;" class="cls-post-card">'
+      + '<div style="display:flex;align-items:flex-start;gap:12px;">'
+      + '<span style="font-size:18px;flex-shrink:0;margin-top:2px;">' + icon + '</span>'
+      + '<div style="flex:1;min-width:0;">'
+      + (title ? '<div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;">' + title + '</div>' : '')
+      + (date  ? '<div style="font-size:11px;color:var(--faint);margin-bottom:6px;">' + date + '</div>' : '')
+      + (body  ? '<div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">' + body + '</div>' : '')
+      + (link  ? '<a href="' + link + '" target="_blank" rel="noopener" style="font-size:12px;color:var(--purple-glow);text-decoration:none;font-weight:500;">Open link →</a>' : '')
+      + '</div></div></div>';
+  }).join('');
+}
+
+async function clsLoadPosts(yr) {
+  if (CLS_LOADED[yr]) return;
+  const gid = GIDS['class' + yr];
+  if (!gid || gid.includes('_GID')) {
+    // No sheet tab set up yet — show empty state
+    const el = document.getElementById('cls-' + yr + '-posts');
+    if (el) el.innerHTML = '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;font-size:13px;color:var(--muted);">No posts yet — check back soon!</div>';
+    return;
+  }
+  try {
+    const rows = await fetchTab(gid);
+    CLS_LOADED[yr] = true;
+    clsRenderPosts(yr, rows);
+  } catch(e) {
+    console.warn('[ClassPages] load failed for ' + yr, e);
+    const el = document.getElementById('cls-' + yr + '-posts');
+    if (el) el.innerHTML = '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;font-size:13px;color:var(--muted);">Could not load posts.</div>';
+  }
+}
+
+// Class of 2027 auto-loads via ssub check in clsShow
 
 load();
 observeReveal();
