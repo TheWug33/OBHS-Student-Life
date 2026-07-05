@@ -335,6 +335,13 @@ img{max-width:100%;display:block;}
   .fresh-strip{padding:9px 18px;gap:8px;flex-direction:column;align-items:flex-start;}
   .fresh-text{white-space:normal;}
 }
+
+/* ── Compact sidebar announcements ── */
+.ann-compact .ann{padding:10px 12px;gap:10px;}
+.ann-compact .ann-t{font-size:12.5px;line-height:1.35;}
+.ann-compact .ann-m{font-size:10.5px;}
+.ann-compact .ann-badge{display:none;}
+.ann-compact .ann-dot{width:7px;height:7px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -421,14 +428,6 @@ img{max-width:100%;display:block;}
 
   <div class="home-grid">
     <div class="home-main">
-      <div class="reveal" style="margin-bottom:36px">
-        <div class="blk-head"><span class="blk-title">Announcements</span><button class="blk-link" onclick="go('student',document.querySelector('[data-page=student]'))">See all →</button></div>
-        <div id="ann-list">
-          <div class="skel" style="height:60px;margin-bottom:8px"></div>
-          <div class="skel" style="height:60px;margin-bottom:8px"></div>
-          <div class="skel" style="height:60px"></div>
-        </div>
-      </div>
       <div class="reveal">
         <div class="blk-head"><span class="blk-title">Upcoming Events</span><button class="blk-link" onclick="openCal()">Full calendar →</button></div>
         <div class="ev-card" id="ev-list">
@@ -451,6 +450,14 @@ img{max-width:100%;display:block;}
             <div class="cd-sep">:</div>
             <div class="cd-u"><div class="cd-n" id="cd-m">--</div><div class="cd-ul">min</div></div>
           </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="blk-head"><span class="blk-title sm">Announcements</span><button class="blk-link" onclick="go('student',document.querySelector('[data-page=student]'))">See all →</button></div>
+        <div id="ann-list" class="ann-compact">
+          <div class="skel" style="height:48px;margin-bottom:7px"></div>
+          <div class="skel" style="height:48px;margin-bottom:7px"></div>
+          <div class="skel" style="height:48px"></div>
         </div>
       </div>
       <div class="reveal">
@@ -1057,11 +1064,11 @@ const GIDS = {
   quicklinks:    '605046719',
   countdown:     '1732793405',
   flyers:        'FLYERS_GID', // ← replace after setting up flyer tab
-  class2027:     '892855092', // ← add Google Sheet tab GID for Class of 2027
-  class2028:     '566872314',
-  class2029:     '869921388',
-  class2030:     '1158737297',
-  lyric:         '185335575', // ← add Google Sheet tab GID for Lyric of the Week
+  class2027:     'CLASS2027_GID', // ← add Google Sheet tab GID for Class of 2027
+  class2028:     'CLASS2028_GID',
+  class2029:     'CLASS2029_GID',
+  class2030:     'CLASS2030_GID',
+  lyric:         'LYRIC_GID', // ← add Google Sheet tab GID for Lyric of the Week
 };
 
 // ── FORM LINKS ──
@@ -1261,7 +1268,7 @@ function renderAnn(rows){
   const el=document.getElementById('ann-list');
   const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD YOUR'));
   if(!clean.length){el.innerHTML='<p style="font-size:13px;color:var(--faint);padding:12px 0">No announcements right now.</p>';return;}
-  el.innerHTML=clean.slice(0,5).map(r=>`<div class="ann"><div class="ann-dot" style="background:${dotC(r.TAG)};color:${dotC(r.TAG)}"></div><div class="ann-body"><div class="ann-t">${r.TITLE}</div><div class="ann-m">${r.DATE||''}${r.SOURCE?' · '+r.SOURCE:''}</div></div>${r.TAG?`<span class="ann-badge" style="${badgeS(r.TAG)}">${r.TAG}</span>`:''}</div>`).join('');
+  el.innerHTML=clean.slice(0,3).map(r=>`<div class="ann"><div class="ann-dot" style="background:${dotC(r.TAG)};color:${dotC(r.TAG)}"></div><div class="ann-body"><div class="ann-t">${r.TITLE}</div><div class="ann-m">${r.DATE||''}${r.SOURCE?' · '+r.SOURCE:''}</div></div>${r.TAG?`<span class="ann-badge" style="${badgeS(r.TAG)}">${r.TAG}</span>`:''}</div>`).join('');
 }
 // Month name → number map for date comparison
 const MONTH_NUM={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
@@ -1298,7 +1305,7 @@ function renderEv(rows){
       if(evDate < oneDayAgo) yr = currentYear + 1;
       r._date = new Date(yr, mo, dy);
       // Fix display values in case they came in wrong
-      if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,3);
+      if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,6);
       if(rawDay.includes('/')) r.DAY = String(dy);
     } else {
       r._date = new Date(9999, 0, 1);
