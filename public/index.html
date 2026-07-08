@@ -916,8 +916,8 @@ img{max-width:100%;display:block;}
     <div class="two">
       <div class="cs">
         <div class="cs-ttl">📋 Submit a Form</div>
-        <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">🚌</div><div><div class="flr-t">Field Trip Request</div><div class="flr-d">Link coming soon — contact Student Life</div></div><div class="flr-arr" style="font-size:10px">Soon</div></div>
-        <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">🚶</div><div><div class="flr-t">Early Dismissal</div><div class="flr-d">Link coming soon — contact Student Life</div></div><div class="flr-arr" style="font-size:10px">Soon</div></div>
+        <div class="flr" onclick="window.open(FIELDTRIP_URL,'_blank')"><div class="flr-ico">🚌</div><div><div class="flr-t">Field Trip Request</div><div class="flr-d">Submit at least 2 weeks in advance</div></div><div class="flr-arr">→</div></div>
+        <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div class="flr-ico">🚶</div><div><div class="flr-t">Early Dismissal</div><div class="flr-d">Submit at least 48 hours in advance · roster upload required</div></div><div class="flr-arr">→</div></div>
         <div class="flr" onclick="window.open(EVT_URL,'_blank')"><div class="flr-ico">📢</div><div><div class="flr-t">Submit an Event / Meeting</div><div class="flr-d">In-school events where students miss class</div></div><div class="flr-arr">→</div></div>
         <div class="flr" onclick="window.open(CLUB_URL,'_blank')"><div class="flr-ico">🏫</div><div><div class="flr-t">New Club Registration</div><div class="flr-d">Submit via the Club Hub</div></div><div class="flr-arr">→</div></div>
         <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">📊</div><div><div class="flr-t">Budget Request</div><div class="flr-d">Link coming soon — contact Student Life</div></div><div class="flr-arr" style="font-size:10px">Soon</div></div>
@@ -937,13 +937,13 @@ img{max-width:100%;display:block;}
       <div class="cs">
         <div class="cs-ttl">🚌 Field Trip Request</div>
         <div class="info"><div class="info-t">Minimum 2-week advance notice required</div><div class="info-d">Submit your request early. Trips requiring buses need additional lead time for transportation scheduling.</div></div>
-        <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">📝</div><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Link coming soon — contact Student Life</div></div><div class="flr-arr" style="font-size:10px">Soon</div></div>
+        <div class="flr" onclick="window.open(FIELDTRIP_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account</div></div><div class="flr-arr">→</div></div>
         <div class="flr"><div class="flr-ico">📋</div><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
       </div>
       <div class="cs">
         <div class="cs-ttl">🚶 Early Dismissal</div>
         <div class="info"><div class="info-t">Submit at least 48 hours in advance</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
-        <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">📝</div><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Link coming soon — contact Student Life</div></div><div class="flr-arr" style="font-size:10px">Soon</div></div>
+        <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file</div></div><div class="flr-arr">→</div></div>
         <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">📋</div><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 48 hours in advance and approved before communicating to students or parents.</div></div></div>
       </div>
     </div>
@@ -1078,6 +1078,8 @@ const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty
 const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
+const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
+const DISMISSAL_URL = 'https://forms.office.com/r/8DYQiWNcja';        // Early dismissal request form
 
 // ── HERO TEXT ──
 // The big heading and tagline on the homepage
