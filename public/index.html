@@ -345,16 +345,23 @@ img{max-width:100%;display:block;}
 
 /* ── This Week strip ── */
 .wk-wrap{margin-bottom:34px;}
-.wk-strip{display:flex;gap:10px;}
-.wk-day{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 12px 14px;min-height:110px;transition:border-color .2s;}
+.wk-strip{display:flex;gap:9px;}
+.wk-day{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px;min-height:86px;transition:border-color .2s;}
 .wk-day.today{border-color:var(--purple-glow);background:linear-gradient(160deg,rgba(91,63,192,0.22),var(--card));box-shadow:0 0 24px rgba(91,63,192,0.18);}
 .wk-day.past{opacity:0.45;}
-.wk-dow{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
-.wk-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:8px;}
+.wk-date{margin-bottom:7px;}
+.wk-dow{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.wk-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;line-height:1.1;}
 .wk-day.today .wk-dow{color:var(--purple-glow);}
-.wk-ev{font-size:11px;color:var(--silver);line-height:1.4;padding:4px 7px;background:rgba(91,63,192,0.18);border-radius:6px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.wk-ev{font-size:11px;color:var(--silver);line-height:1.35;padding:4px 7px;background:rgba(91,63,192,0.18);border-radius:6px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.wk-ev:last-child{margin-bottom:0;}
 .wk-none{font-size:11px;color:var(--faint);}
-@media (max-width:767px){.wk-strip{overflow-x:auto;padding-bottom:6px;}.wk-day{min-width:120px;}}
+@media (max-width:767px){
+  .wk-strip{flex-direction:column;gap:7px;}
+  .wk-day{display:flex;align-items:flex-start;gap:14px;min-height:0;padding:10px 14px;}
+  .wk-date{margin-bottom:0;width:52px;flex-shrink:0;}
+  .wk-evs{flex:1;min-width:0;padding-top:1px;}
+}
 
 /* ── Class Cup ── */
 .cup-wrap{margin-top:34px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;}
@@ -1305,7 +1312,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -1499,9 +1506,9 @@ function renderWeekStrip() {
       inner = '<div class="wk-none">' + (isPast ? '—' : 'Nothing yet') + '</div>';
     }
     html += '<div class="wk-day' + (isToday ? ' today' : '') + (isPast ? ' past' : '') + '">'
-      + '<div class="wk-dow">' + names[i] + (isToday ? ' · TODAY' : '') + '</div>'
-      + '<div class="wk-num">' + d.getDate() + '</div>'
-      + inner + '</div>';
+      + '<div class="wk-date"><div class="wk-dow">' + names[i] + (isToday ? ' · TODAY' : '') + '</div>'
+      + '<div class="wk-num">' + d.getDate() + '</div></div>'
+      + '<div class="wk-evs">' + inner + '</div></div>';
   }
   el.innerHTML = html;
 }
@@ -1515,9 +1522,17 @@ async function loadClassCup() {
   if (!GIDS.classcup || GIDS.classcup.includes('_GID')) { wrap.style.display = 'none'; return; }
   try {
     const rows = await fetchTab(GIDS.classcup);
-    const clean = rows.filter(r => (r['CLASS']||'').trim() && (r['POINTS']||'').toString().trim() !== '')
-      .map(r => ({ cls: r['CLASS'].toString().trim(), pts: parseInt((r['POINTS']||'0').toString().replace(/[^0-9]/g,'')) || 0 }))
+    const getF = (r, name) => {
+      const k = Object.keys(r).find(k => k.trim().toUpperCase() === name);
+      return k ? r[k] : '';
+    };
+    const clean = rows.map(r => ({
+        cls: (getF(r,'CLASS')||'').toString().trim(),
+        pts: parseInt((getF(r,'POINTS')||'').toString().replace(/[^0-9]/g,''))
+      }))
+      .filter(c => c.cls && !isNaN(c.pts))
       .sort((a,b) => b.pts - a.pts);
+    console.log('[ClassCup] rows:', rows.length, 'clean:', clean.length);
     if (!clean.length) { wrap.style.display = 'none'; return; }
     const max = Math.max(...clean.map(c => c.pts), 1);
     const bars = document.getElementById('cup-bars');
