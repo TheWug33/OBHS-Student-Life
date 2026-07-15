@@ -337,8 +337,10 @@ img{max-width:100%;display:block;}
 .fresh-line.roll-out{transform:translateY(-110%);opacity:0;}
 .fresh-line.roll-prep{transition:none;transform:translateY(110%);opacity:0;}
 .fresh-tag{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--purple-glow);white-space:nowrap;flex-shrink:0;}
-.fresh-text{color:var(--silver);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-.fresh-text em{color:var(--muted);font-style:normal;}
+.fresh-textwrap{flex:1;min-width:0;overflow:hidden;}
+.fresh-text-inner{display:inline-block;white-space:nowrap;color:var(--silver);will-change:transform;}
+.fresh-text-inner em{color:var(--muted);font-style:normal;}
+.fresh-text-inner.ellip{display:block;overflow:hidden;text-overflow:ellipsis;}
 @media (max-width: 767px){
   .fresh-strip{padding:10px 18px;}
 }
@@ -1659,24 +1661,26 @@ function quizMatch() {
 }
 
 // ══════════════════════════════════════════════════════
-// FRESH STRIP — rotating "What's New" board
+// FRESH STRIP — rotating board with marquee for long items
 // ══════════════════════════════════════════════════════
 function renderFresh(ann, lyricRows) {
   const strip = document.getElementById('fresh-strip');
   const line = document.getElementById('fresh-line');
   if (!strip || !line) return;
+  if (window._freshTimer) clearTimeout(window._freshTimer);
+
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const HOLD_FIT = 6500;      // ms a fully-visible message stays
+  const HOLD_EDGE = 1500;     // ms pause before and after a scroll
+  const SCROLL_SPEED = 45;    // px per second
 
   const items = [];
-
-  // All announcements become rotor items (newest first)
   (ann || []).filter(a => (a['TITLE']||'').trim() && !(a['TITLE']||'').includes('ADD YOUR'))
     .slice(0, 8)
     .forEach(a => {
       const date = a['DATE'] || '';
       items.push({ tag: "📣 What's New", html: a['TITLE'] + (date ? ' <em>· ' + date + '</em>' : '') });
     });
-
-  // Lyric of the Week joins the rotation
   if (lyricRows && lyricRows.length) {
     const rows = lyricRows.filter(r => (r['LYRIC'] || r['Lyric'] || r['lyric'] || '').trim());
     if (rows.length) {
@@ -1694,24 +1698,51 @@ function renderFresh(ann, lyricRows) {
   if (!items.length) { strip.style.display = 'none'; return; }
   strip.style.display = 'flex';
 
-  const draw = it => { line.innerHTML = '<span class="fresh-tag">' + it.tag + '</span><span class="fresh-text">' + it.html + '</span>'; };
   let idx = 0;
-  draw(items[0]);
+  const sched = (fn, ms) => { window._freshTimer = setTimeout(fn, ms); };
 
-  if (window._freshTimer) clearInterval(window._freshTimer);
-  if (items.length < 2) return;
+  function draw(it) {
+    line.innerHTML = '<span class="fresh-tag">' + it.tag + '</span>'
+      + '<span class="fresh-textwrap"><span class="fresh-text-inner">' + it.html + '</span></span>';
+  }
 
-  window._freshTimer = setInterval(() => {
-    line.classList.add('roll-out');           // roll current line up & away
-    setTimeout(() => {
+  function step() {
+    const inner = line.querySelector('.fresh-text-inner');
+    const wrap = line.querySelector('.fresh-textwrap');
+    if (!inner || !wrap) return;
+    const overflow = inner.scrollWidth - wrap.clientWidth;
+
+    if (overflow > 8 && !reduceMotion) {
+      // Marquee: hold → glide to reveal the end → hold → flip
+      const dist = overflow + 16;
+      const dur = Math.max(2, dist / SCROLL_SPEED);
+      sched(() => {
+        inner.style.transition = 'transform ' + dur + 's linear';
+        inner.style.transform = 'translateX(-' + dist + 'px)';
+        sched(rollNext, dur * 1000 + HOLD_EDGE);
+      }, HOLD_EDGE);
+    } else {
+      if (overflow > 8 && reduceMotion) inner.classList.add('ellip');
+      if (items.length < 2 && overflow <= 8) return;  // single short item: just sit
+      sched(rollNext, HOLD_FIT);
+    }
+  }
+
+  function rollNext() {
+    line.classList.add('roll-out');
+    sched(() => {
       idx = (idx + 1) % items.length;
       draw(items[idx]);
       line.classList.remove('roll-out');
-      line.classList.add('roll-prep');        // park new line below, no transition
-      void line.offsetHeight;                 // force reflow
-      line.classList.remove('roll-prep');     // roll it up into place
+      line.classList.add('roll-prep');
+      void line.offsetHeight;
+      line.classList.remove('roll-prep');
+      sched(step, 500);
     }, 460);
-  }, 5000);
+  }
+
+  draw(items[0]);
+  step();
 }
 
 async function load(){
