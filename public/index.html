@@ -7,11 +7,6 @@
 <meta name="description" content="Old Bridge High School Student Life — events, clubs, announcements, class pages, and resources for students and faculty. Go Knights!">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#13082E">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Student Life">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="OBHS Student Life">
 <meta property="og:title" content="OBHS Student Life">
@@ -167,7 +162,18 @@ img{max-width:100%;display:block;}
 
 /* Reveal on scroll */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s cubic-bezier(.2,.8,.2,1),transform 0.6s cubic-bezier(.2,.8,.2,1);}
-.reveal.in{opacity:1;transform:translateY(
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* Announcements */
+.ann{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:15px 18px;display:flex;align-items:flex-start;gap:14px;margin-bottom:8px;transition:transform 0.25s cubic-bezier(.2,.8,.2,1),border-color 0.25s,background 0.25s;cursor:pointer;}
+.ann:hover{transform:translateX(4px);border-color:var(--line-bright);background:rgba(45,27,105,0.45);}
+.ann-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;box-shadow:0 0 10px currentColor;}
+.ann-body{flex:1;}
+.ann-t{font-size:13.5px;font-weight:500;color:#fff;line-height:1.35;margin-bottom:3px;}
+.ann-m{font-size:11px;color:var(--faint);letter-spacing:.02em;}
+.ann-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;flex-shrink:0;white-space:nowrap;letter-spacing:.05em;text-transform:uppercase;align-self:flex-start;margin-top:2px;}
+.skel{background:linear-gradient(100deg,rgba(45,27,105,0.2) 30%,rgba(91,63,192,0.15) 50%,rgba(45,27,105,0.2) 70%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:14px;}
+@keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
 
 /* Events */
 .ev-card{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
@@ -1522,9 +1528,9 @@ async function loadClassCup() {
     };
     const clean = rows.map(r => ({
         cls: (getF(r,'CLASS')||'').toString().trim(),
-        pts: parseInt((getF(r,'POINTS')||'0').toString().replace(/[^0-9]/g,'')) || 0
+        pts: parseInt((getF(r,'POINTS')||'').toString().replace(/[^0-9]/g,''))
       }))
-      .filter(c => c.cls)
+      .filter(c => c.cls && !isNaN(c.pts))
       .sort((a,b) => b.pts - a.pts);
     console.log('[ClassCup] rows:', rows.length, 'clean:', clean.length);
     if (!clean.length) { wrap.style.display = 'none'; return; }
