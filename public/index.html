@@ -409,6 +409,19 @@ img{max-width:100%;display:block;}
 @media (max-width: 380px){
   .hero-sub{font-size:9px;letter-spacing:.1em;}
 }
+
+/* ── Search ── */
+.nav-search-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:8px;margin-left:2px;border-radius:8px;transition:color .2s,background .2s;flex-shrink:0;display:flex;align-items:center;}
+.nav-search-btn:hover{color:#fff;background:rgba(255,255,255,0.08);}
+.sr-group{margin-bottom:22px;}
+.sr-group-ttl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;}
+.sr-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s;}
+.sr-item:hover{border-color:var(--line-bright);background:rgba(91,63,192,0.16);}
+.sr-item-t{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;}
+.sr-item-d{font-size:12px;color:var(--muted);}
+@media (max-width:767px){
+  .nav-search-btn{padding:7px;}
+}
 </style>
 </head>
 <body>
@@ -435,6 +448,7 @@ img{max-width:100%;display:block;}
   <button class="nav-btn active" data-page="home" onclick="go('home',this)">Home</button>
   <button class="nav-btn" data-page="student" onclick="go('student',this)">Student Hub</button>
   <button class="nav-btn" data-page="faculty" onclick="go('faculty',this)">Faculty Hub</button>
+  <button class="nav-search-btn" onclick="openSearch()" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
 </nav>
 
 
@@ -1001,12 +1015,12 @@ img{max-width:100%;display:block;}
 
   <div id="f-overview" class="subbody">
     <div class="feat">
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚌</div><div class="fc-ttl">Field Trip Request</div><div class="fc-dsc">Submit a field trip request. Minimum 2-week advance notice required.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚶</div><div class="fc-ttl">Early Dismissal</div><div class="fc-dsc">Request early dismissal for a student activity or school event.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ico">🏫</div><div class="fc-ttl">Club Advisor Resources</div><div class="fc-dsc">Flyer generator, meeting logs, student roster tools, and budget request forms.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Hub</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ico">📢</div><div class="fc-ttl">Submit an Event / Meeting</div><div class="fc-dsc">Submit in-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">IT work orders, room setup, AV equipment reservations, and tech support.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ico">📁</div><div class="fc-ttl">Document Library</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">SharePoint Library</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚌</div><div class="fc-ttl">Field Trip Request</div><div class="fc-dsc">📅 2-week notice · 📝 Microsoft Form</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚶</div><div class="fc-ttl">Early Dismissal</div><div class="fc-dsc">⏱️ 48-hr notice · 📎 Roster upload</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ico">🏫</div><div class="fc-ttl">Club Advisor Resources</div><div class="fc-dsc">🖨️ Flyers · 📋 Roster · 💰 Budget</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Hub</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ico">📢</div><div class="fc-ttl">Submit an Event / Meeting</div><div class="fc-dsc">🕐 Class-time events · 📝 Microsoft Form</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">💻 IT tickets · 🛠️ Tech support</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ico">📁</div><div class="fc-ttl">Document Library</div><div class="fc-dsc">📄 Slips · 📘 Policies · 📑 Forms</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">SharePoint Library</span></div>
     </div>
     <div class="two">
       <div class="cs">
@@ -2119,9 +2133,123 @@ async function clsLoadPosts(yr) {
 
 // Class of 2027 auto-loads via ssub check in clsShow
 
+
+// ══════════════════════════════════════════════════════
+// SITE SEARCH
+// ══════════════════════════════════════════════════════
+function openSearch() {
+  const m = document.getElementById('search-modal');
+  m.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  chLoadClubs(); // warm up club data so results are ready
+  setTimeout(() => document.getElementById('search-input').focus(), 50);
+}
+function closeSearch() {
+  document.getElementById('search-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--faint);font-size:13px;">Start typing to search the whole site…</div>';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const m = document.getElementById('search-modal');
+    if (m && m.style.display !== 'none') closeSearch();
+  }
+});
+
+function srNav(page, subId) {
+  closeSearch();
+  const btn = document.querySelector('[data-page=' + page + ']');
+  go(page, btn);
+  if (subId) setTimeout(() => {
+    const sfn = page === 'student' ? ssub : fsub;
+    const subBtn = document.querySelector('#' + (page==='student'?'s':'f') + '-subnav .sn[data-sub=' + subId + ']');
+    sfn(subBtn, subId);
+  }, 100);
+}
+
+function doSearch(q) {
+  const el = document.getElementById('search-results');
+  q = (q || '').trim().toLowerCase();
+  if (!q) { el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--faint);font-size:13px;">Start typing to search the whole site…</div>'; return; }
+
+  const groups = [];
+
+  // Clubs
+  if (chAllClubs && chAllClubs.length) {
+    const matches = chAllClubs.filter(c =>
+      (c['CLUB']||'').toLowerCase().includes(q) || (c['ADVISOR']||'').toLowerCase().includes(q)
+    ).slice(0, 8);
+    if (matches.length) groups.push({ title: '🏆 Clubs', items: matches.map(c => ({
+      t: c['CLUB'] || '', d: c['ADVISOR'] ? 'Advisor: ' + c['ADVISOR'] : 'Club',
+      action: () => srNav('student', 's-clubs')
+    })) });
+  }
+
+  // Announcements
+  if (window._lastAnn && window._lastAnn.length) {
+    const matches = window._lastAnn.filter(a => (a['TITLE']||'').toLowerCase().includes(q)).slice(0, 6);
+    if (matches.length) groups.push({ title: '📣 Announcements', items: matches.map(a => ({
+      t: a['TITLE'] || '', d: a['DATE'] || 'Announcement',
+      action: () => srNav('student', 's-overview')
+    })) });
+  }
+
+  // Events
+  if (window._allEvents && window._allEvents.length) {
+    const matches = window._allEvents.filter(e => (e['TITLE']||'').toLowerCase().includes(q)).slice(0, 6);
+    if (matches.length) groups.push({ title: '📅 Events', items: matches.map(e => ({
+      t: e['TITLE'] || '', d: [e['MONTH'], e['DAY']].filter(Boolean).join(' ') + (e['LOCATION'] ? ' · ' + e['LOCATION'] : ''),
+      action: () => { closeSearch(); openCal(); }
+    })) });
+  }
+
+  // Quick Links
+  if (window._lastQL && window._lastQL.length) {
+    const matches = window._lastQL.filter(l => (l['LABEL']||'').toLowerCase().includes(q)).slice(0, 6);
+    if (matches.length) groups.push({ title: '🔗 Quick Links', items: matches.map(l => ({
+      t: l['LABEL'] || '', d: 'Quick Link',
+      action: () => { closeSearch(); window.open(l['URL'], '_blank'); }
+    })) });
+  }
+
+  if (!groups.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--faint);font-size:13px;">No matches for "' + q + '". Try a different search.</div>';
+    return;
+  }
+
+  window._srActions = [];
+  let idx = 0;
+  el.innerHTML = groups.map(g =>
+    '<div class="sr-group"><div class="sr-group-ttl">' + g.title + '</div>' +
+    g.items.map(item => {
+      const i = idx++;
+      window._srActions[i] = item.action;
+      return '<div class="sr-item" onclick="window._srActions[' + i + ']()"><div class="sr-item-t">' + item.t + '</div><div class="sr-item-d">' + item.d + '</div></div>';
+    }).join('') +
+    '</div>'
+  ).join('');
+}
+
 load();
 observeReveal();
 </script>
+
+<!-- Search Overlay -->
+<div id="search-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(10,4,24,0.94);backdrop-filter:blur(14px);overflow-y:auto;padding:0;">
+  <div style="max-width:640px;margin:0 auto;padding:20px 20px 40px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 0 18px;position:sticky;top:0;background:linear-gradient(rgba(10,4,24,1),rgba(10,4,24,0.85));z-index:2;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--silver)" stroke-width="2.3" stroke-linecap="round" style="flex-shrink:0;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input id="search-input" type="text" placeholder="Search clubs, announcements, events, links…" autocomplete="off"
+        style="flex:1;background:none;border:none;outline:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:17px;"
+        oninput="doSearch(this.value)">
+      <button onclick="closeSearch()" style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:600;flex-shrink:0;">Esc</button>
+    </div>
+    <div id="search-results">
+      <div style="text-align:center;padding:60px 20px;color:var(--faint);font-size:13px;">Start typing to search the whole site…</div>
+    </div>
+  </div>
+</div>
 
 <!-- Full Calendar Modal -->
 <div id="cal-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(10,4,24,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
