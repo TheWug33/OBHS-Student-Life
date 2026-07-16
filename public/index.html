@@ -455,9 +455,7 @@ img{max-width:100%;display:block;}
     </div>
   </section>
 
-  <div class="dates" id="dates"><span class="dates-loading">Loading key dates…</span></div>
-
-  <div class="fresh-strip" id="fresh-strip" style="display:none">
+    <div class="fresh-strip" id="fresh-strip" style="display:none">
     <div class="fresh-rotor" id="fresh-rotor"><div class="fresh-line" id="fresh-line"></div></div>
   </div>
 
@@ -1444,6 +1442,8 @@ function renderEv(rows){
 const DATE_EMOJI={'final exam':'📅','exam':'📅','last day':'🎓','graduation':'🏆','first day':'🏫','school':'🏫','holiday':'🎉','break':'⛷️','prom':'🎊','spirit':'🎽','awards':'🏅'};
 function dateEmoji(l){l=(l||'').toLowerCase();for(const[k,e]of Object.entries(DATE_EMOJI))if(l.includes(k))return e;return'📅';}
 function renderDates(rows){
+  const _el=document.getElementById('dates');
+  if(!_el) return;
   const el=document.getElementById('dates');
   const clean=rows.filter(r=>r.DATE&&r.LABEL&&!r.LABEL.includes('ADD YOUR')&&r.DATE!=='Mon DD');
   if(!clean.length){el.innerHTML='';return;}
