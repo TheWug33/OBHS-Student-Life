@@ -399,6 +399,16 @@ img{max-width:100%;display:block;}
 .quiz-opt:hover{border-color:var(--line-bright);color:#fff;}
 .quiz-opt.sel{background:var(--purple-ui);border-color:var(--purple-ui);color:#fff;}
 .quiz-match{background:rgba(91,63,192,0.14);border:1px solid var(--line-bright);border-radius:12px;padding:14px 16px;margin-bottom:9px;}
+
+/* ── Mobile hero tightening ── */
+@media (max-width: 767px){
+  .hero{min-height:0;}
+  .hero-inner{padding-top:34px;padding-bottom:30px;}
+  .hero-sub{margin-top:14px;font-size:10px;letter-spacing:.13em;white-space:nowrap;}
+}
+@media (max-width: 380px){
+  .hero-sub{font-size:9px;letter-spacing:.1em;}
+}
 </style>
 </head>
 <body>
