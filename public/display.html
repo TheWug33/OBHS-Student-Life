@@ -70,6 +70,42 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 .ftr-tag{font-family:'Arial Narrow',sans-serif;font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#AFA9EC;white-space:nowrap;flex-shrink:0;}
 .ftr-txt{font-size:18px;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
 .empty{font-size:26px;color:var(--faint);text-align:center;}
+
+/* ── Phone preview mode (portrait / small screens) ── */
+@media (max-width: 900px){
+  body{cursor:auto;}
+  .hdr{padding:16px 18px;}
+  .hdr-brand{font-size:15px;gap:9px;letter-spacing:.13em;}
+  .hdr-brand img{width:28px;}
+  .hdr-time{font-size:21px;}
+  .hdr-date{font-size:11px;}
+  .stage{padding:0;}
+  .slide{inset:82px 18px 66px;justify-content:flex-start;padding-top:8px;}
+  .slide-tag{font-size:13px;margin-bottom:14px;gap:9px;}
+  .slide-tag::before{width:26px;height:2px;}
+  .ev-row{gap:13px;padding:11px 0;}
+  .ev-date{width:58px;padding:7px 0;border-radius:11px;}
+  .ev-mon{font-size:10px;}
+  .ev-day{font-size:22px;}
+  .ev-t{font-size:17px;font-weight:600;}
+  .ev-m{font-size:12px;}
+  .an-row{padding:12px 0;}
+  .an-t{font-size:17px;font-weight:600;}
+  .an-m{font-size:12px;}
+  .cup-row{gap:10px;margin-bottom:14px;}
+  .cup-label{width:116px;font-size:15px;}
+  .cup-track{height:22px;}
+  .cup-pts{width:64px;font-size:15px;}
+  .cd-label{font-size:13px;margin-bottom:10px;letter-spacing:.16em;}
+  .cd-num{font-size:78px;}
+  .cd-days{font-size:13px;letter-spacing:.2em;}
+  .lyric{margin-top:28px;font-size:15px;}
+  .lyric em{font-size:12px;}
+  .ftr{padding:12px 18px;gap:10px;}
+  .ftr-tag{font-size:11px;letter-spacing:.12em;}
+  .ftr-txt{font-size:13px;}
+  .empty{font-size:15px;}
+}
 </style>
 </head>
 <body>
