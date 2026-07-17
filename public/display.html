@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBHS Student Life — Display</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+:root{
+  --void:#0A0418; --ink:#13082E; --purple-mid:#2D1B69; --purple-ui:#3D2680;
+  --purple-glow:#5B3FC0; --silver:#C7C9D1; --card:rgba(45,27,105,0.35);
+  --line:rgba(255,255,255,0.10); --line-bright:rgba(139,109,255,0.45);
+  --muted:rgba(255,255,255,0.55); --faint:rgba(255,255,255,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;cursor:none;}
+body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-ui,sans-serif;}
+
+/* Photo backdrop */
+.bg{position:fixed;inset:0;background-size:cover;background-position:center 30%;opacity:0;transition:opacity 2s;}
+.bg.on{opacity:1;}
+.shade{position:fixed;inset:0;background:linear-gradient(160deg,rgba(10,4,24,0.94),rgba(19,8,46,0.88) 55%,rgba(26,10,61,0.82));}
+
+/* Header */
+.hdr{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px 48px;z-index:5;}
+.hdr-brand{display:flex;align-items:center;gap:16px;font-family:'Arial Narrow','Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}
+.hdr-brand img{width:44px;}
+.hdr-clock{text-align:right;}
+.hdr-time{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+.hdr-date{font-size:15px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+
+/* Slides */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;padding:120px 60px 90px;}
+.slide{position:absolute;inset:120px 60px 90px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .9s,transform .9s;pointer-events:none;}
+.slide.on{opacity:1;transform:none;}
+.slide-tag{font-family:'Arial Narrow',sans-serif;font-size:20px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#AFA9EC;margin-bottom:28px;display:flex;align-items:center;gap:14px;}
+.slide-tag::before{content:'';width:44px;height:3px;background:var(--purple-glow);border-radius:2px;}
+
+/* Events slide */
+.ev-row{display:flex;align-items:center;gap:26px;padding:19px 0;border-bottom:1px solid var(--line);}
+.ev-date{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
+.ev-mon{font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#CDC6F5;}
+.ev-day{font-size:38px;font-weight:800;line-height:1.05;}
+.ev-t{font-size:33px;font-weight:700;}
+.ev-m{font-size:19px;color:var(--muted);margin-top:3px;}
+
+/* Announcements slide */
+.an-row{padding:22px 0;border-bottom:1px solid var(--line);}
+.an-t{font-size:34px;font-weight:700;line-height:1.25;}
+.an-m{font-size:19px;color:var(--muted);margin-top:5px;}
+
+/* Class Cup slide */
+.cup-row{display:flex;align-items:center;gap:26px;margin-bottom:30px;}
+.cup-label{width:230px;flex-shrink:0;font-size:30px;font-weight:700;white-space:nowrap;}
+.cup-track{flex:1;height:42px;background:rgba(0,0,0,0.4);border:1px solid var(--line);border-radius:24px;overflow:hidden;}
+.cup-fill{height:100%;width:0;border-radius:24px;background:linear-gradient(90deg,#3D2680,#5B3FC0);transition:width 1.4s cubic-bezier(.22,.9,.35,1);}
+.cup-row.leader .cup-fill{background:linear-gradient(90deg,#5B3FC0,#8B6DFF);box-shadow:0 0 30px rgba(139,109,255,0.5);}
+.cup-pts{width:140px;flex-shrink:0;text-align:right;font-size:30px;font-weight:800;color:var(--silver);font-variant-numeric:tabular-nums;}
+
+/* Countdown / lyric slide */
+.cd-wrap{text-align:center;}
+.cd-label{font-size:24px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
+.cd-num{font-size:150px;font-weight:800;line-height:1;background:linear-gradient(135deg,#F0F0F4,#C7C9D1 50%,#9A9CA8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.cd-days{font-size:26px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-top:10px;}
+.lyric{margin-top:64px;font-size:27px;line-height:1.5;color:var(--silver);font-style:italic;max-width:960px;margin-left:auto;margin-right:auto;}
+.lyric em{color:var(--muted);font-style:normal;font-size:21px;display:block;margin-top:12px;}
+
+/* Footer strip */
+.ftr{position:fixed;left:0;right:0;bottom:0;padding:20px 48px;display:flex;align-items:center;gap:16px;background:rgba(0,0,0,0.45);border-top:1px solid var(--line);z-index:5;}
+.ftr-tag{font-family:'Arial Narrow',sans-serif;font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#AFA9EC;white-space:nowrap;flex-shrink:0;}
+.ftr-txt{font-size:18px;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.empty{font-size:26px;color:var(--faint);text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="bg" id="bg-a"></div>
+<div class="bg" id="bg-b"></div>
+<div class="shade"></div>
+
+<div class="hdr">
+  <div class="hdr-brand"><img src="/icon-192.png" alt=""> OBHS Student Life</div>
+  <div class="hdr-clock">
+    <div class="hdr-time" id="clock">--:--</div>
+    <div class="hdr-date" id="date">—</div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="slide" id="slide-events"><div class="slide-tag">Upcoming Events</div><div id="ev-list"><div class="empty">Loading…</div></div></div>
+  <div class="slide" id="slide-ann"><div class="slide-tag">Announcements</div><div id="an-list"><div class="empty">Loading…</div></div></div>
+  <div class="slide" id="slide-cup"><div class="slide-tag">🏆 Class Cup</div><div id="cup-list"><div class="empty">Loading…</div></div></div>
+  <div class="slide" id="slide-cd"><div class="cd-wrap"><div class="cd-label" id="cd-label">Countdown</div><div class="cd-num" id="cd-num">—</div><div class="cd-days">Days</div><div class="lyric" id="lyric" style="display:none"></div></div></div>
+</div>
+
+<div class="ftr">
+  <div class="ftr-tag">📣 What's New</div>
+  <div class="ftr-txt" id="ftr-txt">obhs-student-life-ob.vercel.app</div>
+</div>
+
+<script>
+// Same data sources as the main site
+const GIDS = {
+  announcements: '1447819289',
+  events:        '424739582',
+  countdown:     '1732793405',
+  lyric:         '185335575',
+  classcup:      '1469693941',
+};
+const PHOTOS = ['/sl-photo-1.jpg','/sl-photo-2.jpg','/sl-photo-3.jpg','/sl-photo-4.jpg','/sl-photo-6.jpg','/sl-photo-7.jpg','/sl-photo-8.jpg'];
+const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function splitLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  if(lines.length<2)return[];
+  const hdrs=splitLine(lines[0]).map(h=>h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(l=>{const v=splitLine(l).map(x=>x.replace(/^"|"$/g,'').trim());const o={};hdrs.forEach((h,i)=>o[h.toUpperCase()]=v[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
+}
+async function tab(gid){
+  try{const r=await fetch('/api/sheet?gid='+gid,{cache:'no-store'});if(!r.ok)return[];const t=await r.text();if(!t||t.includes('<!DOCTYPE'))return[];return parseCSV(t);}catch(e){return[];}
+}
+
+// Clock
+function tick(){
+  const n=new Date();
+  let h=n.getHours(),m=String(n.getMinutes()).padStart(2,'0');
+  const ap=h>=12?'PM':'AM';h=h%12||12;
+  document.getElementById('clock').textContent=h+':'+m+' '+ap;
+  document.getElementById('date').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+}
+setInterval(tick,1000);tick();
+
+// Photo backdrop rotation
+let bgIdx=0,bgA=true;
+function rotateBG(){
+  const incoming=document.getElementById(bgA?'bg-b':'bg-a');
+  const outgoing=document.getElementById(bgA?'bg-a':'bg-b');
+  bgIdx=(bgIdx+1)%PHOTOS.length;
+  incoming.style.backgroundImage="url('"+PHOTOS[bgIdx]+"')";
+  incoming.classList.add('on');outgoing.classList.remove('on');
+  bgA=!bgA;
+}
+document.getElementById('bg-a').style.backgroundImage="url('"+PHOTOS[0]+"')";
+document.getElementById('bg-a').classList.add('on');
+PHOTOS.forEach(s=>{const i=new Image();i.src=s;});
+setInterval(rotateBG,20000);
+
+// Slide rotation
+const SLIDES=['slide-events','slide-ann','slide-cup','slide-cd'];
+let sIdx=0;
+function showSlide(i){
+  SLIDES.forEach((id,k)=>document.getElementById(id).classList.toggle('on',k===i));
+}
+showSlide(0);
+setInterval(()=>{sIdx=(sIdx+1)%SLIDES.length;showSlide(sIdx);},12000);
+
+// Data
+async function loadData(){
+  const [ann,evt,cd,lyr,cup]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.classcup)]);
+
+  // Events
+  const today=new Date();today.setHours(0,0,0,0);
+  const upcoming=evt.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.DAY&&r.DAY!=='0').map(r=>{
+    const rawDay=(r.DAY||'').toString().trim();
+    const dy=rawDay.includes('/')?parseInt(rawDay.split('/')[1]):parseInt(rawDay)||1;
+    let mo=(r.MONTH||'').toString().trim().toUpperCase().slice(0,3);
+    if(mo in MONTHS){
+      let yr=today.getFullYear();
+      let d=new Date(yr,MONTHS[mo],dy);
+      if(d<new Date(today.getTime()-86400000))d=new Date(yr+1,MONTHS[mo],dy);
+      r._d=d;r._mon=mo;r._day=dy;
+    } else r._d=new Date(9999,0,1);
+    return r;
+  }).filter(r=>r._d>=today).sort((a,b)=>a._d-b._d).slice(0,5);
+  document.getElementById('ev-list').innerHTML=upcoming.length?upcoming.map(r=>
+    '<div class="ev-row"><div class="ev-date"><div class="ev-mon">'+r._mon+'</div><div class="ev-day">'+r._day+'</div></div>'+
+    '<div><div class="ev-t">'+r.TITLE+'</div><div class="ev-m">'+(r.TIME||'All Day')+(r.LOCATION?' · '+r.LOCATION:'')+'</div></div></div>'
+  ).join(''):'<div class="empty">No upcoming events posted.</div>';
+
+  // Announcements
+  const cleanAnn=ann.filter(a=>a.TITLE&&!a.TITLE.includes('ADD YOUR')).slice(0,4);
+  document.getElementById('an-list').innerHTML=cleanAnn.length?cleanAnn.map(a=>
+    '<div class="an-row"><div class="an-t">'+a.TITLE+'</div><div class="an-m">'+(a.DATE||'')+(a.SOURCE?' · '+a.SOURCE:'')+'</div></div>'
+  ).join(''):'<div class="empty">No announcements right now.</div>';
+  // Footer ticker: newest announcement
+  if(cleanAnn.length)document.getElementById('ftr-txt').textContent=cleanAnn[0].TITLE+(cleanAnn[0].DATE?' · '+cleanAnn[0].DATE:'');
+
+  // Class Cup
+  const cupClean=cup.map(r=>({cls:(r.CLASS||'').trim(),pts:parseInt((r.POINTS||'0').replace(/[^0-9]/g,''))||0})).filter(c=>c.cls).sort((a,b)=>b.pts-a.pts);
+  if(cupClean.length){
+    const max=Math.max(...cupClean.map(c=>c.pts),1);
+    document.getElementById('cup-list').innerHTML=cupClean.map((c,i)=>
+      '<div class="cup-row'+(i===0?' leader':'')+'"><div class="cup-label">Class of '+c.cls+(i===0?' 👑':'')+'</div>'+
+      '<div class="cup-track"><div class="cup-fill" data-w="'+Math.max(6,Math.round(c.pts/max*100))+'"></div></div>'+
+      '<div class="cup-pts">'+c.pts.toLocaleString()+'</div></div>'
+    ).join('');
+    setTimeout(()=>document.querySelectorAll('.cup-fill').forEach(f=>f.style.width=f.dataset.w+'%'),400);
+  } else {
+    document.getElementById('cup-list').innerHTML='<div class="empty">Points race starts soon!</div>';
+  }
+
+  // Countdown
+  const cdRow=cd.find(r=>r.TARGET_DATE);
+  if(cdRow){
+    document.getElementById('cd-label').textContent=cdRow.LABEL||'Countdown';
+    const t=new Date(cdRow.TARGET_DATE);
+    const days=Math.max(0,Math.ceil((t-new Date())/86400000));
+    document.getElementById('cd-num').textContent=days;
+  }
+
+  // Lyric
+  const lyrRows=lyr.filter(r=>(r.LYRIC||'').trim());
+  if(lyrRows.length){
+    const r=lyrRows[lyrRows.length-1];
+    const attribution=[r.SONG,r.ARTIST].filter(Boolean).join(', ');
+    document.getElementById('lyric').innerHTML='\u201C'+r.LYRIC+'\u201D'+(attribution?'<em>— '+attribution+(r['SUBMITTED BY']?' · submitted by '+r['SUBMITTED BY']:'')+'</em>':'');
+    document.getElementById('lyric').style.display='block';
+  }
+}
+loadData();
+setInterval(loadData,5*60*1000);          // refresh data every 5 minutes
+setTimeout(()=>location.reload(),30*60*1000); // full reload every 30 min (picks up code updates)
+</script>
+</body>
+</html>
