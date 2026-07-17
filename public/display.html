@@ -68,7 +68,12 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 /* Footer strip */
 .ftr{position:fixed;left:0;right:0;bottom:0;padding:20px 48px;display:flex;align-items:center;gap:16px;background:rgba(0,0,0,0.45);border-top:1px solid var(--line);z-index:5;}
 .ftr-tag{font-family:'Arial Narrow',sans-serif;font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#AFA9EC;white-space:nowrap;flex-shrink:0;}
-.ftr-txt{font-size:18px;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.ftr-marq{flex:1;min-width:0;overflow:hidden;}
+.ftr-track{display:inline-flex;align-items:center;white-space:nowrap;font-size:18px;color:var(--silver);will-change:transform;}
+.ftr-track.go{animation:ftr-crawl var(--dur,40s) linear infinite;}
+@keyframes ftr-crawl{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ftr-item{padding-right:26px;}
+.ftr-sep{color:var(--purple-glow);padding-right:26px;font-size:14px;}
 .empty{font-size:26px;color:var(--faint);text-align:center;}
 
 /* ── Phone preview mode (portrait / small screens) ── */
@@ -103,7 +108,9 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
   .lyric em{font-size:12px;}
   .ftr{padding:12px 18px;gap:10px;}
   .ftr-tag{font-size:11px;letter-spacing:.12em;}
-  .ftr-txt{font-size:13px;}
+  .ftr-track{font-size:13px;}
+  .ftr-item{padding-right:18px;}
+  .ftr-sep{padding-right:18px;font-size:11px;}
   .empty{font-size:15px;}
 }
 </style>
@@ -131,7 +138,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 
 <div class="ftr">
   <div class="ftr-tag">📣 What's New</div>
-  <div class="ftr-txt" id="ftr-txt">obhs-student-life-ob.vercel.app</div>
+  <div class="ftr-marq"><div class="ftr-track" id="ftr-track"><span class="ftr-item">Loading…</span></div></div>
 </div>
 
 <script>
@@ -227,8 +234,23 @@ async function loadData(){
   document.getElementById('an-list').innerHTML=cleanAnn.length?cleanAnn.map(a=>
     '<div class="an-row"><div class="an-t">'+a.TITLE+'</div><div class="an-m">'+(a.DATE||'')+(a.SOURCE?' · '+a.SOURCE:'')+'</div></div>'
   ).join(''):'<div class="empty">No announcements right now.</div>';
-  // Footer ticker: newest announcement
-  if(cleanAnn.length)document.getElementById('ftr-txt').textContent=cleanAnn[0].TITLE+(cleanAnn[0].DATE?' · '+cleanAnn[0].DATE:'');
+  // Footer ticker: continuous crawl of all announcements
+  const tickerAnn = ann.filter(a=>a.TITLE&&!a.TITLE.includes('ADD YOUR')).slice(0,8);
+  const track = document.getElementById('ftr-track');
+  if (track) {
+    const items = tickerAnn.length
+      ? tickerAnn.map(a=>a.TITLE+(a.DATE?' — '+a.DATE:''))
+      : ['Welcome to OBHS Student Life'];
+    const half = items.map(t=>'<span class="ftr-item">'+t+'</span><span class="ftr-sep">✦</span>').join('');
+    track.classList.remove('go');
+    track.innerHTML = half + half;
+    requestAnimationFrame(()=>{
+      const w = track.scrollWidth / 2;
+      const dur = Math.max(16, Math.round(w / 70)); // ~70px per second
+      track.style.setProperty('--dur', dur + 's');
+      track.classList.add('go');
+    });
+  }
 
   // Class Cup
   const cupClean=cup.map(r=>({cls:(r.CLASS||'').trim(),pts:parseInt((r.POINTS||'0').replace(/[^0-9]/g,''))||0})).filter(c=>c.cls).sort((a,b)=>b.pts-a.pts);
