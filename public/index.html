@@ -432,7 +432,9 @@ img{max-width:100%;display:block;}
 /* ── Hero photo rotation ── */
 .hero-photo{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;transition:opacity 1.6s ease;pointer-events:none;}
 .hero-photo.on{opacity:1;}
-.hero-shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,4,24,0.93) 0%,rgba(19,8,46,0.82) 45%,rgba(26,10,61,0.62) 100%);pointer-events:none;}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,4,24,0.88) 0%,rgba(19,8,46,0.68) 45%,rgba(26,10,61,0.38) 100%);pointer-events:none;}
+.hero.has-photos .hero-knight{display:none;}
+.hero.has-photos .hero-glow{display:none;}
 @media (prefers-reduced-motion: reduce){
   .hero-photo{transition:opacity .5s;}
 }
@@ -2313,6 +2315,8 @@ const HERO_PHOTOS = ['/sl-photo-1.jpg','/sl-photo-2.jpg','/sl-photo-3.jpg','/sl-
   let idx = 0;
   a.style.backgroundImage = "url('" + HERO_PHOTOS[0] + "')";
   a.classList.add('on');
+  const heroEl = document.querySelector('.hero');
+  if (heroEl) heroEl.classList.add('has-photos');
   let showingA = true;
 
   if (reduceMotion || HERO_PHOTOS.length < 2) return; // static first photo
