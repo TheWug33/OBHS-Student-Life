@@ -423,16 +423,6 @@ img{max-width:100%;display:block;}
   .nav-search-btn{padding:7px;}
 }
 
-/* ── Live stats bar ── */
-.stats-bar{display:flex;gap:10px;margin-bottom:28px;}
-.stat-item{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center;}
-.stat-n{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;background:var(--metal-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;}
-.stat-l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:4px;}
-@media (max-width:767px){
-  .stats-bar{flex-wrap:wrap;}
-  .stat-item{min-width:calc(50% - 5px);flex:1 1 calc(50% - 5px);}
-}
-
 /* ── Knight of the Week spotlight ── */
 .spot-card{background:linear-gradient(155deg,#2D1B69,#13082E);border:1px solid var(--line-bright);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
 .spot-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;}
@@ -522,11 +512,6 @@ img{max-width:100%;display:block;}
 
   <div class="home-grid">
     <div class="home-main">
-      <div class="stats-bar" id="stats-bar" style="display:none">
-        <div class="stat-item"><div class="stat-n" id="stat-clubs">—</div><div class="stat-l">Clubs</div></div>
-        <div class="stat-item"><div class="stat-n" id="stat-events">—</div><div class="stat-l">Events Scheduled</div></div>
-        <div class="stat-item"><div class="stat-n" id="stat-ann">—</div><div class="stat-l">Announcements</div></div>
-      </div>
       <div class="reveal">
         <div class="blk-head"><span class="blk-title">Upcoming Events</span><button class="blk-link" onclick="openCal()">Full calendar →</button></div>
         <div class="ev-card" id="ev-list">
@@ -628,14 +613,14 @@ img{max-width:100%;display:block;}
     </div>
 
     <div class="feat">
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-classes')"><div class="fc-ico">🎓</div><div class="fc-ttl">Class Pages</div><div class="fc-dsc">🎓 2027–2030 · 📣 Advisor updates</div></div>
-      <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ico">📰</div><div class="fc-ttl">Knight Life</div><div class="fc-dsc">📰 News · 🎬 Features · ✍️ Stories</div></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ico">🏆</div><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">💵 $10 entry · 🔥 Biggest event of the year</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Sign-ups open</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ico">🤝</div><div class="fc-ttl">Community Service</div><div class="fc-dsc">📝 Log hours · ✅ Upload proof</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ico">📋</div><div class="fc-ttl">Club Hub</div><div class="fc-dsc">🔎 Find a club · 🖨️ Make a flyer</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-committees')"><div class="fc-ico">🗳️</div><div class="fc-ttl">Student Committees</div><div class="fc-dsc">🗳️ Join a committee · 🏫 Shape OBHS</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New · 2026–27</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-events')"><div class="fc-ico">📅</div><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">🕺 Dances · 🎟️ Events · 📲 No office trip</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ico">🎽</div><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">👕 Knights gear · 🏫 Office pickup</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">In-office pickup</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-classes')"><div class="fc-ico">🎓</div><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
+      <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ico">📰</div><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ico">🏆</div><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign up, pay your $10, and represent your class in the biggest event of the year.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Sign-ups open</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ico">🤝</div><div class="fc-ttl">Community Service</div><div class="fc-dsc">Log hours, upload verification, and track progress toward the 10-hour graduation requirement.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ico">📋</div><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-committees')"><div class="fc-ico">🗳️</div><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Join a leadership committee and help shape school culture for 2026–27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New · 2026–27</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-events')"><div class="fc-ico">📅</div><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ico">🎽</div><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Browse and buy OBHS Knights gear. Pick up in the Student Life office.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">In-office pickup</span></div>
     </div>
 
     <!-- CLASS CUP -->
@@ -1040,12 +1025,12 @@ img{max-width:100%;display:block;}
 
   <div id="f-overview" class="subbody">
     <div class="feat">
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚌</div><div class="fc-ttl">Field Trip Request</div><div class="fc-dsc">📅 2-week notice · 📝 Microsoft Form</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚶</div><div class="fc-ttl">Early Dismissal</div><div class="fc-dsc">⏱️ 48-hr notice · 📎 Roster upload</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ico">🏫</div><div class="fc-ttl">Club Advisor Resources</div><div class="fc-dsc">🖨️ Flyers · 📋 Roster · 💰 Budget</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Hub</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ico">📢</div><div class="fc-ttl">Submit an Event / Meeting</div><div class="fc-dsc">🕐 Class-time events · 📝 Microsoft Form</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">💻 IT tickets · 🛠️ Tech support</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ico">📁</div><div class="fc-ttl">Document Library</div><div class="fc-dsc">📄 Slips · 📘 Policies · 📑 Forms</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">SharePoint Library</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚌</div><div class="fc-ttl">Field Trip Request</div><div class="fc-dsc">Submit a field trip request. Minimum 2-week advance notice required.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚶</div><div class="fc-ttl">Early Dismissal</div><div class="fc-dsc">Request early dismissal for a student activity or school event.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ico">🏫</div><div class="fc-ttl">Club Advisor Resources</div><div class="fc-dsc">Flyer generator, meeting logs, student roster tools, and budget request forms.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Hub</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ico">📢</div><div class="fc-ttl">Submit an Event / Meeting</div><div class="fc-dsc">Submit in-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">IT work orders, room setup, AV equipment reservations, and tech support.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ico">📁</div><div class="fc-ttl">Document Library</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">SharePoint Library</span></div>
     </div>
     <div class="two">
       <div class="cs">
@@ -1826,7 +1811,6 @@ async function load(){
     try{renderEv(evt);}catch(e){console.warn('[render] ev',e);}
     try{renderWeekStrip();}catch(e){console.warn('[render] week',e);}
     try{loadClassCup();}catch(e){console.warn('[render] cup',e);}
-    try{renderStats();}catch(e){console.warn('[render] stats',e);}
     try{loadSpotlight();}catch(e){console.warn('[render] spotlight',e);}
     try{renderDates(dates);}catch(e){console.warn('[render] dates',e);}
     try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
@@ -2260,22 +2244,7 @@ function doSearch(q) {
 }
 
 
-// ══════════════════════════════════════════════════════
-// LIVE STATS BAR
-// ══════════════════════════════════════════════════════
-async function renderStats() {
-  const bar = document.getElementById('stats-bar');
-  if (!bar) return;
-  await chLoadClubs(); // ensure club count is available
-  const clubs = (chAllClubs && chAllClubs.length) || 0;
-  const events = (window._allEvents && window._allEvents.length) || 0;
-  const ann = (window._lastAnn && window._lastAnn.filter(a => (a['TITLE']||'').trim() && !(a['TITLE']||'').includes('ADD YOUR')).length) || 0;
-  if (!clubs && !events && !ann) { bar.style.display = 'none'; return; }
-  document.getElementById('stat-clubs').textContent = clubs || '—';
-  document.getElementById('stat-events').textContent = events || '—';
-  document.getElementById('stat-ann').textContent = ann || '—';
-  bar.style.display = 'flex';
-}
+
 
 // ══════════════════════════════════════════════════════
 // KNIGHT OF THE WEEK SPOTLIGHT
