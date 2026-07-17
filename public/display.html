@@ -112,11 +112,18 @@ const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function splitLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','LABEL','TARGET_DATE','CLASS','POINTS','LYRIC','SONG','ARTIST'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
-  const hdrs=splitLine(lines[0]).map(h=>h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(l=>{const v=splitLine(l).map(x=>x.replace(/^"|"$/g,'').trim());const o={};hdrs.forEach((h,i)=>o[h.toUpperCase()]=v[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
+  // Find the real header row — sheets may have instruction rows above it
+  let hi=0;
+  for(let i=0;i<Math.min(lines.length,8);i++){
+    const cells=splitLine(lines[i]).map(c=>c.replace(/^"|"$/g,'').trim().toUpperCase());
+    if(cells.some(c=>KNOWN.includes(c))){hi=i;break;}
+  }
+  const hdrs=splitLine(lines[hi]).map(h=>h.replace(/^"|"$/g,'').trim());
+  return lines.slice(hi+1).map(l=>{const v=splitLine(l).map(x=>x.replace(/^"|"$/g,'').trim());const o={};hdrs.forEach((h,i)=>o[h.toUpperCase()]=v[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
 }
 async function tab(gid){
   try{const r=await fetch('/api/sheet?gid='+gid,{cache:'no-store'});if(!r.ok)return[];const t=await r.text();if(!t||t.includes('<!DOCTYPE'))return[];return parseCSV(t);}catch(e){return[];}
