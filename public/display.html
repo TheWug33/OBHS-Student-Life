@@ -112,6 +112,18 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
   .ftr-sep{padding-right:18px;font-size:11px;}
   .empty{font-size:15px;}
 }
+
+/* ── Knight watermark ── */
+.knight-wm{position:fixed;right:-4%;top:52%;transform:translateY(-50%);width:62vh;height:62vh;background:url('/knight-mark.png') center/contain no-repeat;opacity:0.07;z-index:2;pointer-events:none;}
+
+/* ── QR card ── */
+.qr-card{position:fixed;right:44px;bottom:96px;z-index:6;background:#fff;border-radius:14px;padding:11px 11px 7px;text-align:center;box-shadow:0 10px 34px rgba(0,0,0,0.55);}
+.qr-card canvas,.qr-card img{display:block;border-radius:4px;}
+.qr-label{font-family:'Arial Narrow',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#26215C;margin-top:6px;}
+@media (max-width: 900px){
+  .qr-card{display:none;}
+  .knight-wm{opacity:0.05;width:70vw;height:70vw;right:-14%;}
+}
 </style>
 </head>
 <body>
@@ -119,6 +131,8 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 <div class="bg" id="bg-a"></div>
 <div class="bg" id="bg-b"></div>
 <div class="shade"></div>
+<div class="knight-wm"></div>
+<div class="qr-card"><div id="qr-box"></div><div class="qr-label">Scan for the site</div></div>
 
 <div class="hdr">
   <div class="hdr-brand"><img src="/icon-192.png" alt=""> OBHS Student Life</div>
@@ -287,6 +301,21 @@ async function loadData(){
 loadData();
 setInterval(loadData,5*60*1000);          // refresh data every 5 minutes
 setTimeout(()=>location.reload(),30*60*1000); // full reload every 30 min (picks up code updates)
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+try {
+  new QRCode(document.getElementById('qr-box'), {
+    text: 'https://obhs-student-life-ob.vercel.app/',
+    width: 118, height: 118,
+    colorDark: '#13082E', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+} catch(e) {
+  // If the CDN is unreachable, hide the card rather than show an empty white box
+  var qc = document.querySelector('.qr-card');
+  if (qc) qc.style.display = 'none';
+}
 </script>
 </body>
 </html>
