@@ -121,6 +121,19 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
   .qr-card{right:14px;bottom:76px;padding:8px 8px 5px;border-radius:11px;transform:scale(0.72);transform-origin:bottom right;}
   .knight-wm{opacity:0.09;width:78vw;height:78vw;right:-16%;}
 }
+
+/* ── KOTW slide ── */
+.kotw-type{display:inline-block;font-family:'Arial Narrow',sans-serif;font-size:17px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#CDC6F5;background:rgba(91,63,192,0.35);border:1px solid var(--line-bright);padding:7px 20px;border-radius:24px;margin-bottom:22px;}
+.kotw-name{font-size:74px;font-weight:800;line-height:1.05;background:linear-gradient(135deg,#F0F0F4,#C7C9D1 50%,#9A9CA8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.kotw-blurb{font-size:29px;color:var(--silver);line-height:1.5;margin-top:22px;max-width:1020px;}
+/* ── Poster slide ── */
+.poster-wrap{height:100%;display:flex;align-items:center;justify-content:center;}
+.poster-wrap img{max-height:100%;max-width:100%;border-radius:16px;box-shadow:0 22px 70px rgba(0,0,0,0.6);}
+@media (max-width: 900px){
+  .kotw-type{font-size:11px;padding:5px 13px;margin-bottom:12px;}
+  .kotw-name{font-size:34px;}
+  .kotw-blurb{font-size:15px;margin-top:12px;}
+}
 </style>
 </head>
 <body>
@@ -140,7 +153,8 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 <div class="stage">
   <div class="slide" id="slide-events"><div class="slide-tag">Upcoming Events</div><div id="ev-list"><div class="empty">Loading…</div></div></div>
   <div class="slide" id="slide-ann"><div class="slide-tag">Announcements</div><div id="an-list"><div class="empty">Loading…</div></div></div>
-  <div class="slide" id="slide-cup"><div class="slide-tag">🏆 Class Cup</div><div id="cup-list"><div class="empty">Loading…</div></div></div>
+  <div class="slide" id="slide-kotw"><div class="slide-tag">🌟 Knight of the Week</div><div id="kotw-wrap"><div class="empty">Loading…</div></div></div>
+  <div class="slide" id="slide-poster"><div class="poster-wrap"><img src="/no-cell-poster.jpg" alt="Bell to Bell, No Cell — phones off and away all day"></div></div>
   <div class="slide" id="slide-cd"><div class="cd-wrap"><div class="cd-label" id="cd-label">Countdown</div><div class="cd-num" id="cd-num">—</div><div class="cd-days">Days</div><div class="lyric" id="lyric" style="display:none"></div></div></div>
 </div>
 
@@ -156,7 +170,7 @@ const GIDS = {
   events:        '424739582',
   countdown:     '1732793405',
   lyric:         '185335575',
-  classcup:      '1469693941',
+  spotlight:     '888519751',
 };
 const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -191,17 +205,20 @@ setInterval(tick,1000);tick();
 
 
 // Slide rotation
-const SLIDES=['slide-events','slide-ann','slide-cup','slide-cd'];
+const ALL_SLIDES=['slide-events','slide-ann','slide-kotw','slide-poster','slide-cd'];
+let SLIDES=['slide-events','slide-ann','slide-poster','slide-cd']; // KOTW joins when it has data
 let sIdx=0;
 function showSlide(i){
-  SLIDES.forEach((id,k)=>document.getElementById(id).classList.toggle('on',k===i));
+  ALL_SLIDES.forEach(id=>document.getElementById(id).classList.remove('on'));
+  const el=document.getElementById(SLIDES[i]);
+  if(el)el.classList.add('on');
 }
 showSlide(0);
 setInterval(()=>{sIdx=(sIdx+1)%SLIDES.length;showSlide(sIdx);},12000);
 
 // Data
 async function loadData(){
-  const [ann,evt,cd,lyr,cup]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.classcup)]);
+  const [ann,evt,cd,lyr,kotw]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.spotlight)]);
 
   // Events
   const today=new Date();today.setHours(0,0,0,0);
@@ -246,18 +263,20 @@ async function loadData(){
     });
   }
 
-  // Class Cup
-  const cupClean=cup.map(r=>({cls:(r.CLASS||'').trim(),pts:parseInt((r.POINTS||'0').replace(/[^0-9]/g,''))||0})).filter(c=>c.cls).sort((a,b)=>b.pts-a.pts);
-  if(cupClean.length){
-    const max=Math.max(...cupClean.map(c=>c.pts),1);
-    document.getElementById('cup-list').innerHTML=cupClean.map((c,i)=>
-      '<div class="cup-row'+(i===0?' leader':'')+'"><div class="cup-label">Class of '+c.cls+(i===0?' 👑':'')+'</div>'+
-      '<div class="cup-track"><div class="cup-fill" data-w="'+Math.max(6,Math.round(c.pts/max*100))+'"></div></div>'+
-      '<div class="cup-pts">'+c.pts.toLocaleString()+'</div></div>'
-    ).join('');
-    setTimeout(()=>document.querySelectorAll('.cup-fill').forEach(f=>f.style.width=f.dataset.w+'%'),400);
+  // Knight of the Week
+  const kotwClean=kotw.filter(r=>(r.NAME||'').trim());
+  if(kotwClean.length){
+    const k=kotwClean[kotwClean.length-1];
+    const type=k.TYPE||'Student';
+    const icon=/club/i.test(type)?'📋':/teacher|advisor|faculty/i.test(type)?'🍎':'🎓';
+    document.getElementById('kotw-wrap').innerHTML=
+      '<div class="kotw-type">'+icon+' '+type+'</div>'+
+      '<div class="kotw-name">'+k.NAME+'</div>'+
+      ((k.BLURB||k.DESCRIPTION)?'<div class="kotw-blurb">'+(k.BLURB||k.DESCRIPTION)+'</div>':'');
+    if(SLIDES.indexOf('slide-kotw')===-1)SLIDES=['slide-events','slide-ann','slide-kotw','slide-poster','slide-cd'];
   } else {
-    document.getElementById('cup-list').innerHTML='<div class="empty">Points race starts soon!</div>';
+    SLIDES=['slide-events','slide-ann','slide-poster','slide-cd'];
+    if(sIdx>=SLIDES.length)sIdx=0;
   }
 
   // Countdown

@@ -1224,6 +1224,7 @@ const GIDS = {
   classcup:      '1469693941',
   spotlight:     '888519751',
 };
+const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
 // ── FORM LINKS ──
 // Replace any of these with new URLs as needed — no other code changes required
@@ -1593,6 +1594,7 @@ function renderWeekStrip() {
 async function loadClassCup() {
   const wrap = document.getElementById('cup-wrap');
   if (!wrap) return;
+  if (!SHOW_CLASS_CUP) { wrap.style.display = 'none'; return; }
   if (!GIDS.classcup || GIDS.classcup.includes('_GID')) { wrap.style.display = 'none'; return; }
   try {
     const rows = await fetchTab(GIDS.classcup);
