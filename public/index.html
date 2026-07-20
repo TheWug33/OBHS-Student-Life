@@ -212,7 +212,7 @@ img{max-width:100%;display:block;}
 /* Flyers */
 .fly-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
 .fly{aspect-ratio:8.5/11;border-radius:9px;overflow:hidden;cursor:pointer;border:1px solid var(--line);position:relative;display:flex;align-items:flex-end;padding:8px;transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;background:linear-gradient(155deg,#2D1B69,#0A0418);}
-.fly:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}
+@media (hover:hover){.fly:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
 .fly-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);position:relative;z-index:2;}
 
 /* ═══════════════════════════════════════════
@@ -2404,12 +2404,28 @@ function openFlyer(i) {
   document.getElementById('flyer-modal-img').src = r.IMAGE_URL;
   document.getElementById('flyer-modal-img').alt = r.TITLE || 'Flyer';
   document.getElementById('flyer-modal-title').textContent = r.TITLE || '';
-  document.getElementById('flyer-modal').style.display = 'flex';
+  const modal = document.getElementById('flyer-modal');
+  const inner = document.getElementById('flyer-modal-inner');
+  modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  inner.style.opacity = '0';
+  inner.style.transform = 'scale(0.92)';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      inner.style.opacity = '1';
+      inner.style.transform = 'scale(1)';
+    });
+  });
 }
 function closeFlyer() {
-  document.getElementById('flyer-modal').style.display = 'none';
-  document.body.style.overflow = '';
+  const modal = document.getElementById('flyer-modal');
+  const inner = document.getElementById('flyer-modal-inner');
+  inner.style.opacity = '0';
+  inner.style.transform = 'scale(0.92)';
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 220);
 }
 document.addEventListener('keydown', function(e){
   if (e.key === 'Escape') {
@@ -2438,6 +2454,16 @@ observeReveal();
     <div id="search-results">
       <div style="text-align:center;padding:60px 20px;color:var(--faint);font-size:13px;">Start typing to search the whole site…</div>
     </div>
+  </div>
+</div>
+
+<!-- Flyer Lightbox -->
+<div id="flyer-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(10,4,24,0.96);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:20px;">
+  <button onclick="closeFlyer()" aria-label="Close" style="position:absolute;top:18px;right:18px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid var(--line-bright);color:#fff;font-size:22px;cursor:pointer;z-index:2;">✕</button>
+  <div id="flyer-modal-inner" style="max-width:min(94vw,820px);max-height:92vh;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0;transform:scale(0.92);transition:opacity .28s ease,transform .28s cubic-bezier(.2,.9,.3,1.1);">
+    <img id="flyer-modal-img" src="" alt="" style="max-width:100%;max-height:80vh;width:auto;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.65);">
+    <div id="flyer-modal-title" style="font-size:14px;color:var(--muted);text-align:center;"></div>
+    <div style="font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;">Tap outside or ✕ to close</div>
   </div>
 </div>
 
