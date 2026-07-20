@@ -547,6 +547,15 @@ img{max-width:100%;display:block;}
           <div class="skel" style="height:56px"></div>
         </div>
       </div>
+      <div class="reveal" id="flyers-block" style="margin-top:36px">
+        <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="window.open(FLYER_FORM_URL,'_blank')">Submit →</button></div>
+        <div class="fly-row" id="fly-row" style="grid-template-columns:repeat(4,1fr)">
+          <div class="fly"><span class="fly-label">Loading…</span></div>
+          <div class="fly"></div>
+          <div class="fly"></div>
+          <div class="fly"></div>
+        </div>
+      </div>
     </div>
 
     <div class="home-side">
@@ -573,14 +582,6 @@ img{max-width:100%;display:block;}
           <div class="skel" style="height:40px;margin-bottom:7px"></div>
           <div class="skel" style="height:40px;margin-bottom:7px"></div>
           <div class="skel" style="height:40px"></div>
-        </div>
-      </div>
-      <div class="reveal" id="flyers-block">
-        <div class="blk-head"><span class="blk-title sm">Recent Flyers</span><button class="blk-link" onclick="window.open(FLYER_FORM_URL,'_blank')">Submit →</button></div>
-        <div class="fly-row" id="fly-row">
-          <div class="fly"><span class="fly-label">Loading…</span></div>
-          <div class="fly"></div>
-          <div class="fly"></div>
         </div>
       </div>
     </div>
@@ -1523,7 +1524,7 @@ function renderFlyers(rows){
   const el=document.getElementById('fly-row');
   const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.IMAGE_URL&&r.IMAGE_URL.startsWith('http')).slice(0,6);
   if(!clean.length){el.innerHTML='<div class="fly" style="grid-column:1/-1"><span class="fly-label">Flyers appear here once teachers submit them</span></div>';return;}
-  el.style.gridTemplateColumns=`repeat(${Math.min(clean.length,3)},1fr)`;
+  el.style.gridTemplateColumns=`repeat(${Math.min(clean.length,4)},1fr)`;
   window._flyerData=clean;
   el.innerHTML=clean.map((r,i)=>`<div class="fly" onclick="openFlyer(${i})" style="padding:0;cursor:pointer"><img src="${r.IMAGE_URL}" alt="${r.TITLE}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=\\'fly-label\\' style=\\'padding:8px\\'>${r.TITLE}</span>'"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:7px;font-family:Barlow Condensed;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.75)">${r.TITLE}</div></div>`).join('');
 }
