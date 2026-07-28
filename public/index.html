@@ -1063,7 +1063,7 @@ img{max-width:100%;display:block;}
       <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ico">🚶</div><div class="fc-ttl">Early Dismissal</div><div class="fc-dsc">Request early dismissal for a student activity or school event.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
       <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ico">🏫</div><div class="fc-ttl">Club Advisor Resources</div><div class="fc-dsc">Flyer generator, meeting logs, student roster tools, and budget request forms.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Hub</span></div>
       <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ico">📢</div><div class="fc-ttl">Submit an Event / Meeting</div><div class="fc-dsc">Submit in-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
-      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">IT work orders, room setup, AV equipment reservations, and tech support.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
+      <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ico">🛟</div><div class="fc-ttl">Help Desk</div><div class="fc-dsc">IT work orders, tech support, and reserving spaces like the auditorium or cafeteria.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">IT Support</span></div>
       <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ico">📁</div><div class="fc-ttl">Document Library</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">SharePoint Library</span></div>
     </div>
     <div class="two">
@@ -1175,6 +1175,7 @@ img{max-width:100%;display:block;}
     <div class="cs">
       <div class="cs-ttl">🛟 Help Desk</div>
       <div class="flr" onclick="window.open(IT_URL,'_blank')"><div class="flr-ico">💻</div><div><div class="flr-t">Submit an IT work order</div><div class="flr-d">Hardware, software, network issues</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="window.open(FACILITIES_URL,'_blank')"><div class="flr-ico">🏛️</div><div><div class="flr-t">Reserve a space</div><div class="flr-d">Auditorium, cafeteria, and other facilities</div></div><div class="flr-arr">→</div></div>
       
       
       <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d">Room 845 · Mr. Beverly · sbeverly@obps.org</div></div></div>
@@ -1232,6 +1233,7 @@ const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 const CS_URL        = 'https://forms.cloud.microsoft/r/AWSrYfCzya';   // Community service hours form
 const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty event/meeting submission
 const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
+const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
