@@ -616,6 +616,7 @@ img{max-width:100%;display:block;}
 
   <div class="subnav" id="s-subnav">
     <button class="sn active" onclick="ssub(this,'s-overview')">Overview</button>
+    <button class="sn" onclick="ssub(this,'s-athletics')">Athletics</button>
     <button class="sn" onclick="ssub(this,'s-clubs')">Clubs &amp; Activities</button>
     <button class="sn" onclick="ssub(this,'s-service')">Community Service</button>
     <button class="sn" onclick="ssub(this,'s-events')">Events &amp; Sign-Ups</button>
@@ -641,14 +642,15 @@ img{max-width:100%;display:block;}
     </div>
 
     <div class="feat">
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-classes')"><div class="fc-ico">🎓</div><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-athletics')"><div class="fc-ico">🏈</div><div class="fc-ttl">Athletics</div><div class="fc-dsc">This week's games, plus full schedules, rosters, and scores for every Knights team.</div></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(9)'),'s-classes')"><div class="fc-ico">🎓</div><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
       <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ico">📰</div><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ico">🏆</div><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign up, pay your $10, and represent your class in the biggest event of the year.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Sign-ups open</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ico">🤝</div><div class="fc-ttl">Community Service</div><div class="fc-dsc">Log hours, upload verification, and track progress toward the 10-hour graduation requirement.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ico">📋</div><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-committees')"><div class="fc-ico">🗳️</div><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Join a leadership committee and help shape school culture for 2026–27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New · 2026–27</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-events')"><div class="fc-ico">📅</div><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
-      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ico">🎽</div><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Browse and buy OBHS Knights gear. Pick up in the Student Life office.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">In-office pickup</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div class="fc-ico">🏆</div><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign up, pay your $10, and represent your class in the biggest event of the year.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Sign-ups open</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-service')"><div class="fc-ico">🤝</div><div class="fc-ttl">Community Service</div><div class="fc-dsc">Log hours, upload verification, and track progress toward the 10-hour graduation requirement.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-clubs')"><div class="fc-ico">📋</div><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-committees')"><div class="fc-ico">🗳️</div><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Join a leadership committee and help shape school culture for 2026–27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New · 2026–27</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-events')"><div class="fc-ico">📅</div><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
+      <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-spirit')"><div class="fc-ico">🎽</div><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Browse and buy OBHS Knights gear. Pick up in the Student Life office.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">In-office pickup</span></div>
     </div>
 
     <!-- CLASS CUP -->
@@ -680,7 +682,32 @@ img{max-width:100%;display:block;}
     </div>
   </div>
 
-  <div id="s-clubs" class="subbody" style="display:none">
+  <div id="s-athletics" class="subbody" style="display:none">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
+    <div>
+      <div class="blk-title" style="margin-bottom:6px">🏈 Knights Athletics</div>
+      <p style="font-size:13px;color:var(--muted);max-width:520px;line-height:1.6;">This week's games at a glance. For full schedules, rosters, coaching staff, and live scores for every team, visit the official Knights Athletics site.</p>
+    </div>
+    <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedules & Rosters →</button>
+  </div>
+
+  <div class="blk-head" style="margin-bottom:12px"><span class="blk-title sm">This Week's Games</span></div>
+  <div class="ev-card" id="ath-list">
+    <div class="skel" style="height:56px;margin-bottom:8px"></div>
+    <div class="skel" style="height:56px;margin-bottom:8px"></div>
+    <div class="skel" style="height:56px"></div>
+  </div>
+
+  <div style="margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;">
+    <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:6px;">Athletic Director</div>
+    <div style="font-size:14px;color:var(--muted);">Questions about tryouts, physicals, or team sign-ups? Full details are on the </div>
+    <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:none;border:none;color:var(--purple-glow);font-size:14px;padding:0;cursor:pointer;text-decoration:underline;margin-top:2px;">Knights Athletics site →</button>
+  </div>
+
+</div>
+
+<div id="s-clubs" class="subbody" style="display:none">
 
   <!-- Club Hub sub-nav -->
   <div style="display:flex;gap:4px;margin-bottom:22px;background:rgba(0,0,0,0.25);padding:4px;border-radius:10px;width:fit-content;">
@@ -954,7 +981,7 @@ img{max-width:100%;display:block;}
       <div class="cs-ttl">📅 Event Sign-Ups</div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6">Register for school events right here in Student Life — no trip to the Main Office needed. Sign-ups open when each event is announced.</p>
       <div class="flr" style="opacity:0.5;cursor:default"><div class="flr-ico">🎉</div><div><div class="flr-t">Upcoming event sign-ups</div><div class="flr-d">Sign-ups posted here when available</div></div><div class="flr-arr" style="font-size:10px">TBA</div></div>
-      <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="flr-ico">🏆</div><div><div class="flr-t">Battle of the Classes</div><div class="flr-d">View class sign-ups &amp; payment info</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div class="flr-ico">🏆</div><div><div class="flr-t">Battle of the Classes</div><div class="flr-d">View class sign-ups &amp; payment info</div></div><div class="flr-arr">→</div></div>
       <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">🎓</div><div><div class="flr-t">Senior events</div><div class="flr-d">Senior tailgate, awards night, parking passes</div></div></div>
     </div>
   </div>
@@ -1225,6 +1252,7 @@ const GIDS = {
   lyric:         '185335575',
   classcup:      '1469693941',
   spotlight:     '888519751',
+  athletics:     'ATHLETICS_GID', // ← add Google Sheet tab GID for this week's games
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
@@ -1234,6 +1262,7 @@ const CS_URL        = 'https://forms.cloud.microsoft/r/AWSrYfCzya';   // Communi
 const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty event/meeting submission
 const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
 const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
+const ATHLETICS_URL = 'https://oldbridgeathletics.org/'; // Full schedules, rosters, scores
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
@@ -2040,7 +2069,7 @@ function chSubmitForm() {
 
 
 // Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
-const sPages = ['s-overview','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit','s-classes'];
+const sPages = ['s-overview','s-athletics','s-clubs','s-service','s-events','s-committees','s-botc','s-spirit','s-classes'];
 const fPages = ['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
 
 function ssub(btn, id) {
@@ -2050,6 +2079,7 @@ function ssub(btn, id) {
   window.scrollTo({top:0,behavior:'instant'});
   if (id === 's-clubs') chLoadClubs();
   if (id === 's-classes') clsLoadPosts('2027');
+  if (id === 's-athletics') loadAthletics();
 }
 
 function fsub(btn, id) {
@@ -2440,6 +2470,51 @@ document.getElementById('flyer-modal')?.addEventListener('click', function(e){
   if (e.target === this) closeFlyer();
 });
 
+
+// ══════════════════════════════════════════════════════
+// ATHLETICS — this week's games (links to oldbridgeathletics.org for full depth)
+// ══════════════════════════════════════════════════════
+let athLoaded = false;
+async function loadAthletics() {
+  if (athLoaded) return;
+  const el = document.getElementById('ath-list');
+  if (!el) return;
+  if (!GIDS.athletics || GIDS.athletics.includes('_GID')) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Game schedule coming soon — check the full Knights Athletics site for now.</p>';
+    return;
+  }
+  try {
+    const rows = await fetchTab(GIDS.athletics);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const oneDayAgo = new Date(today.getTime() - 86400000);
+    const clean = rows.filter(r => r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
+      const rawDay = (r.DAY||'').toString().trim();
+      const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
+      let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
+      const mo = MONTH_NUM[rawMonth.slice(0,3)];
+      let yr = today.getFullYear();
+      if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
+      let evDate = new Date(yr, mo, dy);
+      if (evDate < oneDayAgo) yr = today.getFullYear() + 1;
+      r._date = new Date(yr, mo, dy);
+      r.MONTH = rawMonth.slice(0,3);
+      r.DAY = String(dy);
+      return r;
+    }).filter(r => r._date >= today).sort((a,b) => a._date - b._date).slice(0,6);
+
+    if (!clean.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted this week — check the full site for the season schedule.</p>';
+      athLoaded = true;
+      return;
+    }
+    el.innerHTML = clean.map(r => `<div class="ev-row"><div class="ev-date"><div class="ev-mon">${r.MONTH}</div><div class="ev-day">${r.DAY}</div></div><div class="ev-info"><div class="ev-t">${r.TITLE}</div><div class="ev-m">${r.TIME||'TBD'}${r.LOCATION?' · '+r.LOCATION:''}</div></div></div>`).join('');
+    athLoaded = true;
+  } catch(e) {
+    console.warn('[Athletics] load failed', e);
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Could not load games — visit the full Knights Athletics site.</p>';
+  }
+}
+
 load();
 observeReveal();
 </script>
@@ -2486,6 +2561,7 @@ observeReveal();
   </div>
 </div>
 
-<script src="https://cdn.vercel-insights.com/v1/script.js" defer></script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
