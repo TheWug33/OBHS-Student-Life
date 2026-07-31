@@ -458,6 +458,7 @@ img{max-width:100%;display:block;}
 .ptr-ind.spin svg{animation:ptr-spin .7s linear infinite;}
 @keyframes ptr-spin{to{transform:rotate(360deg);}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -546,7 +547,7 @@ img{max-width:100%;display:block;}
   <div class="home-grid">
     <div class="home-main">
       <div class="reveal">
-        <div class="blk-head"><span class="blk-title">Upcoming Events</span><div style="display:flex;gap:14px;align-items:center;"><button class="blk-link" onclick="exportCalendar()" title="Export to your calendar">⬇ Export</button><button class="blk-link" onclick="openCal()">Full calendar →</button></div></div>
+        <div class="blk-head"><span class="blk-title">Upcoming Events</span><div style="display:flex;gap:14px;align-items:center;"><button class="blk-link" onclick="exportCalendar()" title="Add to your calendar app">⬇ Export</button><button class="blk-link" onclick="exportCalendarPDF()" title="Share or save as PDF">📄 PDF</button><button class="blk-link" onclick="openCal()">Full calendar →</button></div></div>
         <div class="ev-card" id="ev-list">
           <div class="skel" style="height:56px"></div>
           <div class="skel" style="height:56px"></div>
@@ -2571,30 +2572,40 @@ function icsDate(d) {
   const dy = String(d.getDate()).padStart(2, '0');
   return yr + mo + dy;
 }
-function exportCalendar() {
-  const events = window._allEvents || [];
-  if (!events.length) {
-    alert('No events are loaded yet — try again in a moment.');
-    return;
+// Shares a file via the native share sheet (Messages, Save to Files, AirDrop, etc.)
+// Falls back to a plain download link when Web Share isn't available (most desktop browsers).
+async function shareOrDownload(blob, filename, mimeType, shareTitle) {
+  try {
+    const file = new File([blob], filename, { type: mimeType });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: shareTitle });
+      return;
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return; // user cancelled the share sheet — not an error
+    console.warn('[share] falling back to download', e);
   }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function buildIcsContent(events) {
   const now = new Date();
   const stamp = icsDate(now) + 'T' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0') + '00';
-
   let lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//OBHS Student Life//Events//EN',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'X-WR-CALNAME:OBHS Student Life',
-    'X-WR-TIMEZONE:America/New_York',
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//OBHS Student Life//Events//EN',
+    'CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:OBHS Student Life','X-WR-TIMEZONE:America/New_York',
   ];
-
   events.forEach((r, i) => {
     if (!r._date) return;
     const start = r._date;
     const end = r._endDate || r._date;
-    // ICS all-day DTEND is exclusive — add one day past the last actual day
     const dtEnd = new Date(end); dtEnd.setDate(dtEnd.getDate() + 1);
     const descParts = [];
     if (r.TIME) descParts.push(r.TIME);
@@ -2606,24 +2617,109 @@ function exportCalendar() {
       'DTSTART;VALUE=DATE:' + icsDate(start),
       'DTEND;VALUE=DATE:' + icsDate(dtEnd),
       'SUMMARY:' + icsEscape(r.TITLE),
-      descParts.length ? 'DESCRIPTION:' + icsEscape(descParts.join(' · ')) : null,
+      descParts.length ? 'DESCRIPTION:' + icsEscape(descParts.join(' \u00b7 ')) : null,
       r.LOCATION ? 'LOCATION:' + icsEscape(r.LOCATION) : null,
       'END:VEVENT'
     );
   });
-
   lines.push('END:VCALENDAR');
-  const icsContent = lines.filter(l => l !== null).join('\r\n');
+  return lines.filter(l => l !== null).join('\r\n');
+}
 
+async function exportCalendar() {
+  const events = window._allEvents || [];
+  if (!events.length) { alert('No events are loaded yet — try again in a moment.'); return; }
+  const icsContent = buildIcsContent(events);
   const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'OBHS-Student-Life-Calendar.ics';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  await shareOrDownload(blob, 'OBHS-Student-Life-Calendar.ics', 'text/calendar', 'OBHS Student Life Calendar');
+}
+
+function eventRangeLabel(r) {
+  const start = r._date, end = r._endDate || r._date;
+  const startLabel = (r.MONTH || '') + ' ' + (r.DAY || '');
+  if (end.getTime() === start.getTime()) return startLabel;
+  const sameMonth = end.getMonth() === start.getMonth();
+  const endMonths = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const endLabel = sameMonth ? String(end.getDate()) : endMonths[end.getMonth()] + ' ' + end.getDate();
+  return startLabel + '\u2013' + endLabel;
+}
+
+async function exportCalendarPDF() {
+  const events = window._allEvents || [];
+  if (!events.length) { alert('No events are loaded yet — try again in a moment.'); return; }
+  if (!window.jspdf) { alert('PDF export is still loading — try again in a moment.'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const marginX = 48;
+  let y = 64;
+
+  // Header
+  doc.setFillColor(26, 10, 61);
+  doc.rect(0, 0, pageW, 86, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text('OBHS STUDENT LIFE', marginX, 40);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(199, 201, 209);
+  doc.text('Upcoming Events Calendar \u00b7 Generated ' + new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}), marginX, 60);
+
+  y = 118;
+  doc.setTextColor(20, 20, 30);
+
+  events.forEach((r) => {
+    if (y > pageH - 70) {
+      doc.addPage();
+      y = 56;
+    }
+    // Date pill
+    doc.setFillColor(61, 38, 128);
+    const dateLabel = eventRangeLabel(r);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    const pillW = Math.max(70, doc.getTextWidth(dateLabel) + 18);
+    doc.roundedRect(marginX, y - 13, pillW, 20, 5, 5, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.text(dateLabel, marginX + 9, y + 1);
+
+    // Title + meta
+    doc.setTextColor(20, 20, 30);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12.5);
+    doc.text(r.TITLE || '', marginX + pillW + 14, y - 2);
+
+    const metaParts = [];
+    if (r.TIME) metaParts.push(r.TIME);
+    if (r.LOCATION) metaParts.push(r.LOCATION);
+    if (metaParts.length) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(110, 110, 120);
+      doc.text(metaParts.join('  \u00b7  '), marginX + pillW + 14, y + 12);
+    }
+
+    doc.setDrawColor(230, 230, 235);
+    doc.line(marginX, y + 24, pageW - marginX, y + 24);
+    y += 40;
+  });
+
+  // Footer on every page
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(160, 160, 170);
+    doc.text('obhs-student-life-ob.vercel.app', marginX, pageH - 28);
+    doc.text('Page ' + p + ' of ' + pageCount, pageW - marginX - 60, pageH - 28);
+  }
+
+  const blob = doc.output('blob');
+  await shareOrDownload(blob, 'OBHS-Student-Life-Calendar.pdf', 'application/pdf', 'OBHS Student Life Calendar');
 }
 
 load();
@@ -2665,7 +2761,8 @@ observeReveal();
         <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff">Full Calendar</h2>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="exportCalendar()" style="background:var(--purple-ui);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:filter .2s;">⬇ Export Calendar</button>
+        <button onclick="exportCalendar()" style="background:var(--purple-ui);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:filter .2s;">⬇ Add to Calendar</button>
+        <button onclick="exportCalendarPDF()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;display:flex;align-items:center;gap:7px;">📄 Share PDF</button>
         <button onclick="closeCal()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;transition:background .2s;">✕ Close</button>
       </div>
     </div>
