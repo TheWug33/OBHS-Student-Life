@@ -36,6 +36,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 /* Events slide */
 .ev-row{display:flex;align-items:center;gap:26px;padding:19px 0;border-bottom:1px solid var(--line);}
 .ev-date{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
+.ev-date.range{width:136px;}
 .ev-mon{font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#CDC6F5;}
 .ev-day{font-size:38px;font-weight:800;line-height:1.05;}
 .ev-t{font-size:33px;font-weight:700;}
@@ -86,6 +87,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
   .slide-tag::before{width:26px;height:2px;}
   .ev-row{gap:13px;padding:11px 0;}
   .ev-date{width:58px;padding:7px 0;border-radius:11px;}
+  .ev-date.range{width:78px;}
   .ev-mon{font-size:10px;}
   .ev-day{font-size:22px;}
   .ev-t{font-size:17px;font-weight:600;}
@@ -176,8 +178,31 @@ const GIDS = {
 const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
+function buildEventTile(mon, day, endMonRaw, endDayRaw) {
+  endMonRaw = (endMonRaw||'').toString().trim().toUpperCase().slice(0,3);
+  endDayRaw = (endDayRaw||'').toString().trim();
+  let inner = '<div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div>';
+  let wide = false;
+  if (endDayRaw && endDayRaw !== '0') {
+    const endMon = endMonRaw || mon;
+    const endDay = parseInt(endDayRaw) || endDayRaw;
+    const sameMonth = endMon === mon;
+    const sameDay = String(endDay) === String(day);
+    if (!sameDay) {
+      wide = true;
+      if (sameMonth) {
+        inner = '<div class="ev-mon">'+mon+'</div><div class="ev-day" style="font-size:0.62em;letter-spacing:-0.02em;">'+day+'\u2013'+endDay+'</div>';
+      } else {
+        inner = '<div class="ev-mon" style="font-size:0.7em;">'+mon+' '+day+'</div><div class="ev-day" style="font-size:0.45em;line-height:1.2;margin-top:4px;">\u2013'+endMon+' '+endDay+'</div>';
+      }
+    }
+  }
+  return '<div class="ev-date'+(wide?' range':'')+'">'+inner+'</div>';
+}
+
+
 function splitLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','LABEL','TARGET_DATE','CLASS','POINTS','LYRIC','SONG','ARTIST'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','LABEL','TARGET_DATE','CLASS','POINTS','LYRIC','SONG','ARTIST'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -244,7 +269,7 @@ async function loadData(){
     return r;
   }).filter(r=>r._d>=today).sort((a,b)=>a._d-b._d).slice(0,5);
   document.getElementById('ev-list').innerHTML=upcoming.length?upcoming.map(r=>
-    '<div class="ev-row"><div class="ev-date"><div class="ev-mon">'+r._mon+'</div><div class="ev-day">'+r._day+'</div></div>'+
+    '<div class="ev-row">'+buildEventTile(r._mon,r._day,r.END_MONTH,r.END_DAY)+
     '<div><div class="ev-t">'+r.TITLE+'</div><div class="ev-m">'+(r.TIME||'All Day')+(r.LOCATION?' · '+r.LOCATION:'')+'</div></div></div>'
   ).join(''):'<div class="empty">No upcoming events posted.</div>';
 

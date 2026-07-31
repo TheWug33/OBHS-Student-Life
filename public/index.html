@@ -186,6 +186,7 @@ img{max-width:100%;display:block;}
 .ev:last-child{border-bottom:none;}
 .ev:hover{background:rgba(91,63,192,0.12);}
 .ev-date{width:44px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,#3D2680,#1A0A3D);border:1px solid var(--line-bright);border-radius:9px;padding:6px 4px;}
+.ev-date.range{width:58px;}
 .ev-mo{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);}
 .ev-dy{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;color:#fff;line-height:1;}
 .ev-t{font-size:13.5px;font-weight:500;color:#fff;}
@@ -1381,10 +1382,7 @@ function openCal(){
   }
   el.innerHTML = window._allEvents.map(r => `
     <div style="background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:16px;">
-      <div style="width:48px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,#3D2680,#1A0A3D);border:1px solid var(--line-bright);border-radius:9px;padding:6px 4px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);">${r.MONTH||''}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;">${r.DAY||''}</div>
-      </div>
+      ${buildEventTile(r)}
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:500;color:#fff;">${r.TITLE||''}</div>
         <div style="font-size:11px;color:var(--faint);margin-top:2px;">${r.TIME||''}${r.LOCATION?' · '+r.LOCATION:''}</div>
@@ -1416,7 +1414,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -1463,6 +1461,31 @@ function renderAnn(rows){
 }
 // Month name → number map for date comparison
 const MONTH_NUM={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+// Builds a date tile — handles single days and multi-day ranges (e.g. Winter Break, Disney Trip)
+function buildEventTile(r) {
+  const mon = r.MONTH || '';
+  const day = r.DAY || '';
+  const endMonRaw = (r.END_MONTH||'').toString().trim().toUpperCase().slice(0,3);
+  const endDayRaw = (r.END_DAY||'').toString().trim();
+  let inner = `<div class="ev-mo">${mon}</div><div class="ev-dy">${day}</div>`;
+  let wide = false;
+  if (endDayRaw && endDayRaw !== '0') {
+    const endMon = endMonRaw || mon;
+    const endDay = parseInt(endDayRaw) || endDayRaw;
+    const sameMonth = endMon === mon;
+    const sameDay = String(endDay) === String(day);
+    if (!sameDay) {
+      wide = true;
+      if (sameMonth) {
+        inner = `<div class="ev-mo">${mon}</div><div class="ev-dy" style="font-size:16px;letter-spacing:-0.5px;">${day}–${endDay}</div>`;
+      } else {
+        inner = `<div class="ev-mo" style="font-size:7.5px;letter-spacing:.05em;">${mon} ${day}</div><div class="ev-dy" style="font-size:12px;line-height:1.2;margin-top:2px;">–${endMon} ${endDay}</div>`;
+      }
+    }
+  }
+  return `<div class="ev-date${wide ? ' range' : ''}">${inner}</div>`;
+}
+
 
 function renderEv(rows){
   const el=document.getElementById('ev-list');
@@ -1498,8 +1521,21 @@ function renderEv(rows){
       // Fix display values in case they came in wrong
       if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,6);
       if(rawDay.includes('/')) r.DAY = String(dy);
+      // Compute end date for multi-day events (Winter Break, Disney Trip, etc.)
+      const endDayRaw = (r.END_DAY||'').toString().trim();
+      if (endDayRaw && endDayRaw !== '0') {
+        const endMonRaw = (r.END_MONTH||'').toString().trim().toUpperCase().slice(0,3);
+        const endMo = MONTH_NUM[endMonRaw] !== undefined ? MONTH_NUM[endMonRaw] : mo;
+        const endDy = parseInt(endDayRaw) || dy;
+        let endYr = yr;
+        if (endMo < mo) endYr = yr + 1; // range crosses a new year (rare, but safe)
+        r._endDate = new Date(endYr, endMo, endDy);
+      } else {
+        r._endDate = r._date;
+      }
     } else {
       r._date = new Date(9999, 0, 1);
+      r._endDate = r._date;
     }
     console.log('[Events] row:', r.TITLE, '| MONTH:', r.MONTH, '| DAY:', r.DAY, '| date:', r._date, '| past:', r._date < today);
     return r;
@@ -1516,10 +1552,7 @@ function renderEv(rows){
 
   el.innerHTML=upcoming8.map(r=>`
     <div class="ev">
-      <div class="ev-date">
-        <div class="ev-mo">${r.MONTH||''}</div>
-        <div class="ev-dy">${r.DAY||''}</div>
-      </div>
+      ${buildEventTile(r)}
       <div style="flex:1">
         <div class="ev-t">${r.TITLE}</div>
         <div class="ev-s">${r.TIME||''}${r.LOCATION?' · '+r.LOCATION:''}</div>
@@ -1605,7 +1638,7 @@ function renderWeekStrip() {
     const d = new Date(monday); d.setDate(monday.getDate() + i);
     const isToday = d.getTime() === today.getTime();
     const isPast = d < today;
-    const dayEvs = evs.filter(r => r._date && r._date.getTime() === d.getTime());
+    const dayEvs = evs.filter(r => r._date && d.getTime() >= r._date.getTime() && d.getTime() <= (r._endDate||r._date).getTime());
     let inner = '';
     if (dayEvs.length) {
       inner = dayEvs.slice(0,3).map(r => '<div class="wk-ev">' + (r.TITLE||'') + '</div>').join('');
@@ -2507,7 +2540,7 @@ async function loadAthletics() {
       athLoaded = true;
       return;
     }
-    el.innerHTML = clean.map(r => `<div class="ev-row"><div class="ev-date"><div class="ev-mon">${r.MONTH}</div><div class="ev-day">${r.DAY}</div></div><div class="ev-info"><div class="ev-t">${r.TITLE}</div><div class="ev-m">${r.TIME||'TBD'}${r.LOCATION?' · '+r.LOCATION:''}</div></div></div>`).join('');
+    el.innerHTML = clean.map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' · '+r.LOCATION:''}</div></div></div>`).join('');
     athLoaded = true;
   } catch(e) {
     console.warn('[Athletics] load failed', e);
