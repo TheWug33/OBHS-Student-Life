@@ -187,6 +187,11 @@ img{max-width:100%;display:block;}
 .ev:hover{background:rgba(91,63,192,0.12);}
 .ev-date{width:44px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,#3D2680,#1A0A3D);border:1px solid var(--line-bright);border-radius:9px;padding:6px 4px;}
 .ev-date.range{width:58px;}
+.ev-date.cross{width:auto;min-width:98px;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;}
+.ev-date.cross .ev-half{display:flex;flex-direction:column;align-items:center;}
+.ev-date.cross .ev-mo{font-size:8px;}
+.ev-date.cross .ev-dy{font-size:18px;}
+.ev-date.cross .ev-arrow{color:rgba(255,255,255,0.35);font-size:12px;padding-bottom:2px;}
 .ev-mo{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);}
 .ev-dy{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;color:#fff;line-height:1;}
 .ev-t{font-size:13.5px;font-weight:500;color:#fff;}
@@ -1467,23 +1472,24 @@ function buildEventTile(r) {
   const day = r.DAY || '';
   const endMonRaw = (r.END_MONTH||'').toString().trim().toUpperCase().slice(0,3);
   const endDayRaw = (r.END_DAY||'').toString().trim();
-  let inner = `<div class="ev-mo">${mon}</div><div class="ev-dy">${day}</div>`;
-  let wide = false;
   if (endDayRaw && endDayRaw !== '0') {
     const endMon = endMonRaw || mon;
     const endDay = parseInt(endDayRaw) || endDayRaw;
     const sameMonth = endMon === mon;
     const sameDay = String(endDay) === String(day);
     if (!sameDay) {
-      wide = true;
       if (sameMonth) {
-        inner = `<div class="ev-mo">${mon}</div><div class="ev-dy" style="font-size:16px;letter-spacing:-0.5px;">${day}–${endDay}</div>`;
-      } else {
-        inner = `<div class="ev-mo" style="font-size:7.5px;letter-spacing:.05em;">${mon} ${day}</div><div class="ev-dy" style="font-size:12px;line-height:1.2;margin-top:2px;">–${endMon} ${endDay}</div>`;
+        return `<div class="ev-date range"><div class="ev-mo">${mon}</div><div class="ev-dy" style="font-size:16px;letter-spacing:-0.5px;">${day}–${endDay}</div></div>`;
       }
+      // Cross-month range: two matching mini date-chips, same size, side by side
+      return `<div class="ev-date cross">
+        <div class="ev-half"><div class="ev-mo">${mon}</div><div class="ev-dy">${day}</div></div>
+        <div class="ev-arrow">–</div>
+        <div class="ev-half"><div class="ev-mo">${endMon}</div><div class="ev-dy">${endDay}</div></div>
+      </div>`;
     }
   }
-  return `<div class="ev-date${wide ? ' range' : ''}">${inner}</div>`;
+  return `<div class="ev-date"><div class="ev-mo">${mon}</div><div class="ev-dy">${day}</div></div>`;
 }
 
 

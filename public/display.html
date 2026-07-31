@@ -37,6 +37,11 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 .ev-row{display:flex;align-items:center;gap:26px;padding:19px 0;border-bottom:1px solid var(--line);}
 .ev-date{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
 .ev-date.range{width:136px;}
+.ev-date.cross{width:auto;min-width:180px;display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 16px;}
+.ev-date.cross .ev-half{display:flex;flex-direction:column;align-items:center;}
+.ev-date.cross .ev-mon{font-size:13px;}
+.ev-date.cross .ev-day{font-size:30px;}
+.ev-date.cross .ev-arrow{color:rgba(255,255,255,0.35);font-size:22px;padding-bottom:4px;}
 .ev-mon{font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#CDC6F5;}
 .ev-day{font-size:38px;font-weight:800;line-height:1.05;}
 .ev-t{font-size:33px;font-weight:700;}
@@ -88,6 +93,10 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
   .ev-row{gap:13px;padding:11px 0;}
   .ev-date{width:58px;padding:7px 0;border-radius:11px;}
   .ev-date.range{width:78px;}
+  .ev-date.cross{min-width:104px;gap:8px;padding:7px 9px;}
+  .ev-date.cross .ev-mon{font-size:9px;}
+  .ev-date.cross .ev-day{font-size:18px;}
+  .ev-date.cross .ev-arrow{font-size:14px;}
   .ev-mon{font-size:10px;}
   .ev-day{font-size:22px;}
   .ev-t{font-size:17px;font-weight:600;}
@@ -181,23 +190,23 @@ const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT',
 function buildEventTile(mon, day, endMonRaw, endDayRaw) {
   endMonRaw = (endMonRaw||'').toString().trim().toUpperCase().slice(0,3);
   endDayRaw = (endDayRaw||'').toString().trim();
-  let inner = '<div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div>';
-  let wide = false;
   if (endDayRaw && endDayRaw !== '0') {
     const endMon = endMonRaw || mon;
     const endDay = parseInt(endDayRaw) || endDayRaw;
     const sameMonth = endMon === mon;
     const sameDay = String(endDay) === String(day);
     if (!sameDay) {
-      wide = true;
       if (sameMonth) {
-        inner = '<div class="ev-mon">'+mon+'</div><div class="ev-day" style="font-size:0.62em;letter-spacing:-0.02em;">'+day+'\u2013'+endDay+'</div>';
-      } else {
-        inner = '<div class="ev-mon" style="font-size:0.7em;">'+mon+' '+day+'</div><div class="ev-day" style="font-size:0.45em;line-height:1.2;margin-top:4px;">\u2013'+endMon+' '+endDay+'</div>';
+        return '<div class="ev-date range"><div class="ev-mon">'+mon+'</div><div class="ev-day" style="font-size:0.62em;letter-spacing:-0.02em;">'+day+'\u2013'+endDay+'</div></div>';
       }
+      return '<div class="ev-date cross">'
+        +'<div class="ev-half"><div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div></div>'
+        +'<div class="ev-arrow">\u2013</div>'
+        +'<div class="ev-half"><div class="ev-mon">'+endMon+'</div><div class="ev-day">'+endDay+'</div></div>'
+        +'</div>';
     }
   }
-  return '<div class="ev-date'+(wide?' range':'')+'">'+inner+'</div>';
+  return '<div class="ev-date"><div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div></div>';
 }
 
 
