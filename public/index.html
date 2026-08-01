@@ -457,6 +457,19 @@ img{max-width:100%;display:block;}
 .ptr-ind.ready svg{transform:rotate(180deg);stroke:#fff;}
 .ptr-ind.spin svg{animation:ptr-spin .7s linear infinite;}
 @keyframes ptr-spin{to{transform:rotate(360deg);}}
+
+/* ── Full Calendar modal header ── */
+.cal-modal-head{position:relative;margin-bottom:28px;}
+.cal-modal-ttl{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;margin-bottom:18px;}
+.cal-modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.cal-modal-btn{background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;display:flex;align-items:center;gap:7px;cursor:pointer;transition:filter .2s,background .2s;white-space:nowrap;}
+.cal-modal-btn.primary{background:var(--purple-ui);border:none;color:#fff;}
+.cal-modal-x{position:absolute;top:0;right:0;width:38px;height:38px;border-radius:50%;background:rgba(199,201,209,0.1);border:1px solid var(--line);color:var(--silver);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+@media (max-width:600px){
+  .cal-modal-ttl{font-size:28px;margin-top:4px;}
+  .cal-modal-actions{gap:8px;}
+  .cal-modal-btn{flex:1 1 auto;justify-content:center;padding:11px 14px;font-size:12.5px;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
@@ -2774,15 +2787,13 @@ observeReveal();
 <!-- Full Calendar Modal -->
 <div id="cal-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(10,4,24,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
   <div style="max-width:720px;margin:0 auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
-        <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff">Full Calendar</h2>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="subscribeCalendar()" style="background:var(--purple-ui);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:filter .2s;">🔗 Link to My Calendar</button>
-        <button onclick="exportCalendarPDF()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;display:flex;align-items:center;gap:7px;">📄 Share PDF</button>
-        <button onclick="closeCal()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;transition:background .2s;">✕ Close</button>
+    <div class="cal-modal-head">
+      <button onclick="closeCal()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Full Calendar</h2>
+      <div class="cal-modal-actions">
+        <button onclick="subscribeCalendar()" class="cal-modal-btn primary">🔗 Link to My Calendar</button>
+        <button onclick="exportCalendarPDF()" class="cal-modal-btn">📄 Share PDF</button>
       </div>
     </div>
     <div id="cal-list" style="display:flex;flex-direction:column;gap:8px;">
