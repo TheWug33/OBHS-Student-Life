@@ -547,7 +547,7 @@ img{max-width:100%;display:block;}
   <div class="home-grid">
     <div class="home-main">
       <div class="reveal">
-        <div class="blk-head"><span class="blk-title">Upcoming Events</span><div style="display:flex;gap:14px;align-items:center;"><button class="blk-link" onclick="exportCalendar()" title="Add to your calendar app">⬇ Export</button><button class="blk-link" onclick="exportCalendarPDF()" title="Share or save as PDF">📄 PDF</button><button class="blk-link" onclick="openCal()">Full calendar →</button></div></div>
+        <div class="blk-head"><span class="blk-title">Upcoming Events</span><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;"><button class="blk-link" onclick="subscribeCalendar()" title="Add to your calendar app — stays current automatically">🔗 Subscribe</button><button class="blk-link" onclick="exportCalendarPDF()" title="Share or print as PDF">📄 PDF</button><button class="blk-link" onclick="openCal()">Full calendar →</button></div></div>
         <div class="ev-card" id="ev-list">
           <div class="skel" style="height:56px"></div>
           <div class="skel" style="height:56px"></div>
@@ -2626,6 +2626,25 @@ function buildIcsContent(events) {
   return lines.filter(l => l !== null).join('\r\n');
 }
 
+// ══════════════════════════════════════════════════════
+// SUBSCRIBE — one-time setup that keeps a calendar app auto-synced forever
+// (different from Export, which is a one-time snapshot)
+// ══════════════════════════════════════════════════════
+function subscribeCalendar() {
+  const httpsUrl = 'https://obhs-student-life-ob.vercel.app/api/calendar';
+  const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
+  // On iOS/macOS this opens Calendar's native "Subscribe" prompt directly
+  window.location.href = webcalUrl;
+  // Also put the link on the clipboard for Outlook / Google Calendar / Android,
+  // which need it pasted into a "Subscribe from web" field instead
+  const msg = 'Subscribe link copied!\n\n' + httpsUrl + '\n\nOutlook: Add calendar \u2192 Subscribe from web\nGoogle Calendar: Other calendars + \u2192 From URL\n\nPaste this link there \u2014 your calendar will then stay in sync automatically with no duplicates.';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(httpsUrl).then(() => setTimeout(() => alert(msg), 250)).catch(() => alert(msg));
+  } else {
+    alert(msg);
+  }
+}
+
 async function exportCalendar() {
   const events = window._allEvents || [];
   if (!events.length) { alert('No events are loaded yet — try again in a moment.'); return; }
@@ -2761,7 +2780,7 @@ observeReveal();
         <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff">Full Calendar</h2>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="exportCalendar()" style="background:var(--purple-ui);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:filter .2s;">⬇ Add to Calendar</button>
+        <button onclick="subscribeCalendar()" style="background:var(--purple-ui);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:filter .2s;">🔗 Subscribe</button>
         <button onclick="exportCalendarPDF()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;display:flex;align-items:center;gap:7px;">📄 Share PDF</button>
         <button onclick="closeCal()" style="background:rgba(199,201,209,0.1);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--silver);letter-spacing:.04em;transition:background .2s;">✕ Close</button>
       </div>
