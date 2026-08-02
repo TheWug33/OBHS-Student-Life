@@ -1233,7 +1233,8 @@ img{max-width:100%;display:block;}
 
   <div id="ath-page-body" class="subbody">
 
-  <div style="display:flex;justify-content:flex-end;margin-bottom:24px;">
+  <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
+    <button onclick="openCoaches()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">🏅 Coaching Staff</button>
     <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedules & Rosters →</button>
   </div>
 
@@ -2776,6 +2777,80 @@ async function exportCalendarPDF() {
   await shareOrDownload(blob, 'OBHS-Student-Life-Calendar.pdf', 'application/pdf', 'OBHS Student Life Calendar');
 }
 
+
+// ══════════════════════════════════════════════════════
+// COACHING STAFF — static directory grouped by season
+// ══════════════════════════════════════════════════════
+const COACHES = {
+  'Fall': [
+    ['Cheerleading', 'Christine Cotugno', 'ccotugno@obps.org'],
+    ['Dance', 'Kristen Celentano', 'kcelentano@obps.org'],
+    ['Boys Cross Country', 'Matt Tiplady', 'mtiplady@obps.org'],
+    ['Girls Cross Country', 'Adrian Cline', 'acline@obps.org'],
+    ['Field Hockey', 'Brittany Fuentes', 'bfuentes@obps.org'],
+    ['Football', 'Matt Donaghue', 'mdonaghue@obps.org'],
+    ['Gymnastics', 'Mike Canzano', 'mcanzano@obps.org'],
+    ['Boys Soccer', 'Chris McGrath', 'cmcgrath@obps.org'],
+    ['Girls Soccer', 'Kim Hopping', 'khopping@obps.org'],
+    ['Girls Tennis', 'Evan Wigdortz', 'ewigdortz@obps.org'],
+    ['Girls Volleyball', 'Andrew Hopman', 'ahopman@obps.org'],
+  ],
+  'Winter': [
+    ['Cheerleading', 'Christine Cotugno', 'ccotugno@obps.org'],
+    ['Boys Basketball', 'Jared Meyer', 'coachjaredmeyer@gmail.com'],
+    ['Girls Basketball', 'Alec Alspach', 'aalspach@obps.org'],
+    ['Unified Basketball', 'Brooke Chlebowski', 'bchlebowski@obps.org'],
+    ['Unified Bowling', 'Nicole Cornejo', 'ncornejo@obps.org'],
+    ['Boys & Girls Bowling', 'Theresa Fischetti', 'tfischetti@obps.org'],
+    ['Boys & Girls Swimming', 'Fallon Quiles', 'fquiles@obps.org'],
+    ['Boys Winter Track', 'Scott Beverly', 'sbeverly@obps.org'],
+    ['Girls Winter Track', 'Matt Tiplady', 'mtiplady@obps.org'],
+    ['Hockey', 'Mick Messemer', 'mmessemer@obps.org'],
+    ['Wrestling', 'John Post', 'jpost@obps.org'],
+  ],
+  'Spring': [
+    ['Baseball', 'Matt Donaghue', 'mdonaghue@obps.org'],
+    ['Golf', 'Alec Alspach', 'aalspach@obps.org'],
+    ['Boys Lacrosse', 'Anthony Rybek', 'arybek@obps.org'],
+    ['Girls Lacrosse', 'Steve Gajewski', 'sgajewski@obps.org'],
+    ['Softball', 'Angela D\u2019Amico', 'adamico@obps.org'],
+    ['Boys Spring Track', 'Scott Beverly', 'sbeverly@obps.org'],
+    ['Girls Spring Track', 'Adrian Cline', 'acline@obps.org'],
+    ['Unified Spring Track', 'Brooke Chlebowski', 'bchlebowski@obps.org'],
+    ['Boys Tennis', 'Evan Wigdortz', 'ewigdortz@obps.org'],
+    ['Boys Volleyball', 'Andrew Hopman', 'ahopman@obps.org'],
+  ],
+};
+
+function renderCoaches() {
+  const el = document.getElementById('coach-list');
+  if (!el) return;
+  el.innerHTML = Object.entries(COACHES).map(([season, list]) => `
+    <div style="margin-bottom:26px">
+      <div class="blk-title sm" style="margin-bottom:10px">${season} Coaches</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px">
+        ${list.map(([sport, name, email]) => `
+          <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;">
+            <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:4px;">${sport}</div>
+            <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;">${name}</div>
+            <a href="mailto:${email}" style="font-size:12px;color:var(--muted);text-decoration:none;">${email}</a>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openCoaches() {
+  renderCoaches();
+  document.getElementById('coach-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeCoaches() {
+  document.getElementById('coach-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 </script>
@@ -2803,6 +2878,18 @@ observeReveal();
     <img id="flyer-modal-img" src="" alt="" style="max-width:100%;max-height:80vh;width:auto;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.65);">
     <div id="flyer-modal-title" style="font-size:14px;color:var(--muted);text-align:center;"></div>
     <div style="font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;">Tap outside or ✕ to close</div>
+  </div>
+</div>
+
+<!-- Coaching Staff Modal -->
+<div id="coach-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(10,4,24,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeCoaches()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Coaching Staff</h2>
+    </div>
+    <div id="coach-list"></div>
   </div>
 </div>
 
