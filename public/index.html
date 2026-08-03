@@ -2107,7 +2107,7 @@ async function chLoadClubs() {
 
 function chSubmitForm() {
   const name = document.getElementById('ch-f-name')?.value.trim();
-  if (!name) { alert('Please enter a club name.'); return; }
+  if (!name) { showToast('Please enter a club name.'); return; }
   const fields = {
     'Club Name': name,
     'Category': document.getElementById('ch-f-cat')?.value || '',
@@ -2667,15 +2667,15 @@ function subscribeCalendar() {
   // which need it pasted into a "Subscribe from web" field instead
   const msg = 'Calendar link copied!\n\n' + httpsUrl + '\n\nOutlook: Add calendar \u2192 Subscribe from web\nGoogle Calendar: Other calendars + \u2192 From URL\n\nPaste this link there to link these dates to your calendar \u2014 it\u2019ll stay current automatically with no duplicates.';
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(httpsUrl).then(() => setTimeout(() => alert(msg), 250)).catch(() => alert(msg));
+    navigator.clipboard.writeText(httpsUrl).then(() => setTimeout(() => showInfoModal(msg), 250)).catch(() => showInfoModal(msg));
   } else {
-    alert(msg);
+    showInfoModal(msg);
   }
 }
 
 async function exportCalendar() {
   const events = window._allEvents || [];
-  if (!events.length) { alert('No events are loaded yet — try again in a moment.'); return; }
+  if (!events.length) { showToast('No events are loaded yet — try again in a moment.'); return; }
   const icsContent = buildIcsContent(events);
   const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
   await shareOrDownload(blob, 'OBHS-Student-Life-Calendar.ics', 'text/calendar', 'OBHS Student Life Calendar');
@@ -2693,8 +2693,8 @@ function eventRangeLabel(r) {
 
 async function exportCalendarPDF() {
   const events = window._allEvents || [];
-  if (!events.length) { alert('No events are loaded yet — try again in a moment.'); return; }
-  if (!window.jspdf) { alert('PDF export is still loading — try again in a moment.'); return; }
+  if (!events.length) { showToast('No events are loaded yet — try again in a moment.'); return; }
+  if (!window.jspdf) { showToast('PDF export is still loading — try again in a moment.'); return; }
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
@@ -2941,13 +2941,51 @@ function closeHandbook() {
   document.body.style.overflow = '';
 }
 
+// Small on-page toast — used instead of alert(), since native alert()/confirm()/prompt()
+// dialogs are unreliable inside installed home-screen apps (standalone PWA mode) on iOS
+// and can misbehave in ways that look like the app itself navigating unexpectedly.
+function showToast(msg) {
+  let t = document.getElementById('site-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'site-toast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--card-solid);border:1px solid var(--line-bright);color:#fff;padding:13px 20px;border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:13.5px;box-shadow:0 12px 34px rgba(0,0,0,0.5);z-index:900;opacity:0;transition:opacity .25s,transform .25s;max-width:86vw;text-align:center;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => {
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2600);
+}
+
 // Opens a resource link safely — if the URL is still a placeholder ('#'),
-// shows a friendly message instead of calling window.open, which can
+// shows a friendly toast instead of calling window.open, which can
 // misbehave in the installed app (navigating the app itself instead of
 // opening anything, which looks like an accidental return to the homepage).
+function showInfoModal(msg) {
+  const modal = document.getElementById('info-modal');
+  const body = document.getElementById('info-modal-body');
+  if (!modal || !body) return;
+  body.textContent = msg;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeInfoModal() {
+  const modal = document.getElementById('info-modal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 function openResourceLink(url, label) {
   if (!url || url === '#') {
-    alert((label || 'This resource') + ' isn\u2019t set up yet \u2014 check back soon!');
+    showToast((label || 'This resource') + ' isn\u2019t set up yet \u2014 check back soon!');
     return;
   }
   window.open(url, '_blank');
@@ -3064,6 +3102,15 @@ observeReveal();
       <p style="font-size:12.5px;color:var(--faint);line-height:1.7;margin:16px 0 0;">Thank you for helping make Old Bridge High School a place where every student has the opportunity to get involved, develop new skills, and experience Life Beyond the Classroom.</p>
     </div>
 
+  </div>
+</div>
+
+<!-- Generic Info Modal (replaces alert() for longer messages — alert/confirm/prompt
+     are unreliable inside installed home-screen apps on iOS) -->
+<div id="info-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);box-shadow:0 24px 70px rgba(0,0,0,0.6);">
+    <div id="info-modal-body" style="font-size:14px;color:var(--silver);line-height:1.7;white-space:pre-line;margin-bottom:18px;"></div>
+    <button onclick="closeInfoModal()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:11px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Got it</button>
   </div>
 </div>
 
