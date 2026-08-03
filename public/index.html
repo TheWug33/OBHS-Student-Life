@@ -1313,7 +1313,7 @@ const GIDS = {
   classcup:      '1469693941',
   spotlight:     '888519751',
   athletics:     '775220800',
-  fieldtrips:    'FIELDTRIPS_GID', // ← add Google Sheet tab GID for the field trip / departure log
+  fieldtrips:    '368429671',
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
@@ -2947,7 +2947,10 @@ function ftRow(r) {
   if (r.RETURN_TIME) metaParts.push('Back ' + r.RETURN_TIME);
   if (r.DESTINATION) metaParts.push(r.DESTINATION);
   if (r.TEACHER) metaParts.push(r.TEACHER);
-  return `<div class="ev" style="padding:12px 0;"><div style="flex:1"><div class="ev-t" style="font-size:14px">${r.GROUP}</div><div class="ev-s" style="font-size:12px">${metaParts.join(' \u00b7 ')}</div>${r.DESCRIPTION ? '<div style="font-size:12px;color:var(--faint);margin-top:2px">' + r.DESCRIPTION + '</div>' : ''}</div></div>`;
+  const rosterLink = (r.ROSTER_URL || '').trim().startsWith('http')
+    ? `<a href="${r.ROSTER_URL}" target="_blank" style="font-size:12px;color:var(--purple-glow);text-decoration:underline;margin-top:3px;display:inline-block;">📎 View Roster</a>`
+    : '';
+  return `<div class="ev" style="padding:12px 0;"><div style="flex:1"><div class="ev-t" style="font-size:14px">${r.GROUP}</div><div class="ev-s" style="font-size:12px">${metaParts.join(' \u00b7 ')}</div>${r.DESCRIPTION ? '<div style="font-size:12px;color:var(--faint);margin-top:2px">' + r.DESCRIPTION + '</div>' : ''}${rosterLink}</div></div>`;
 }
 
 function renderFieldTrips() {
