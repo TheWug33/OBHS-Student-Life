@@ -1142,63 +1142,18 @@ img{max-width:100%;display:block;}
   </div>
 
   <div id="f-clubs" class="subbody" style="display:none">
-    <div id="f-club-hub-root">
-      <div style="display:flex;gap:4px;margin-bottom:24px;background:rgba(0,0,0,0.2);padding:4px;border-radius:10px;width:fit-content;">
-        <button class="fch-tab active" onclick="fchTab(this,'fch-directory')" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--purple-ui);color:#fff;transition:background .2s;">Directory</button>
-        <button class="fch-tab" onclick="fchTab(this,'fch-flyer')" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Flyer Generator</button>
-      </div>
-      <div id="fch-directory" class="fch-panel">
-        <div style="display:flex;gap:8px;margin-bottom:16px;">
-          <input id="fch-search" type="text" placeholder="Search clubs..." oninput="fchFilter()" style="flex:1;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
-          <select id="fch-catsel" onchange="fchFilter()" style="padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"><option value="">All categories</option></select>
-        </div>
-        <div id="fch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
-          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--faint);font-size:13px;">Loading clubs…</div>
-        </div>
-      </div>
-      <div id="fch-flyer" class="fch-panel" style="display:none">
-        <div class="blk-title" style="margin-bottom:16px">Flyer Generator</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Fill in your club's details and print or save as a PDF to post around school.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-          <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;">
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="ffl-name" type="text" value="Art Club" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Tagline</label><input id="ffl-tag" type="text" value="Where creativity comes to life" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day &amp; Time</label><input id="ffl-when" type="text" value="Tuesdays, 3:00–4:30 PM" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="ffl-where" type="text" value="Room 109" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="ffl-advisor" type="text" value="Ms. Carter" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">About This Club</label><textarea id="ffl-about" rows="3" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;">Open to all students who love drawing, painting, and design. No experience needed!</textarea></div>
-            <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact / Instagram</label><input id="ffl-contact" type="text" value="@OBHSArtClub" oninput="fchUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
-            <button onclick="fchPrintFlyer()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;">🖨️ Print / Save as PDF</button>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
-            <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Live Preview</div>
-            <div id="fch-flyer-output" style="border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;font-family:Georgia,serif;">
-              <div style="background:#26215C;color:#EEEDFE;padding:18px 16px;text-align:center;">
-                <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Old Bridge High School · Go Knights!</div>
-                <div id="ffp-name" style="font-size:22px;font-weight:700;margin-bottom:4px;">Art Club</div>
-                <div id="ffp-tag" style="font-size:12px;opacity:.75;font-style:italic;">Where creativity comes to life</div>
-              </div>
-              <div style="height:4px;background:linear-gradient(90deg,#534AB7,#AFA9EC,#D3D1C7);"></div>
-              <div style="padding:16px;background:#fff;color:#222;">
-                <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">About us</div>
-                <p id="ffp-about" style="font-size:12px;line-height:1.6;color:#333;margin-bottom:10px;">Open to all students who love drawing, painting, and design. No experience needed!</p>
-                <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">When &amp; where</div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-                  <span id="ffp-when" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Tuesdays, 3:00–4:30 PM</span>
-                  <span id="ffp-where" style="font-size:11px;background:#EEEDFE;color:#534AB7;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;">Room 109</span>
-                </div>
-                <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Faculty advisor</div>
-                <p id="ffp-advisor" style="font-size:12px;color:#333;margin-bottom:10px;">Ms. Carter</p>
-                <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Find us</div>
-                <p id="ffp-contact" style="font-size:12px;color:#333;">@OBHSArtClub</p>
-              </div>
-              <div style="background:#3C3489;color:#AFA9EC;padding:10px 16px;font-size:10px;text-align:center;font-family:'DM Sans',sans-serif;">Old Bridge High School — Student Life</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="cs">
+      <div class="cs-ttl">🎓 Club Advisor Resources</div>
+      <div class="info"><div class="info-t">Everything you need to run a club at OBHS</div><div class="info-d">Guides, forms, and templates for advising a student organization — from day-to-day meetings to funding to end-of-year wrap-up.</div></div>
+
+      <div class="flr" onclick="window.open(HANDBOOK_URL,'_blank')"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="window.open(BUDGET_URL,'_blank')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="window.open(MEETING_LOG_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="window.open(NEW_CLUB_URL,'_blank')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="window.open(EOY_REPORT_URL,'_blank')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
+
 
   <div id="f-events" class="subbody" style="display:none">
     <div class="cs">
@@ -1325,6 +1280,11 @@ const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT wor
 const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
 const ATHLETICS_URL = 'https://www.oldbridgeadmin.org/o/obhs/page/old-bridge-athletics'; // Full schedules, rosters, scores
 const FIELDTRIP_LOG_FORM_URL = '#'; // ← replace with the Google Form link once created
+const HANDBOOK_URL = '#';    // ← Club Advisor Handbook doc link
+const BUDGET_URL = '#';      // ← Budget & Purchasing guide/form link
+const MEETING_LOG_URL = '#'; // ← Meeting log / attendance template link
+const NEW_CLUB_URL = '#';    // ← Start a New Club approval process/application link
+const EOY_REPORT_URL = '#';  // ← End-of-Year Reporting form link
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
@@ -2229,23 +2189,6 @@ function chPrintFlyer() {
   w.document.write(chFlyerPrintHTML({name:'fl-name',tag:'fl-tag',about:'fl-about',when:'fl-when',where:'fl-where',advisor:'fl-advisor',contact:'fl-contact'}));
   w.document.close(); setTimeout(()=>w.print(),400);
 }
-function fchUpdateFlyer() {
-  const g = id => document.getElementById(id);
-  if(g('ffp-name'))  g('ffp-name').textContent  = g('ffl-name')?.value||'Club Name';
-  if(g('ffp-tag'))   g('ffp-tag').textContent   = g('ffl-tag')?.value||'';
-  if(g('ffp-about')) g('ffp-about').textContent = g('ffl-about')?.value||'';
-  if(g('ffp-when'))  g('ffp-when').textContent  = g('ffl-when')?.value||'';
-  if(g('ffp-where')) g('ffp-where').textContent = g('ffl-where')?.value||'';
-  if(g('ffp-advisor'))g('ffp-advisor').textContent=g('ffl-advisor')?.value||'';
-  if(g('ffp-contact'))g('ffp-contact').textContent=g('ffl-contact')?.value||'';
-}
-function fchPrintFlyer() {
-  const w=window.open('','_blank');
-  w.document.write(chFlyerPrintHTML({name:'ffl-name',tag:'ffl-tag',about:'ffl-about',when:'ffl-when',where:'ffl-where',advisor:'ffl-advisor',contact:'ffl-contact'}));
-  w.document.close(); setTimeout(()=>w.print(),400);
-}
-
-
 // ══════════════════════════════════════════════════════
 // CLASS PAGES — per-grade announcements & resources
 // ══════════════════════════════════════════════════════
