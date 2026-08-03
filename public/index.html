@@ -1120,6 +1120,25 @@ img{max-width:100%;display:block;}
         <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">📋</div><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 48 hours in advance and approved before communicating to students or parents.</div></div></div>
       </div>
     </div>
+
+    <div class="cs" style="margin-top:24px;">
+      <div class="cs-ttl">🚌 Field Trip &amp; Departure Log</div>
+      <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
+      <div class="flr" onclick="window.open(FIELDTRIP_LOG_FORM_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time</div></div><div class="flr-arr">→</div></div>
+
+      <div style="margin-top:22px;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">🚏 Leaving Today</div>
+        <div id="ft-today-list"><div class="skel" style="height:56px"></div></div>
+      </div>
+
+      <div style="margin-top:26px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Full Log (searchable)</div>
+          <input id="ft-search" type="text" placeholder="Search by group, teacher, or destination..." oninput="renderFieldTrips()" style="flex:1;max-width:280px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;">
+        </div>
+        <div id="ft-archive-list"><div class="skel" style="height:56px"></div></div>
+      </div>
+    </div>
   </div>
 
   <div id="f-clubs" class="subbody" style="display:none">
@@ -1294,6 +1313,7 @@ const GIDS = {
   classcup:      '1469693941',
   spotlight:     '888519751',
   athletics:     '775220800',
+  fieldtrips:    'FIELDTRIPS_GID', // ← add Google Sheet tab GID for the field trip / departure log
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
@@ -1304,6 +1324,7 @@ const EVT_URL       = 'https://forms.cloud.microsoft/r/8Bh7tiLDu2';   // Faculty
 const IT_URL        = 'https://nj8.mlworkorders.com/Login.aspx';       // IT work orders (Help Desk)
 const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
 const ATHLETICS_URL = 'https://oldbridgeathletics.org/'; // Full schedules, rosters, scores
+const FIELDTRIP_LOG_FORM_URL = '#'; // ← replace with the Google Form link once created
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
@@ -1457,7 +1478,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -2163,6 +2184,7 @@ function fsub(btn, id) {
   if (btn && btn.classList) btn.classList.add('active');
   fPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
   window.scrollTo({top:0,behavior:'instant'});
+  if (id === 'f-forms') loadFieldTrips();
 }
 
 
@@ -2423,29 +2445,43 @@ async function loadSpotlight() {
 // HERO PHOTO ROTATION
 // ══════════════════════════════════════════════════════
 const HERO_PHOTOS = ['/sl-photo-1.jpg','/sl-photo-2.jpg','/sl-photo-3.jpg','/sl-photo-4.jpg','/sl-photo-5.jpg','/sl-photo-9.jpg'];
-(function heroRotate(){
+
+// Tests whether an image URL actually loads before trusting it in the rotation —
+// a missing/deleted file is silently skipped instead of leaving a blank hero.
+function preloadCheck(src) {
+  return new Promise(resolve => {
+    const im = new Image();
+    im.onload = () => resolve(src);
+    im.onerror = () => resolve(null);
+    im.src = src;
+  });
+}
+
+(async function heroRotate(){
   const a = document.getElementById('hero-photo-a');
   const b = document.getElementById('hero-photo-b');
   if (!a || !b || !HERO_PHOTOS.length) return;
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Preload
-  HERO_PHOTOS.forEach(src => { const im = new Image(); im.src = src; });
+  const results = await Promise.all(HERO_PHOTOS.map(preloadCheck));
+  const goodPhotos = results.filter(Boolean);
+
+  if (!goodPhotos.length) return; // none loaded — fall back to the knight/gradient hero, no blank background
 
   let idx = 0;
-  a.style.backgroundImage = "url('" + HERO_PHOTOS[0] + "')";
+  a.style.backgroundImage = "url('" + goodPhotos[0] + "')";
   a.classList.add('on');
   const heroEl = document.querySelector('.hero');
   if (heroEl) heroEl.classList.add('has-photos');
   let showingA = true;
 
-  if (reduceMotion || HERO_PHOTOS.length < 2) return; // static first photo
+  if (reduceMotion || goodPhotos.length < 2) return; // static single photo
 
   setInterval(() => {
-    idx = (idx + 1) % HERO_PHOTOS.length;
+    idx = (idx + 1) % goodPhotos.length;
     const incoming = showingA ? b : a;
     const outgoing = showingA ? a : b;
-    incoming.style.backgroundImage = "url('" + HERO_PHOTOS[idx] + "')";
+    incoming.style.backgroundImage = "url('" + goodPhotos[idx] + "')";
     incoming.classList.add('on');
     outgoing.classList.remove('on');
     showingA = !showingA;
@@ -2870,6 +2906,68 @@ function openCoaches() {
 function closeCoaches() {
   document.getElementById('coach-modal').style.display = 'none';
   document.body.style.overflow = '';
+}
+
+
+// ══════════════════════════════════════════════════════
+// FIELD TRIP & DEPARTURE LOG — who's leaving the building, plus a searchable history
+// ══════════════════════════════════════════════════════
+let ftData = [];
+let ftLoaded = false;
+
+async function loadFieldTrips() {
+  const todayEl = document.getElementById('ft-today-list');
+  const archEl = document.getElementById('ft-archive-list');
+  if (!todayEl || !archEl) return;
+  if (ftLoaded) { renderFieldTrips(); return; }
+  if (!GIDS.fieldtrips || GIDS.fieldtrips.includes('_GID')) {
+    todayEl.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:10px 0">Not set up yet \u2014 check back soon.</p>';
+    archEl.innerHTML = '';
+    return;
+  }
+  try {
+    const rows = await fetchTab(GIDS.fieldtrips);
+    ftData = rows.filter(r => (r.GROUP||'').trim() && (r.DATE||'').trim()).map(r => {
+      const d = new Date((r.DATE||'').trim() + 'T00:00:00');
+      r._date = isNaN(d.getTime()) ? null : d;
+      return r;
+    }).filter(r => r._date).sort((a, b) => b._date - a._date);
+    ftLoaded = true;
+    renderFieldTrips();
+  } catch (e) {
+    console.warn('[FieldTrips] load failed', e);
+    todayEl.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:10px 0">Could not load the log right now.</p>';
+  }
+}
+
+function ftRow(r) {
+  const dateLabel = r._date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const metaParts = [dateLabel];
+  if (r.DISMISSAL_TIME) metaParts.push('Out ' + r.DISMISSAL_TIME);
+  if (r.RETURN_TIME) metaParts.push('Back ' + r.RETURN_TIME);
+  if (r.DESTINATION) metaParts.push(r.DESTINATION);
+  if (r.TEACHER) metaParts.push(r.TEACHER);
+  return `<div class="ev" style="padding:12px 0;"><div style="flex:1"><div class="ev-t" style="font-size:14px">${r.GROUP}</div><div class="ev-s" style="font-size:12px">${metaParts.join(' \u00b7 ')}</div>${r.DESCRIPTION ? '<div style="font-size:12px;color:var(--faint);margin-top:2px">' + r.DESCRIPTION + '</div>' : ''}</div></div>`;
+}
+
+function renderFieldTrips() {
+  const todayEl = document.getElementById('ft-today-list');
+  const archEl = document.getElementById('ft-archive-list');
+  if (!todayEl || !archEl) return;
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const todays = ftData.filter(r => r._date.getTime() === today.getTime());
+  todayEl.innerHTML = todays.length
+    ? todays.map(ftRow).join('')
+    : '<p style="font-size:13px;color:var(--faint);padding:10px 0">No one\u2019s logged as leaving today.</p>';
+
+  const q = (document.getElementById('ft-search')?.value || '').trim().toLowerCase();
+  const filtered = q
+    ? ftData.filter(r => (r.GROUP + ' ' + (r.TEACHER||'') + ' ' + (r.DESTINATION||'')).toLowerCase().includes(q))
+    : ftData.slice(0, 30);
+  archEl.innerHTML = filtered.length
+    ? filtered.map(ftRow).join('')
+    : '<p style="font-size:13px;color:var(--faint);padding:10px 0">No matches.</p>';
 }
 
 load();
