@@ -2498,29 +2498,42 @@ function preloadCheck(src) {
   const ind = document.getElementById('ptr-ind');
   if (!ind) return;
 
-  const THRESHOLD = 78;
-  let startY = null, dy = 0, pulling = false;
+  const THRESHOLD = 130;   // total pull distance required to actually trigger a reload
+  const DEADZONE = 28;     // ignore small/accidental movements entirely before engaging
+  let startY = null, startX = null, dy = 0, pulling = false, cancelled = false;
 
   document.addEventListener('touchstart', function(e){
     if (window.scrollY <= 0 && e.touches.length === 1) {
       startY = e.touches[0].clientY;
-      pulling = false; dy = 0;
+      startX = e.touches[0].clientX;
+      pulling = false; cancelled = false; dy = 0;
     } else {
       startY = null;
     }
   }, { passive: true });
 
   document.addEventListener('touchmove', function(e){
-    if (startY === null) return;
-    const raw = e.touches[0].clientY - startY;
-    if (raw <= 0 || window.scrollY > 0) {
+    if (startY === null || cancelled) return;
+    const rawY = e.touches[0].clientY - startY;
+    const rawX = e.touches[0].clientX - startX;
+
+    // Any meaningfully diagonal or sideways motion cancels this gesture entirely —
+    // real pull-to-refresh is a deliberate straight-down drag, not a scroll with drift.
+    if (Math.abs(rawX) > Math.abs(rawY) * 0.6) {
+      cancelled = true;
       if (pulling) { ind.style.transform = ''; ind.classList.remove('ready'); pulling = false; }
       return;
     }
+    if (rawY <= DEADZONE || window.scrollY > 0) {
+      if (pulling) { ind.style.transform = ''; ind.classList.remove('ready'); pulling = false; }
+      return;
+    }
+
     pulling = true;
-    dy = Math.min(raw * 0.45, 120); // resistance
+    const eased = rawY - DEADZONE;
+    dy = Math.min(eased * 0.4, 120); // resistance
     ind.style.transform = 'translateY(' + (dy + 64) + 'px)';
-    ind.classList.toggle('ready', dy > THRESHOLD * 0.45 && raw > THRESHOLD);
+    ind.classList.toggle('ready', eased > THRESHOLD);
   }, { passive: true });
 
   document.addEventListener('touchend', function(){
