@@ -1150,7 +1150,7 @@ img{max-width:100%;display:block;}
       <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openMeetingLog()"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openNewClub()"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="openResourceLink(EOY_REPORT_URL,'End-of-Year Reporting')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openEoy()"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
 
@@ -3062,6 +3062,68 @@ function closeNewClub() {
   document.body.style.overflow = '';
 }
 
+// ══════════════════════════════════════════════════════
+// END-OF-YEAR REPORTING — guidance + printable report template
+// ══════════════════════════════════════════════════════
+function openEoy() {
+  document.getElementById('eoy-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeEoy() {
+  document.getElementById('eoy-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function eoyReportPrintHTML() {
+  const officerRows = Array.from({length: 5}, () => '<tr><td></td><td></td><td></td><td></td></tr>').join('');
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>OBHS End-of-Year Club Report</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;max-width:680px;margin:32px auto;padding:0 24px;color:#222}
+  .eo-header{background:#26215C;color:#EEEDFE;padding:20px 22px;text-align:center;border-radius:8px 8px 0 0}
+  .eo-school{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:sans-serif}
+  .eo-title{font-size:22px;font-weight:700;}
+  .eo-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;padding:20px 22px;border:1px solid #ddd;border-top:none;font-family:sans-serif;font-size:12px;}
+  .eo-field label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#534AB7;font-weight:700;margin-bottom:4px;}
+  .eo-field .line{border-bottom:1px solid #999;height:20px;}
+  .eo-section{padding:16px 22px 4px;}
+  .sh{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:8px;font-family:sans-serif}
+  table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:11px;margin-bottom:6px;}
+  th{background:#EEEDFE;color:#3C3489;text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+  td{border-bottom:1px solid #ddd;padding:9px 8px;height:14px;}
+  .lines{border:1px solid #ddd;border-radius:4px;padding:10px;min-height:70px;background:repeating-linear-gradient(#fff,#fff 27px,#e8e8e8 28px);margin-bottom:16px;}
+  .eo-footer{background:#3C3489;color:#AFA9EC;padding:10px 22px;font-size:10px;text-align:center;font-family:sans-serif;border-radius:0 0 8px 8px;margin-top:20px;}
+  @media print{body{margin:0;padding:0;max-width:100%}}</style></head><body>
+  <div class="eo-header"><div class="eo-school">Old Bridge High School &nbsp;\u00b7&nbsp; Student Life</div><div class="eo-title">End-of-Year Club Report</div></div>
+  <div class="eo-fields">
+    <div class="eo-field"><label>Club / Team</label><div class="line"></div></div>
+    <div class="eo-field"><label>Advisor</label><div class="line"></div></div>
+    <div class="eo-field"><label>School Year</label><div class="line"></div></div>
+    <div class="eo-field"><label>Meetings Held This Year</label><div class="line"></div></div>
+    <div class="eo-field"><label>Membership \u2014 Start of Year</label><div class="line"></div></div>
+    <div class="eo-field"><label>Membership \u2014 End of Year</label><div class="line"></div></div>
+  </div>
+  <div class="eo-section">
+    <div class="sh">Key Accomplishments &amp; Events This Year</div>
+    <div class="lines"></div>
+  </div>
+  <div class="eo-section">
+    <div class="sh">Officer Transition \u2014 Outgoing \u2192 Incoming</div>
+    <table><thead><tr><th>Role</th><th>Outgoing Officer</th><th>Incoming Officer</th><th>Contact Info</th></tr></thead><tbody>${officerRows}</tbody></table>
+  </div>
+  <div class="eo-section">
+    <div class="sh">Equipment / Funds Status</div>
+    <div class="lines" style="min-height:45px;"></div>
+    <div class="sh">Notes for Next Year</div>
+    <div class="lines"></div>
+  </div>
+  <div class="eo-footer">Old Bridge High School \u2014 Student Life \u00b7 Submit completed report to sbeverly@obps.org</div>
+  </body></html>`;
+}
+function printEoyReport() {
+  const w = window.open('', '_blank');
+  w.document.write(eoyReportPrintHTML());
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
 load();
 observeReveal();
 </script>
@@ -3186,6 +3248,45 @@ observeReveal();
 </div>
 
 <!-- Meeting Logs & Attendance Modal -->
+<!-- End-of-Year Reporting Modal -->
+<div id="eoy-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeEoy()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">End-of-Year Reporting</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">📊 Why It Matters</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">A short year-end summary is what makes next September easy — for you, for a new advisor if the club ever changes hands, and for incoming officers who'd otherwise start from zero. Five minutes now saves everyone a scramble later.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">✅ What to Include</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Club summary — meetings held, key events, and highlights from the year</li>
+        <li>Membership count — where you started vs. where you ended</li>
+        <li>Officer transition — outgoing officers and their incoming replacements, with contact info</li>
+        <li>Equipment or funds status — anything on hand, anything remaining in the budget</li>
+        <li>Notes for next year — anything a new advisor or officer would want to know</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:22px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📅 Deadline</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">Submit before the last day of classes each year, while the details — and your officers — are still around to confirm them.</p>
+    </div>
+
+    <button onclick="printEoyReport()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-bottom:12px;">🖨 Print a Blank End-of-Year Report</button>
+
+    <div style="text-align:center;">
+      <a href="mailto:sbeverly@obps.org?subject=End-of-Year Club Report" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">📩 Email your completed report to sbeverly@obps.org</a>
+    </div>
+
+  </div>
+</div>
+
 <div id="meeting-log-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
   <div style="max-width:720px;margin:0 auto;">
     <div class="cal-modal-head">
