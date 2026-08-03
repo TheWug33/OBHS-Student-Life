@@ -1149,7 +1149,7 @@ img{max-width:100%;display:block;}
       <div class="flr" onclick="openHandbook()"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openMeetingLog()"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="openResourceLink(NEW_CLUB_URL,'Start a New Club')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openNewClub()"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openResourceLink(EOY_REPORT_URL,'End-of-Year Reporting')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
@@ -3050,6 +3050,18 @@ function printMeetingLog() {
   setTimeout(() => w.print(), 400);
 }
 
+// ══════════════════════════════════════════════════════
+// START A NEW CLUB — approval process guidance
+// ══════════════════════════════════════════════════════
+function openNewClub() {
+  document.getElementById('new-club-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeNewClub() {
+  document.getElementById('new-club-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 </script>
@@ -3204,6 +3216,50 @@ observeReveal();
     </div>
 
     <button onclick="printMeetingLog()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">🖨 Print a Blank Meeting Log</button>
+
+  </div>
+</div>
+
+<!-- Start a New Club Modal -->
+<div id="new-club-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeNewClub()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Start a New Club</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">🌱 Something New at OBHS</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">Students come to you first when they want to start a club — here's what to know before you say yes, so you can set them up for a smooth approval instead of a stalled one.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">✅ Requirements to Start a Club</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>A faculty advisor willing to commit to the role (that's you)</li>
+        <li>A core group of interested students — a handful of names to start, not the whole roster on day one</li>
+        <li>A clear purpose or mission that doesn't significantly overlap with an existing club</li>
+        <li>A realistic plan for regular meetings for the rest of the year</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📝 The Approval Process</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Student(s) submit a New Club application through the Club Hub (button below)</li>
+        <li>Student Life reviews it for duplication, feasibility, and advisor sign-off</li>
+        <li>Once approved, the club is added to the live Club Directory — searchable, with its own flyer-ready listing</li>
+        <li>You're notified and can schedule your first meeting right away</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:22px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📅 Timing</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">Clubs meant to run the full school year are best submitted early in the fall. A club can still be approved later in the year, but with less time to meet and less certainty it'll return the following September.</p>
+    </div>
+
+    <button onclick="window.open(CLUB_URL,'_blank')" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit a New Club Application →</button>
 
   </div>
 </div>
