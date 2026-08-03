@@ -567,7 +567,7 @@ img{max-width:100%;display:block;}
         </div>
       </div>
       <div class="reveal" id="flyers-block" style="margin-top:36px">
-        <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="window.open(FLYER_FORM_URL,'_blank')">Submit →</button></div>
+        <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openResourceLink(FLYER_FORM_URL,'Flyer submission')">Submit →</button></div>
         <div class="fly-row" id="fly-row" style="grid-template-columns:repeat(4,1fr)">
           <div class="fly"><span class="fly-label">Loading…</span></div>
           <div class="fly"></div>
@@ -1124,7 +1124,7 @@ img{max-width:100%;display:block;}
     <div class="cs" style="margin-top:24px;">
       <div class="cs-ttl">🚌 Field Trip &amp; Departure Log</div>
       <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
-      <div class="flr" onclick="window.open(FIELDTRIP_LOG_FORM_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div class="flr-ico">📝</div><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time</div></div><div class="flr-arr">→</div></div>
 
       <div style="margin-top:22px;">
         <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">🚏 Leaving Today</div>
@@ -1147,10 +1147,10 @@ img{max-width:100%;display:block;}
       <div class="info"><div class="info-t">Everything you need to run a club at OBHS</div><div class="info-d">Guides, forms, and templates for advising a student organization — from day-to-day meetings to funding to end-of-year wrap-up.</div></div>
 
       <div class="flr" onclick="openHandbook()"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="window.open(BUDGET_URL,'_blank')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="window.open(MEETING_LOG_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="window.open(NEW_CLUB_URL,'_blank')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="window.open(EOY_REPORT_URL,'_blank')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(MEETING_LOG_URL,'Meeting Logs & Attendance')"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(NEW_CLUB_URL,'Start a New Club')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(EOY_REPORT_URL,'End-of-Year Reporting')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
 
@@ -1172,7 +1172,7 @@ img{max-width:100%;display:block;}
       <div class="flr" onclick="window.open(FACILITIES_URL,'_blank')"><div class="flr-ico">🏛️</div><div><div class="flr-t">Reserve a space</div><div class="flr-d">Auditorium, cafeteria, and other facilities</div></div><div class="flr-arr">→</div></div>
       
       
-      <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d">Room 845 · Mr. Beverly · sbeverly@obps.org</div></div></div>
+      <div class="flr" style="opacity:0.75;cursor:default"><div class="flr-ico">📞</div><div><div class="flr-t">Contact Student Life directly</div><div class="flr-d">Mr. Beverly · sbeverly@obps.org</div></div></div>
     </div>
   </div>
 
@@ -2939,6 +2939,18 @@ function openHandbook() {
 function closeHandbook() {
   document.getElementById('handbook-modal').style.display = 'none';
   document.body.style.overflow = '';
+}
+
+// Opens a resource link safely — if the URL is still a placeholder ('#'),
+// shows a friendly message instead of calling window.open, which can
+// misbehave in the installed app (navigating the app itself instead of
+// opening anything, which looks like an accidental return to the homepage).
+function openResourceLink(url, label) {
+  if (!url || url === '#') {
+    alert((label || 'This resource') + ' isn\u2019t set up yet \u2014 check back soon!');
+    return;
+  }
+  window.open(url, '_blank');
 }
 
 load();
