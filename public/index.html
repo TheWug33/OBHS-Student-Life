@@ -1146,7 +1146,7 @@ img{max-width:100%;display:block;}
       <div class="cs-ttl">🎓 Club Advisor Resources</div>
       <div class="info"><div class="info-t">Everything you need to run a club at OBHS</div><div class="info-d">Guides, forms, and templates for advising a student organization — from day-to-day meetings to funding to end-of-year wrap-up.</div></div>
 
-      <div class="flr" onclick="window.open(HANDBOOK_URL,'_blank')"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openHandbook()"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="window.open(BUDGET_URL,'_blank')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="window.open(MEETING_LOG_URL,'_blank')"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="window.open(NEW_CLUB_URL,'_blank')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
@@ -2929,6 +2929,18 @@ function renderFieldTrips() {
     : '<p style="font-size:13px;color:var(--faint);padding:10px 0">No matches.</p>';
 }
 
+// ══════════════════════════════════════════════════════
+// CLUB ADVISOR HANDBOOK — themed in-site modal
+// ══════════════════════════════════════════════════════
+function openHandbook() {
+  document.getElementById('handbook-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeHandbook() {
+  document.getElementById('handbook-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 </script>
@@ -2968,6 +2980,78 @@ observeReveal();
       <h2 class="cal-modal-ttl">Coaching Staff</h2>
     </div>
     <div id="coach-list"></div>
+  </div>
+</div>
+
+<!-- Club Advisor Handbook Modal -->
+<div id="handbook-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeHandbook()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Club Advisor Handbook</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">👋 Welcome</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;">Thank you for serving as a Club Advisor at Old Bridge High School. Your time, leadership, and commitment provide students with opportunities to explore interests, develop leadership skills, build relationships, and create lasting memories beyond the classroom. Your support plays a vital role in fostering an engaging and inclusive school community.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px;">
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">✅ Advisor Responsibilities</div>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+          <li>Supervise all club meetings and activities</li>
+          <li>Encourage student leadership while providing guidance and support</li>
+          <li>Maintain a safe, respectful, and inclusive environment for all members</li>
+          <li>Communicate regularly with student officers and members</li>
+          <li>Ensure all school and district policies are followed</li>
+          <li>Submit required forms, requests, and reports in a timely manner</li>
+        </ul>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📅 Planning a Successful Club</div>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+          <li>Establish a regular meeting schedule</li>
+          <li>Encourage active student participation and leadership</li>
+          <li>Keep attendance and meeting records</li>
+          <li>Promote upcoming meetings and events through the Student Life Office</li>
+          <li>Plan meaningful activities that support your club's mission and goals</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">💰 Financial &amp; Event Procedures</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">Before making purchases, planning fundraisers, hosting events, or scheduling trips, please follow all Student Life and district approval procedures. Additional information, forms, and timelines are available right here in <strong style="color:var(--silver)">Club Advisor Resources</strong>.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">💬 Communication</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">The Student Life Office is here to support you throughout the school year. Advisors are encouraged to communicate regularly regarding club announcements, event planning, facility reservations, fundraising requests, budget and purchasing questions, and student concerns.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">🔗 Helpful Resources</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-size:12.5px;color:var(--silver);">
+        <div>📘 Club Advisor Handbook</div>
+        <div>💰 Budget &amp; Purchase Requests</div>
+        <div>📝 Meeting Log &amp; Attendance Templates</div>
+        <div>🌱 New Club Approval Info</div>
+        <div>📊 End-of-Year Reporting</div>
+        <div>✅ Forms, Checklists &amp; Deadlines</div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;text-align:center;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📩 Office of Student Life</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;">Scott Beverly</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">Student Activities Coordinator</div>
+      <a href="mailto:sbeverly@obps.org" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">sbeverly@obps.org</a>
+      <p style="font-size:12.5px;color:var(--faint);line-height:1.7;margin:16px 0 0;">Thank you for helping make Old Bridge High School a place where every student has the opportunity to get involved, develop new skills, and experience Life Beyond the Classroom.</p>
+    </div>
+
   </div>
 </div>
 
