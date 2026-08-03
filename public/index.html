@@ -1148,7 +1148,7 @@ img{max-width:100%;display:block;}
 
       <div class="flr" onclick="openHandbook()"><div class="flr-ico">📘</div><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div class="flr-ico">💰</div><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
-      <div class="flr" onclick="openResourceLink(MEETING_LOG_URL,'Meeting Logs & Attendance')"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openMeetingLog()"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openResourceLink(NEW_CLUB_URL,'Start a New Club')"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openResourceLink(EOY_REPORT_URL,'End-of-Year Reporting')"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
     </div>
@@ -2991,6 +2991,65 @@ function openResourceLink(url, label) {
   window.open(url, '_blank');
 }
 
+// ══════════════════════════════════════════════════════
+// MEETING LOGS & ATTENDANCE — guidance + printable blank template
+// ══════════════════════════════════════════════════════
+function openMeetingLog() {
+  document.getElementById('meeting-log-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeMeetingLog() {
+  document.getElementById('meeting-log-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function meetingLogPrintHTML() {
+  const rows = Array.from({length: 16}, () => '<tr><td></td><td class="chk"></td><td class="chk"></td></tr>').join('');
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>OBHS Meeting Log</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;max-width:680px;margin:32px auto;padding:0 24px;color:#222}
+  .ml-header{background:#26215C;color:#EEEDFE;padding:20px 22px;text-align:center;border-radius:8px 8px 0 0}
+  .ml-school{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:sans-serif}
+  .ml-title{font-size:22px;font-weight:700;}
+  .ml-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;padding:20px 22px;border:1px solid #ddd;border-top:none;font-family:sans-serif;font-size:12px;}
+  .ml-field label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#534AB7;font-weight:700;margin-bottom:4px;}
+  .ml-field .line{border-bottom:1px solid #999;height:20px;}
+  .ml-section{padding:16px 22px 4px;}
+  .sh{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin-bottom:8px;font-family:sans-serif}
+  table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:11px;}
+  th{background:#EEEDFE;color:#3C3489;text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+  td{border-bottom:1px solid #ddd;padding:9px 8px;height:14px;}
+  td.chk{width:60px;text-align:center;}
+  .lines{border:1px solid #ddd;border-radius:4px;padding:10px;min-height:70px;background:repeating-linear-gradient(#fff,#fff 27px,#e8e8e8 28px);margin-bottom:16px;}
+  .ml-footer{background:#3C3489;color:#AFA9EC;padding:10px 22px;font-size:10px;text-align:center;font-family:sans-serif;border-radius:0 0 8px 8px;margin-top:20px;}
+  @media print{body{margin:0;padding:0;max-width:100%}}</style></head><body>
+  <div class="ml-header"><div class="ml-school">Old Bridge High School &nbsp;\u00b7&nbsp; Student Life</div><div class="ml-title">Club Meeting Log</div></div>
+  <div class="ml-fields">
+    <div class="ml-field"><label>Club / Team</label><div class="line"></div></div>
+    <div class="ml-field"><label>Advisor</label><div class="line"></div></div>
+    <div class="ml-field"><label>Date</label><div class="line"></div></div>
+    <div class="ml-field"><label>Time</label><div class="line"></div></div>
+    <div class="ml-field"><label>Location</label><div class="line"></div></div>
+    <div class="ml-field"><label>Next Meeting Date</label><div class="line"></div></div>
+  </div>
+  <div class="ml-section">
+    <div class="sh">Attendance</div>
+    <table><thead><tr><th>Name</th><th>Present</th><th>Absent</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>
+  <div class="ml-section">
+    <div class="sh">Topics Discussed / Decisions Made</div>
+    <div class="lines"></div>
+    <div class="sh">Action Items \u2014 Who's Doing What</div>
+    <div class="lines"></div>
+  </div>
+  <div class="ml-footer">Old Bridge High School \u2014 Student Life \u00b7 Keep on file for the full school year</div>
+  </body></html>`;
+}
+function printMeetingLog() {
+  const w = window.open('', '_blank');
+  w.document.write(meetingLogPrintHTML());
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
 load();
 observeReveal();
 </script>
@@ -3111,6 +3170,41 @@ observeReveal();
   <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);box-shadow:0 24px 70px rgba(0,0,0,0.6);">
     <div id="info-modal-body" style="font-size:14px;color:var(--silver);line-height:1.7;white-space:pre-line;margin-bottom:18px;"></div>
     <button onclick="closeInfoModal()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:11px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Got it</button>
+  </div>
+</div>
+
+<!-- Meeting Logs & Attendance Modal -->
+<div id="meeting-log-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeMeetingLog()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Meeting Logs &amp; Attendance</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">🎯 Why Keep a Log</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">A simple record of who showed up and what happened protects you if questions ever come up, helps justify budget requests, and makes your End-of-Year Report take five minutes instead of an afternoon of guessing. Keep one per meeting, all year, in one place.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">📋 What to Include Each Meeting</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Date, time, and location</li>
+        <li>Members present <em>and</em> absent (attendance matters both ways)</li>
+        <li>Topics discussed and any decisions made</li>
+        <li>Action items — who's doing what before next time</li>
+        <li>Next meeting date</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:22px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">💡 Best Practice</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">Keep a running folder (physical or digital) of every meeting log for the year. It's the single easiest thing you can do to make officer transitions, funding requests, and your End-of-Year Report painless.</p>
+    </div>
+
+    <button onclick="printMeetingLog()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">🖨 Print a Blank Meeting Log</button>
+
   </div>
 </div>
 
