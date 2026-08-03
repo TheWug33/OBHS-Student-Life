@@ -2185,9 +2185,7 @@ function chUpdateFlyer() {
   if(g('fp-contact'))g('fp-contact').textContent=g('fl-contact')?.value||'';
 }
 function chPrintFlyer() {
-  const w=window.open('','_blank');
-  w.document.write(chFlyerPrintHTML({name:'fl-name',tag:'fl-tag',about:'fl-about',when:'fl-when',where:'fl-where',advisor:'fl-advisor',contact:'fl-contact'}));
-  w.document.close(); setTimeout(()=>w.print(),400);
+  printInPlace(chFlyerPrintHTML({name:'fl-name',tag:'fl-tag',about:'fl-about',when:'fl-when',where:'fl-where',advisor:'fl-advisor',contact:'fl-contact'}));
 }
 // ══════════════════════════════════════════════════════
 // CLASS PAGES — per-grade announcements & resources
@@ -2944,6 +2942,28 @@ function closeHandbook() {
 // Small on-page toast — used instead of alert(), since native alert()/confirm()/prompt()
 // dialogs are unreliable inside installed home-screen apps (standalone PWA mode) on iOS
 // and can misbehave in ways that look like the app itself navigating unexpectedly.
+// Prints HTML content without opening a separate window/tab — a real new window/tab
+// can't be closed or returned from inside an installed home-screen app (standalone mode),
+// which is why printing used to strand people outside the site. This uses a hidden iframe
+// instead, so printing happens in place and the site is never left.
+function printInPlace(htmlContent) {
+  let iframe = document.getElementById('print-frame');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'print-frame';
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+    document.body.appendChild(iframe);
+  }
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(htmlContent);
+  doc.close();
+  setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  }, 350);
+}
+
 function showToast(msg) {
   let t = document.getElementById('site-toast');
   if (!t) {
@@ -3044,10 +3064,7 @@ function meetingLogPrintHTML() {
   </body></html>`;
 }
 function printMeetingLog() {
-  const w = window.open('', '_blank');
-  w.document.write(meetingLogPrintHTML());
-  w.document.close();
-  setTimeout(() => w.print(), 400);
+  printInPlace(meetingLogPrintHTML());
 }
 
 // ══════════════════════════════════════════════════════
@@ -3118,10 +3135,7 @@ function eoyReportPrintHTML() {
   </body></html>`;
 }
 function printEoyReport() {
-  const w = window.open('', '_blank');
-  w.document.write(eoyReportPrintHTML());
-  w.document.close();
-  setTimeout(() => w.print(), 400);
+  printInPlace(eoyReportPrintHTML());
 }
 
 load();
