@@ -733,9 +733,8 @@ img{max-width:100%;display:block;}
       <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-total" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Total clubs</div>
       <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-cats" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Categories</div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
-      <input id="ch-search" type="text" placeholder="Search clubs by name or advisor..." oninput="chFilter()" style="flex:1;min-width:200px;max-width:480px;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
-      <button onclick="openResourceLink(CLUB_DETAILS_FORM_URL,'The club details form')" style="padding:9px 16px;background:none;border:1px solid var(--line-bright);border-radius:8px;color:var(--purple-glow);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;">➕ Add/update your club's details</button>
+    <div style="margin-bottom:12px;">
+      <input id="ch-search" type="text" placeholder="Search clubs by name or advisor..." oninput="chFilter()" style="width:100%;max-width:480px;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
     </div>
     <div id="ch-cattabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
       <button class="ch-cat-tab ch-cat-active" onclick="chSelectCat('',this)" style="padding:5px 14px;font-size:12px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid var(--line);background:var(--purple-ui);color:#fff;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;">All Clubs</button>
@@ -1135,6 +1134,7 @@ img{max-width:100%;display:block;}
       <div class="flr" onclick="openMeetingLog()"><div class="flr-ico">📝</div><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openNewClub()"><div class="flr-ico">🌱</div><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
       <div class="flr" onclick="openEoy()"><div class="flr-ico">📊</div><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
+      <div class="flr" onclick="openResourceLink(CLUB_DETAILS_FORM_URL,'The club details form')"><div class="flr-ico">✏️</div><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — submissions are reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
     </div>
   </div>
 
@@ -1424,7 +1424,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','MEETING_DAY','MEETING_TIME','ROOM','INSTAGRAM','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','MEETING_DAY','MEETING_TIME','ROOM','INSTAGRAM','APPROVED','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -2108,7 +2108,12 @@ async function chLoadClubDetails() {
     rows.forEach(r => {
       const key = (r['Club Name'] || '').trim().toLowerCase();
       if (!key) return;
-      chDetails[key] = r; // later rows overwrite earlier ones — newest submission always wins
+      // Only show submissions you've explicitly approved — add a column literally
+      // named APPROVED to the sheet and put a Y in it once you've reviewed a row.
+      // Nothing here goes live on its own.
+      const approved = /^y/i.test((r['APPROVED'] || '').trim());
+      if (!approved) return;
+      chDetails[key] = r; // later approved rows overwrite earlier ones — newest approved submission wins
     });
   } catch(e) {
     console.warn('[ClubHub] details load failed', e);
