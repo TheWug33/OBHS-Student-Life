@@ -2050,16 +2050,16 @@ function chOpenClub(i) {
   const cat = c._cat;
   const badge = CAT_BADGE_COLORS[cat.cls] || CAT_BADGE_COLORS['cat-other'];
   const rows = [];
-  if (detail['MEETING_DAY'] || detail['MEETING_TIME']) rows.push(['\ud83d\udcc5 Meets', [detail['MEETING_DAY'], detail['MEETING_TIME']].filter(Boolean).join(' \u00b7 ')]);
-  if (detail['ROOM']) rows.push(['\ud83d\udccd Room', detail['ROOM']]);
-  if (detail['INSTAGRAM']) rows.push(['\ud83d\udcf7 Instagram', detail['INSTAGRAM']]);
+  if (detail['Meeting Day'] || detail['Meeting Time']) rows.push(['\ud83d\udcc5 Meets', [detail['Meeting Day'], detail['Meeting Time']].filter(Boolean).join(' \u00b7 ')]);
+  if (detail['Room #']) rows.push(['\ud83d\udccd Room', detail['Room #']]);
+  if (detail['Instagram Account']) rows.push(['\ud83d\udcf7 Instagram', detail['Instagram Account']]);
   const advisor = c['ADVISOR'] || '';
   const email = c['ADVISOR EMAIL'] || '';
 
   document.getElementById('club-modal-body').innerHTML = `
     <span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:12px;${badge}">${cat.label}</span>
     <h2 class="cal-modal-ttl" style="font-size:26px;margin-bottom:14px;">${name}</h2>
-    ${detail['DESCRIPTION'] ? '<p style="font-size:14px;color:var(--silver);line-height:1.7;margin-bottom:18px;">' + detail['DESCRIPTION'] + '</p>' : ''}
+    ${detail['Club Description'] ? '<p style="font-size:14px;color:var(--silver);line-height:1.7;margin-bottom:18px;">' + detail['Club Description'] + '</p>' : ''}
     ${rows.length ? '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' + rows.map(([label, val]) => '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--silver)">' + label + ':</strong> ' + val + '</div>').join('') + '</div>' : ''}
     ${advisor ? '<div style="font-size:13px;color:var(--muted);">\ud83d\udc64 ' + advisor + (email ? ' \u00b7 <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:underline;">' + email + '</a>' : '') + '</div>' : ''}
   `;
@@ -2106,7 +2106,7 @@ async function chLoadClubDetails() {
   try {
     const rows = await fetchTab(GIDS.clubdetails);
     rows.forEach(r => {
-      const key = (r['CLUB'] || '').trim().toLowerCase();
+      const key = (r['Club Name'] || '').trim().toLowerCase();
       if (!key) return;
       chDetails[key] = r; // later rows overwrite earlier ones — newest submission always wins
     });
