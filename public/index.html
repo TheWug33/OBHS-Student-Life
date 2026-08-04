@@ -733,8 +733,9 @@ img{max-width:100%;display:block;}
       <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-total" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Total clubs</div>
       <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted)"><strong id="ch-cats" style="color:#fff;font-size:20px;font-weight:700;display:block;line-height:1.2">—</strong>Categories</div>
     </div>
-    <div style="margin-bottom:12px;">
-      <input id="ch-search" type="text" placeholder="Search clubs by name or advisor..." oninput="chFilter()" style="width:100%;max-width:480px;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <input id="ch-search" type="text" placeholder="Search clubs by name or advisor..." oninput="chFilter()" style="flex:1;min-width:200px;max-width:480px;padding:9px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+      <button onclick="openResourceLink(CLUB_DETAILS_FORM_URL,'The club details form')" style="padding:9px 16px;background:none;border:1px solid var(--line-bright);border-radius:8px;color:var(--purple-glow);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;">➕ Add/update your club's details</button>
     </div>
     <div id="ch-cattabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
       <button class="ch-cat-tab ch-cat-active" onclick="chSelectCat('',this)" style="padding:5px 14px;font-size:12px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid var(--line);background:var(--purple-ui);color:#fff;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;">All Clubs</button>
@@ -1252,6 +1253,7 @@ const GIDS = {
   spotlight:     '888519751',
   athletics:     '775220800',
   fieldtrips:    '368429671',
+  clubdetails:   'CLUBDETAILS_GID', // ← add Google Sheet tab GID for self-serve club descriptions
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
@@ -1270,6 +1272,7 @@ const NEW_CLUB_URL = '#';    // ← Start a New Club approval process/applicatio
 const EOY_REPORT_URL = '#';  // ← End-of-Year Reporting form link
 const CLUB_URL      = 'https://ob-clubdirectory.vercel.app';           // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
+const CLUB_DETAILS_FORM_URL = 'https://forms.gle/zomCeDgnZHKWj6Zy5';
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi';        // Field trip request form
 const DISMISSAL_URL = 'https://forms.office.com/r/8DYQiWNcja';        // Early dismissal request form
 
@@ -1421,7 +1424,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','MEETING_DAY','MEETING_TIME','ROOM','INSTAGRAM','__PowerAppsId__'];
 function parseCSV(text){
   const lines=text.trim().split('\n');
   if(lines.length<2)return[];
@@ -2018,20 +2021,54 @@ function chRenderClubs(clubs) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">No clubs match your search.</div>';
     return;
   }
-  grid.innerHTML = clubs.map(c => {
+  window._chCardClubs = clubs; // so chOpenClub(i) can look the card back up
+  grid.innerHTML = clubs.map((c, i) => {
     const name    = c['CLUB'] || 'Unnamed Club';
     const advisor = c['ADVISOR'] || '';
     const email   = c['ADVISOR EMAIL'] || '';
     const reps    = c['STUDENT REPRESENTATIVES'] || '';
     const cat     = c._cat;
     const badge   = CAT_BADGE_COLORS[cat.cls] || CAT_BADGE_COLORS['cat-other'];
-    return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:border-color .2s;" onmouseover="this.style.borderColor=\'var(--line-bright)\'" onmouseout="this.style.borderColor=\'var(--line)\'">'
+    const detail  = chDetails[name.trim().toLowerCase()];
+    const clickable = !!detail;
+    return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:border-color .2s;' + (clickable ? 'cursor:pointer;' : '') + '" onmouseover="this.style.borderColor=\'var(--line-bright)\'" onmouseout="this.style.borderColor=\'var(--line)\'"' + (clickable ? ' onclick="chOpenClub(' + i + ')"' : '') + '>'
       + '<span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:8px;' + badge + '">' + cat.label + '</span>'
       + '<div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:6px;">' + name + '</div>'
-      + (advisor ? '<div style="font-size:12px;color:var(--muted);margin-bottom:3px;">👤 ' + advisor + (email ? ' · <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:none;">' + email + '</a>' : '') + '</div>' : '')
+      + (advisor ? '<div style="font-size:12px;color:var(--muted);margin-bottom:3px;">👤 ' + advisor + (email ? ' · <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:none;" onclick="event.stopPropagation()">' + email + '</a>' : '') + '</div>' : '')
       + (reps ? '<div style="font-size:11px;color:var(--faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--line);"><strong style="color:var(--muted);">Student Reps:</strong> ' + reps + '</div>' : '')
+      + (clickable ? '<div style="font-size:11px;color:var(--purple-glow);margin-top:10px;font-weight:600;">View details \u2192</div>' : '')
       + '</div>';
   }).join('');
+}
+
+function chOpenClub(i) {
+  const c = (window._chCardClubs || [])[i];
+  if (!c) return;
+  const name = c['CLUB'] || 'Club';
+  const detail = chDetails[name.trim().toLowerCase()];
+  if (!detail) return;
+  const cat = c._cat;
+  const badge = CAT_BADGE_COLORS[cat.cls] || CAT_BADGE_COLORS['cat-other'];
+  const rows = [];
+  if (detail['MEETING_DAY'] || detail['MEETING_TIME']) rows.push(['\ud83d\udcc5 Meets', [detail['MEETING_DAY'], detail['MEETING_TIME']].filter(Boolean).join(' \u00b7 ')]);
+  if (detail['ROOM']) rows.push(['\ud83d\udccd Room', detail['ROOM']]);
+  if (detail['INSTAGRAM']) rows.push(['\ud83d\udcf7 Instagram', detail['INSTAGRAM']]);
+  const advisor = c['ADVISOR'] || '';
+  const email = c['ADVISOR EMAIL'] || '';
+
+  document.getElementById('club-modal-body').innerHTML = `
+    <span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:12px;${badge}">${cat.label}</span>
+    <h2 class="cal-modal-ttl" style="font-size:26px;margin-bottom:14px;">${name}</h2>
+    ${detail['DESCRIPTION'] ? '<p style="font-size:14px;color:var(--silver);line-height:1.7;margin-bottom:18px;">' + detail['DESCRIPTION'] + '</p>' : ''}
+    ${rows.length ? '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;">' + rows.map(([label, val]) => '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;"><strong style="color:var(--silver)">' + label + ':</strong> ' + val + '</div>').join('') + '</div>' : ''}
+    ${advisor ? '<div style="font-size:13px;color:var(--muted);">\ud83d\udc64 ' + advisor + (email ? ' \u00b7 <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:underline;">' + email + '</a>' : '') + '</div>' : ''}
+  `;
+  document.getElementById('club-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeClubModal() {
+  document.getElementById('club-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function chFilter() {
@@ -2062,10 +2099,29 @@ function chBuildCategoryTabs(clubs) {
   });
 }
 
+let chDetails = {}; // club name (lowercased/trimmed) -> latest self-serve submission
+
+async function chLoadClubDetails() {
+  if (!GIDS.clubdetails || GIDS.clubdetails.includes('_GID')) return;
+  try {
+    const rows = await fetchTab(GIDS.clubdetails);
+    rows.forEach(r => {
+      const key = (r['CLUB'] || '').trim().toLowerCase();
+      if (!key) return;
+      chDetails[key] = r; // later rows overwrite earlier ones — newest submission always wins
+    });
+  } catch(e) {
+    console.warn('[ClubHub] details load failed', e);
+  }
+}
+
 async function chLoadClubs() {
   if (chLoaded) return;
   try {
-    const r = await fetch('/api/sheet?url=' + encodeURIComponent(CH_CSV_URL), { cache: 'no-store' });
+    const [r] = await Promise.all([
+      fetch('/api/sheet?url=' + encodeURIComponent(CH_CSV_URL), { cache: 'no-store' }),
+      chLoadClubDetails()
+    ]);
     let text = '';
     if (r.ok) text = await r.text();
     if (!text || text.includes('<!DOCTYPE')) {
@@ -3281,6 +3337,14 @@ observeReveal();
       <a href="mailto:sbeverly@obps.org?subject=End-of-Year Club Report" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">📩 Email your completed report to sbeverly@obps.org</a>
     </div>
 
+  </div>
+</div>
+
+<!-- Club Detail Modal (self-serve enriched club info) -->
+<div id="club-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;position:relative;">
+    <button onclick="closeClubModal()" class="cal-modal-x" aria-label="Close">✕</button>
+    <div id="club-modal-body"></div>
   </div>
 </div>
 
