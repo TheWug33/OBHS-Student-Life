@@ -1185,7 +1185,7 @@ img{max-width:100%;display:block;}
     <div class="sub-hero-body">
       <p class="sub-eyebrow">OBHS Student Life</p>
       <h1 class="sub-title"><span class="metal">Knights</span> Athletics</h1>
-      <p class="sub-desc">This week's games at a glance, plus full schedules, rosters, and scores for every Knights team.</p>
+      <p class="sub-desc">This week's games at a glance, plus the full season schedule for every Knights team.</p>
     </div>
   </section>
 
@@ -1193,7 +1193,8 @@ img{max-width:100%;display:block;}
 
   <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
     <button onclick="openCoaches()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">🏅 Coaching Staff</button>
-    <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedules & Rosters →</button>
+    <button onclick="openSchedule()" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">📅 Full Schedule</button>
+    <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">🌐 Athletics Site</button>
   </div>
 
   <div class="blk-head" style="margin-bottom:12px"><span class="blk-title sm">This Week's Games</span></div>
@@ -3182,6 +3183,72 @@ function printEoyReport() {
   printInPlace(eoyReportPrintHTML());
 }
 
+// ══════════════════════════════════════════════════════
+// FULL ATHLETICS SCHEDULE — every game, grouped by sport
+// ══════════════════════════════════════════════════════
+let scheduleLoaded = false;
+function scheduleSportName(title) {
+  const m = (title || '').match(/^(.*?)\s+(?:vs|@)\s+/i);
+  return m ? m[1].trim() : (title || 'Other').trim();
+}
+async function openSchedule() {
+  document.getElementById('schedule-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  if (scheduleLoaded) return;
+  const el = document.getElementById('schedule-list');
+  if (!GIDS.athletics || GIDS.athletics.includes('_GID')) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Schedule coming soon.</p>';
+    return;
+  }
+  try {
+    const rows = await fetchTab(GIDS.athletics);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const oneDayAgo = new Date(today.getTime() - 86400000);
+    const clean = rows.filter(r => r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
+      const rawDay = (r.DAY||'').toString().trim();
+      const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
+      let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
+      const mo = MONTH_NUM[rawMonth.slice(0,3)];
+      let yr = today.getFullYear();
+      if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
+      let evDate = new Date(yr, mo, dy);
+      if (evDate < oneDayAgo) yr = today.getFullYear() + 1;
+      r._date = new Date(yr, mo, dy);
+      r.MONTH = rawMonth.slice(0,3);
+      r.DAY = String(dy);
+      r._sport = scheduleSportName(r.TITLE);
+      return r;
+    }).sort((a,b) => a._date - b._date);
+
+    if (!clean.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
+      scheduleLoaded = true;
+      return;
+    }
+
+    const bySport = {};
+    clean.forEach(r => { (bySport[r._sport] = bySport[r._sport] || []).push(r); });
+    const sports = Object.keys(bySport).sort();
+
+    el.innerHTML = sports.map(sport => `
+      <div style="margin-bottom:22px">
+        <div class="blk-title sm" style="margin-bottom:8px">${sport}</div>
+        <div class="ev-card">
+          ${bySport[sport].map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+    scheduleLoaded = true;
+  } catch(e) {
+    console.warn('[Schedule] load failed', e);
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Could not load the schedule \u2014 visit the full Knights Athletics site.</p>';
+  }
+}
+function closeSchedule() {
+  document.getElementById('schedule-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 </script>
@@ -3350,6 +3417,18 @@ observeReveal();
   <div style="max-width:560px;margin:0 auto;position:relative;">
     <button onclick="closeClubModal()" class="cal-modal-x" aria-label="Close">✕</button>
     <div id="club-modal-body"></div>
+  </div>
+</div>
+
+<!-- Full Athletics Schedule Modal -->
+<div id="schedule-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeSchedule()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Full Fall Schedule</h2>
+    </div>
+    <div id="schedule-list"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
   </div>
 </div>
 
