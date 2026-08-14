@@ -1281,8 +1281,8 @@ const DISMISSAL_URL = 'https://forms.office.com/r/8DYQiWNcja'; // Early dismissa
 
 // ── HERO TEXT ──
 // The big heading and tagline on the homepage
-const HERO_LINE1 = 'On The';
-const HERO_LINE2 = 'Rise.';
+const HERO_LINE1 = '';
+const HERO_LINE2 = 'On The Rise.';
 const HERO_SUB = 'Your School. Your Story.';
 
 // ── SITE NAME ──
@@ -1317,7 +1317,7 @@ function applySettings() {
  const l1 = document.getElementById('hero-l1');
  const l2 = document.getElementById('hero-l2');
  const sub = document.getElementById('hero-sub');
- if (l1) l1.textContent = HERO_LINE1;
+ if (l1) { l1.textContent = HERO_LINE1; l1.style.display = HERO_LINE1 ? '' : 'none'; }
  if (l2) l2.textContent = HERO_LINE2;
  if (sub) sub.textContent = HERO_SUB;
  // Site name
