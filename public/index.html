@@ -1193,12 +1193,18 @@ img{max-width:100%;display:block;}
 
  <div id="ath-page-body" class="subbody">
 
- <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
-    <button onclick="openPhysicals()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Physical Information</button>
-    <button onclick="window.open('/student-transportation-waiver.pdf','_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Transportation Waiver</button>
- <button onclick="openCoaches()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Coaching Staff</button>
- <button onclick="openSchedule()" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedule</button>
- <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Athletics Site</button>
+ <div style="margin-bottom:24px;">
+   <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+     <button onclick="openSchedule()" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedule</button>
+     <button onclick="openCoaches()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Coaching Staff</button>
+   </div>
+   <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+     <button onclick="openPhysicals()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Physical Information</button>
+     <button onclick="openWaiver()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Transportation Waiver</button>
+   </div>
+   <div style="display:flex;justify-content:flex-end;flex-wrap:wrap;">
+     <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Athletics Site</button>
+   </div>
  </div>
 
  <div class="blk-head" style="margin-bottom:12px"><span class="blk-title sm">This Week's Games</span></div>
@@ -3278,6 +3284,28 @@ function closePhysicals() {
   document.body.style.overflow = '';
 }
 
+// ══════════════════════════════════════════════════════
+// TRANSPORTATION WAIVER — viewed in-page so the app is never left,
+// with explicit Download/Print controls
+// ══════════════════════════════════════════════════════
+function openWaiver() {
+  document.getElementById('waiver-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeWaiver() {
+  document.getElementById('waiver-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function printWaiver() {
+  const frame = document.getElementById('waiver-frame');
+  try {
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+  } catch (e) {
+    window.open('/student-transportation-waiver.pdf', '_blank');
+  }
+}
+
 load();
 observeReveal();
 </script>
@@ -3516,6 +3544,21 @@ observeReveal();
       <a href="mailto:ddimino@obps.org" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">ddimino@obps.org</a>
     </div>
 
+  </div>
+</div>
+
+<!-- Transportation Waiver Viewer Modal -->
+<div id="waiver-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(19,10,40,0.96);padding:16px;">
+  <div style="max-width:900px;margin:0 auto;height:100%;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 4px 14px;">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin:0;">Transportation Waiver</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="/student-transportation-waiver.pdf" download style="background:var(--purple-ui);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;">Download</a>
+        <button onclick="printWaiver()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line-bright);padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Print</button>
+        <button onclick="closeWaiver()" class="cal-modal-x" style="position:static;" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <iframe id="waiver-frame" src="/student-transportation-waiver.pdf" style="flex:1;width:100%;border:1px solid var(--line-bright);border-radius:10px;background:#fff;"></iframe>
   </div>
 </div>
 
