@@ -1194,6 +1194,7 @@ img{max-width:100%;display:block;}
  <div id="ath-page-body" class="subbody">
 
  <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
+    <button onclick="openPhysicals()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Physical Information</button>
  <button onclick="openCoaches()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Coaching Staff</button>
  <button onclick="openSchedule()" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Full Schedule</button>
  <button onclick="window.open(ATHLETICS_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 22px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">Athletics Site</button>
@@ -1276,6 +1277,8 @@ const EOY_REPORT_URL = '#'; // ← End-of-Year Reporting form link
 const CLUB_URL = 'https://ob-clubdirectory.vercel.app'; // Club Hub
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const CLUB_DETAILS_FORM_URL = 'https://forms.gle/zomCeDgnZHKWj6Zy5';
+const SPORT_PHYSICAL_FORM_URL = '#'; // ← replace with the Sport Physical form link
+const PHYSICAL_CLEARANCE_URL = '#'; // ← replace with the physical clearance submission link
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi'; // Field trip request form
 const DISMISSAL_URL = 'https://forms.office.com/r/8DYQiWNcja'; // Early dismissal request form
 
@@ -3262,6 +3265,18 @@ function closeSchedule() {
  document.body.style.overflow = '';
 }
 
+// ══════════════════════════════════════════════════════
+// PHYSICAL INFORMATION — fall sports physical deadlines & forms
+// ══════════════════════════════════════════════════════
+function openPhysicals() {
+  document.getElementById('physical-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closePhysicals() {
+  document.getElementById('physical-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 </script>
@@ -3443,6 +3458,64 @@ observeReveal();
  </div>
  <div id="schedule-list"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
  </div>
+</div>
+
+<!-- Physical Information Modal -->
+<div id="physical-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closePhysicals()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge Public Schools</div>
+      <h2 class="cal-modal-ttl">Physical Information</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Trying Out for a Fall Sport?</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">Every athlete &mdash; middle school or high school &mdash; needs a cleared physical on file before tryouts. <strong style="color:#fff">There are no exceptions.</strong> Physicals are valid for 365 days from the date the physician performs the exam.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Your Physical Must Not Expire Before</div>
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+          <span style="color:#fff;font-weight:600;">August 10, 2026</span>
+          <span style="color:var(--muted);text-align:right;">Football, Cheerleading, Dance, Tennis</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+          <span style="color:#fff;font-weight:600;">August 17, 2026</span>
+          <span style="color:var(--muted);text-align:right;">Cross Country, Field Hockey, Gymnastics, Soccer, Volleyball</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;">
+          <span style="color:#fff;font-weight:600;">September 1, 2026</span>
+          <span style="color:var(--muted);text-align:right;">All Fall Middle School Sports</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">What You Need to Do</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Physicals for fall sports are due by <strong style="color:var(--silver)">July 15, 2026</strong> if not already submitted</li>
+        <li>Drop off physicals at Old Bridge High School &mdash; 4209 Route 516, Matawan, NJ 07747, <strong style="color:var(--silver)">Door 0</strong></li>
+        <li>Sign up for your fall sport through the parent portal, and review all athletic forms</li>
+        <li>Parents are responsible for knowing the status of their child's physical &mdash; check the parent portal directly</li>
+        <li>Athletic Trainers contact students through <strong style="color:var(--silver)">Microsoft Teams</strong> if a physical is expired or a Health History update is needed, 2&ndash;3 weeks before the season starts</li>
+      </ul>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+      <button onclick="openResourceLink(SPORT_PHYSICAL_FORM_URL,'The sport physical form')" style="flex:1;min-width:200px;background:var(--purple-ui);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Sport Physical Form</button>
+      <button onclick="openResourceLink(PHYSICAL_CLEARANCE_URL,'The clearance submission link')" style="flex:1;min-width:200px;background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:13px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Clearance Submission</button>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;text-align:center;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Athletic Department</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;">Daniel DiMino</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">Director of Athletics &middot; (732) 290-3900 ext. 3924</div>
+      <a href="mailto:ddimino@obps.org" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">ddimino@obps.org</a>
+    </div>
+
+  </div>
 </div>
 
 <div id="meeting-log-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
