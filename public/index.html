@@ -1575,26 +1575,25 @@ function renderEv(rows){
  </div>
  `).join('');
 }
-const DATE_EMOJI={'final exam':'','exam':'','last day':'','graduation':'','first day':'','school':'','holiday':'','break':'','prom':'','spirit':'','awards':''};
-function dateEmoji(l){l=(l||'').toLowerCase();for(const[k,e]of Object.entries(DATE_EMOJI))if(l.includes(k))return e;return'';}
 function renderDates(rows){
  const _el=document.getElementById('dates');
  if(!_el) return;
  const el=document.getElementById('dates');
  const clean=rows.filter(r=>r.DATE&&r.LABEL&&!r.LABEL.includes('ADD YOUR')&&r.DATE!=='Mon DD');
  if(!clean.length){el.innerHTML='';return;}
- el.innerHTML=clean.map(r=>{const e=(r.EMOJI&&r.EMOJI.trim()&&r.EMOJI.length<=4&&!r.EMOJI.includes('ADD'))?r.EMOJI:dateEmoji(r.LABEL);return `<div class="date-chip">${e} <span><strong>${r.DATE}</strong> ${r.LABEL}</span></div>`;}).join('')+`<span class="dates-stamp">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
+ // Note: intentionally ignores any EMOJI column in the sheet — see renderQL for the same policy.
+ el.innerHTML=clean.map(r=>`<div class="date-chip"><span><strong>${r.DATE}</strong> ${r.LABEL}</span></div>`).join('')+`<span class="dates-stamp">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
 }
-const QL_EMOJI={'service':'','community':'','hours':'','field trip':'','trip':'','event':'','sign up':'','signup':'','spirit':'','wear':'','help':'','desk':'','announcement':'','club':'','flyer':''};
-function qlEmoji(l){l=(l||'').toLowerCase();for(const[k,e]of Object.entries(QL_EMOJI))if(l.includes(k))return e;return'';}
 function renderQL(rows){
  const el=document.getElementById('ql-list');
  const clean=rows.filter(r=>{if(!r.LABEL)return false;let u=(r.URL||'').trim();return u&&u!=='#'&&!u.includes('PASTE YOUR')&&!u.includes('DesignPageV2')&&u.startsWith('http');});
  if(!clean.length){
- el.innerHTML=`<button class="ql" onclick="window.open('${CS_URL}','_blank')"><span class="ql-ico"></span>Submit service hours<span class="ql-arr">→</span></button><button class="ql" style="opacity:0.4;cursor:default"><span class="ql-ico"></span>Field trip forms<span class="ql-arr" style="font-size:10px">Soon</span></button><button class="ql" style="opacity:0.4;cursor:default"><span class="ql-ico"></span>Spirit wear<span class="ql-arr" style="font-size:10px">Soon</span></button><button class="ql" onclick="window.open('${IT_URL}','_blank')"><span class="ql-ico"></span>Help desk<span class="ql-arr">→</span></button>`;
+ el.innerHTML=`<button class="ql" onclick="window.open('${CS_URL}','_blank')">Submit service hours<span class="ql-arr">→</span></button><button class="ql" style="opacity:0.4;cursor:default">Field trip forms<span class="ql-arr" style="font-size:10px">Soon</span></button><button class="ql" style="opacity:0.4;cursor:default">Spirit wear<span class="ql-arr" style="font-size:10px">Soon</span></button><button class="ql" onclick="window.open('${IT_URL}','_blank')">Help desk<span class="ql-arr">→</span></button>`;
  return;
  }
- el.innerHTML=clean.map(r=>{const e=(r.EMOJI&&r.EMOJI.trim()&&r.EMOJI.length<=4)?r.EMOJI:qlEmoji(r.LABEL);return `<button class="ql" onclick="window.open('${r.URL}','_blank')"><span class="ql-ico">${e}</span>${r.LABEL}<span class="ql-arr">→</span></button>`;}).join('');
+ // Note: intentionally ignores any EMOJI column in the sheet — icons were removed
+ // site-wide and should never come back even if a sheet row includes one.
+ el.innerHTML=clean.map(r=>`<button class="ql" onclick="window.open('${r.URL}','_blank')">${r.LABEL}<span class="ql-arr">→</span></button>`).join('');
 }
 function renderFlyers(rows){
  const el=document.getElementById('fly-row');
