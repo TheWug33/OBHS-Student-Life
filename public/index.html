@@ -1126,7 +1126,7 @@ img{max-width:100%;display:block;}
  <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openNewClub()"><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openEoy()"><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openResourceLink(CLUB_DETAILS_FORM_URL,'The club details form')"><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — submissions are reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openClubDetailsSubmit()"><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — submissions are reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
  </div>
  </div>
 
@@ -1274,7 +1274,8 @@ const MEETING_LOG_URL = '#'; // ← Meeting log / attendance template link
 const NEW_CLUB_URL = 'https://forms.gle/geeiZsqVoFPidXYR9';
 const EOY_REPORT_URL = '#'; // ← End-of-Year Reporting form link
 const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
-const CLUB_DETAILS_FORM_URL = 'https://forms.gle/zomCeDgnZHKWj6Zy5';
+const CLUB_DETAILS_FORM_URL = 'https://forms.gle/zomCeDgnZHKWj6Zy5'; // ← no longer used, kept for reference only
+const FORM_RECEIVER_URL = 'https://script.google.com/macros/s/AKfycbx2MPfAIdmvArt8JKI4thzkxsffjzDGTve1K-NTLFdVRwIaS_BXbsZ98u7xosfPptLPdg/exec';
 const SPORT_PHYSICAL_FORM_URL = 'https://drive.google.com/file/d/1_vzBSsjpakjlvB_Xr1IAbF-17uVInj0y/view?usp=drivesdk';
 const PHYSICAL_CLEARANCE_URL = 'https://drive.google.com/file/d/19dOLw6i2eOwo5cDla9GMxtmED6-C6VFu/view?usp=drivesdk';
 const FIELDTRIP_URL = 'https://forms.office.com/r/FVTZSDRmKi'; // Field trip request form
@@ -3074,9 +3075,58 @@ function printMeetingLog() {
 // ══════════════════════════════════════════════════════
 // START A NEW CLUB — approval process guidance
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// SHARED NATIVE FORM SUBMISSION — posts straight into a Sheet tab via the
+// generic Apps Script receiver, no redirect to any external form.
+//
+// Important: deliberately does NOT set a Content-Type header. Apps Script Web
+// Apps don't handle the CORS "preflight" request browsers send before a JSON
+// POST, which silently breaks the request. Sending a plain string body with
+// no explicit header keeps this a "simple request" that skips preflight —
+// Apps Script still reads the raw JSON fine via e.postData.contents.
+async function submitToSheet(tab, fields, btn, successMsg) {
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting\u2026'; }
+  try {
+    const res = await fetch(FORM_RECEIVER_URL, {
+      method: 'POST',
+      body: JSON.stringify({ _tab: tab, ...fields }),
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.message || 'Unknown error');
+    showToast(successMsg || 'Submitted successfully!');
+    return true;
+  } catch (e) {
+    console.warn('[submitToSheet] failed', e);
+    showToast('Something went wrong \u2014 please try again.');
+    return false;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = original; }
+  }
+}
+
 function openNewClub() {
  document.getElementById('new-club-modal').style.display = 'block';
  document.body.style.overflow = 'hidden';
+}
+async function submitNewClubRequest() {
+  const name = document.getElementById('ncr-name')?.value.trim();
+  if (!name) { showToast('Please enter a club name.'); return; }
+  const btn = document.getElementById('ncr-submit-btn');
+  const ok = await submitToSheet('New Club Requests', {
+    'Club Name': name,
+    'Proposed Faculty Advisor': document.getElementById('ncr-advisor')?.value || '',
+    'Advisor Email': document.getElementById('ncr-advisor-email')?.value || '',
+    'Student Name': document.getElementById('ncr-student')?.value || '',
+    'Student Email': document.getElementById('ncr-student-email')?.value || '',
+    'Why should this club be approved? Provide a short description of the club.': document.getElementById('ncr-why')?.value || '',
+  }, btn, 'Request submitted! You\u2019ll hear back within 5 school days.');
+  if (ok) {
+    ['ncr-name','ncr-advisor','ncr-advisor-email','ncr-student','ncr-student-email','ncr-why'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
 }
 function closeNewClub() {
  document.getElementById('new-club-modal').style.display = 'none';
@@ -3261,6 +3311,37 @@ function printWaiver() {
   // deliberately avoids opening the PDF itself, since iOS hijacks that into a
   // full-screen native preview (QuickLook) with no reliable way back in standalone mode.
   window.print();
+}
+
+// ══════════════════════════════════════════════════════
+// CLUB DETAILS SUBMISSION — native form, posts straight to the Club Hub tab
+// ══════════════════════════════════════════════════════
+function openClubDetailsSubmit() {
+  document.getElementById('club-details-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeClubDetailsSubmit() {
+  document.getElementById('club-details-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitClubDetails() {
+  const name = document.getElementById('cd-name')?.value.trim();
+  if (!name) { showToast('Please enter your club name.'); return; }
+  const btn = document.getElementById('cd-submit-btn');
+  const ok = await submitToSheet('Club Hub', {
+    'Club Name': name,
+    'Club Description': document.getElementById('cd-desc')?.value || '',
+    'Meeting Day': document.getElementById('cd-day')?.value || '',
+    'Meeting Time': document.getElementById('cd-time')?.value || '',
+    'Room #': document.getElementById('cd-room')?.value || '',
+    'Instagram Account': document.getElementById('cd-insta')?.value || '',
+  }, btn, 'Submitted! It\u2019ll appear once Student Life reviews it.');
+  if (ok) {
+    ['cd-name','cd-desc','cd-day','cd-time','cd-room','cd-insta'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
 }
 
 load();
@@ -3579,6 +3660,36 @@ observeReveal();
 </div>
 
 <!-- Start a New Club Modal -->
+<!-- Club Details Submission Modal (native form, no external redirect) -->
+<div id="club-details-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeClubDetailsSubmit()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Update Your Club's Page</h2>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">Add or update your club's description, meeting info, and Instagram. Submissions are reviewed by Student Life before going live.</p>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="cd-name" type="text" placeholder="Must match the directory exactly" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Description</label><textarea id="cd-desc" rows="3" placeholder="What does this club do? Who should join?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day</label><input id="cd-day" type="text" placeholder="Wednesdays" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Time</label><input id="cd-time" type="text" placeholder="3:00-4:00 PM" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room #</label><input id="cd-room" type="text" placeholder="Room 265" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Instagram Account</label><input id="cd-insta" type="text" placeholder="@obhs_club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <button id="cd-submit-btn" onclick="submitClubDetails()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div id="new-club-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
  <div style="max-width:720px;margin:0 auto;">
  <div class="cal-modal-head">
@@ -3617,7 +3728,23 @@ observeReveal();
  <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0;">Clubs meant to run the full school year are best submitted early in the fall. A club can still be approved later in the year, but with less time to meet and less certainty it'll return the following September.</p>
  </div>
 
- <button onclick="window.open(NEW_CLUB_URL,'_blank')" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit a New Club Application →</button>
+ <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;">
+    <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:16px;">Submit Your Club Request</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="ncr-name" type="text" placeholder="e.g. Robotics Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Proposed Faculty Advisor</label><input id="ncr-advisor" type="text" placeholder="Ms. Smith" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Advisor Email</label><input id="ncr-advisor-email" type="email" placeholder="advisor@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="ncr-student" type="text" placeholder="Jane Doe" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="ncr-student-email" type="email" placeholder="you@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      </div>
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Why should this club be approved?</label><textarea id="ncr-why" rows="3" placeholder="What will this club do? Who is it for?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+      <button id="ncr-submit-btn" onclick="submitNewClubRequest()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+      <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed within 5 school days.</p>
+    </div>
+  </div>
 
  </div>
 </div>
