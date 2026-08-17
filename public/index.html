@@ -2544,7 +2544,17 @@ function preloadCheck(src) {
  if (trigger) {
  ind.classList.add('spin');
  ind.style.transform = 'translateY(84px)';
- setTimeout(function(){ location.reload(); }, 350);
+ setTimeout(function(){
+        try {
+          const activePage = document.querySelector('.page.active');
+          const pageId = activePage ? activePage.id.replace('page-','') : 'home';
+          let subId = null;
+          if (pageId === 'student') subId = sPages.find(p => { const el = document.getElementById(p); return el && el.style.display !== 'none'; }) || null;
+          if (pageId === 'faculty') subId = fPages.find(p => { const el = document.getElementById(p); return el && el.style.display !== 'none'; }) || null;
+          sessionStorage.setItem('ptr_return', JSON.stringify({ page: pageId, sub: subId, scroll: window.scrollY }));
+        } catch(e) {}
+        location.reload();
+      }, 350);
  } else {
  ind.style.transform = '';
  ind.classList.remove('ready');
@@ -3321,6 +3331,32 @@ function printWaiver() {
 
 load();
 observeReveal();
+
+// Restores the exact view (page, sub-tab, scroll position) after a pull-to-refresh
+// reload, instead of always landing back on the homepage.
+(function restorePTR(){
+  try {
+    const saved = sessionStorage.getItem('ptr_return');
+    if (!saved) return;
+    sessionStorage.removeItem('ptr_return');
+    const state = JSON.parse(saved);
+    if (!state || !state.page) return;
+    const navBtn = document.querySelector('[data-page=' + state.page + ']');
+    go(state.page, navBtn);
+    if (state.sub) {
+      if (state.page === 'student') {
+        const subBtn = document.querySelector('#s-subnav .sn[onclick*="' + state.sub + '"]');
+        ssub(subBtn, state.sub);
+      } else if (state.page === 'faculty') {
+        const subBtn = document.querySelector('#f-subnav .sn[onclick*="' + state.sub + '"]');
+        fsub(subBtn, state.sub);
+      }
+    }
+    if (typeof state.scroll === 'number') {
+      setTimeout(() => window.scrollTo({ top: state.scroll, behavior: 'instant' }), 60);
+    }
+  } catch (e) { console.warn('[PTR restore] failed', e); }
+})();
 </script>
 
 <!-- Search Overlay -->
