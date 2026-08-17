@@ -1380,6 +1380,7 @@ function go(id, btn) {
  else document.querySelector('[data-page='+id+']').classList.add('active');
  window.scrollTo({top:0,behavior:'instant'});
  setTimeout(observeReveal, 50);
+ try { history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id); } catch(e) {}
  // Re-render cached data when returning to home
  if(id==='home' && window._dataLoaded){
  try{renderAnn(window._lastAnn||[]);}catch(e){}
@@ -2167,6 +2168,7 @@ function ssub(btn, id) {
  window.scrollTo({top:0,behavior:'instant'});
  if (id === 's-clubs') chLoadClubs();
  if (id === 's-classes') clsLoadPosts('2027');
+ try { history.replaceState(null, '', '#student:' + id); } catch(e) {}
 }
 
 function fsub(btn, id) {
@@ -2175,6 +2177,7 @@ function fsub(btn, id) {
  fPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
  window.scrollTo({top:0,behavior:'instant'});
  if (id === 'f-forms') loadFieldTrips();
+ try { history.replaceState(null, '', '#faculty:' + id); } catch(e) {}
 }
 
 
@@ -2514,17 +2517,7 @@ function preloadCheck(src) {
  if (trigger) {
  ind.classList.add('spin');
  ind.style.transform = 'translateY(84px)';
- setTimeout(function(){
-        try {
-          const activePage = document.querySelector('.page.active');
-          const pageId = activePage ? activePage.id.replace('page-','') : 'home';
-          let subId = null;
-          if (pageId === 'student') subId = sPages.find(p => { const el = document.getElementById(p); return el && el.style.display !== 'none'; }) || null;
-          if (pageId === 'faculty') subId = fPages.find(p => { const el = document.getElementById(p); return el && el.style.display !== 'none'; }) || null;
-          sessionStorage.setItem('ptr_return', JSON.stringify({ page: pageId, sub: subId, scroll: window.scrollY }));
-        } catch(e) {}
-        location.reload();
-      }, 350);
+ setTimeout(function(){ location.reload(); }, 350);
  } else {
  ind.style.transform = '';
  ind.classList.remove('ready');
@@ -3304,28 +3297,27 @@ observeReveal();
 
 // Restores the exact view (page, sub-tab, scroll position) after a pull-to-refresh
 // reload, instead of always landing back on the homepage.
-(function restorePTR(){
+// Restores the exact page/sub-tab from the URL hash on load — covers every
+// kind of refresh (browser button, keyboard shortcut, mobile pull-to-refresh)
+// plus direct links and bookmarks, since the hash always reflects where you are.
+(function restoreFromHash(){
   try {
-    const saved = sessionStorage.getItem('ptr_return');
-    if (!saved) return;
-    sessionStorage.removeItem('ptr_return');
-    const state = JSON.parse(saved);
-    if (!state || !state.page) return;
-    const navBtn = document.querySelector('[data-page=' + state.page + ']');
-    go(state.page, navBtn);
-    if (state.sub) {
-      if (state.page === 'student') {
-        const subBtn = document.querySelector('#s-subnav .sn[onclick*="' + state.sub + '"]');
-        ssub(subBtn, state.sub);
-      } else if (state.page === 'faculty') {
-        const subBtn = document.querySelector('#f-subnav .sn[onclick*="' + state.sub + '"]');
-        fsub(subBtn, state.sub);
+    const hash = location.hash.replace('#', '');
+    if (!hash) return; // no hash = default home view, nothing to restore
+    const [page, sub] = hash.split(':');
+    if (!page || !document.getElementById('page-' + page)) return;
+    const navBtn = document.querySelector('[data-page=' + page + ']');
+    go(page, navBtn);
+    if (sub) {
+      if (page === 'student') {
+        const subBtn = document.querySelector('#s-subnav .sn[onclick*="' + sub + '"]');
+        ssub(subBtn, sub);
+      } else if (page === 'faculty') {
+        const subBtn = document.querySelector('#f-subnav .sn[onclick*="' + sub + '"]');
+        fsub(subBtn, sub);
       }
     }
-    if (typeof state.scroll === 'number') {
-      setTimeout(() => window.scrollTo({ top: state.scroll, behavior: 'instant' }), 60);
-    }
-  } catch (e) { console.warn('[PTR restore] failed', e); }
+  } catch (e) { console.warn('[hash restore] failed', e); }
 })();
 </script>
 
