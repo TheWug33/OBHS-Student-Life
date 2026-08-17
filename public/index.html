@@ -1271,6 +1271,7 @@ const GIDS = {
  athletics: '775220800',
  fieldtrips: '368429671',
  clubdetails: '1026862323',
+  clubs: '1167760475',
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 
@@ -1442,7 +1443,7 @@ function observeReveal(){
 }
 
 // ── CSV parser with header detection ──
-const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','MEETING_DAY','MEETING_TIME','ROOM','INSTAGRAM','APPROVED','__PowerAppsId__'];
+const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','EMOJI','LABEL','URL','TARGET_DATE','IMAGE_URL','LINK_URL','ROSTER_URL','CLASS','POINTS','LYRIC','BODY','LINK','TYPE','SONG','ARTIST','GROUP','DISMISSAL_TIME','RETURN_TIME','DESTINATION','TEACHER','DESCRIPTION','MEETING_DAY','MEETING_TIME','ROOM','INSTAGRAM','APPROVED','CLUB','ADVISOR','__PowerAppsId__'];
 function parseCSV(text){
  const lines=text.trim().split('\n');
  if(lines.length<2)return[];
@@ -1955,7 +1956,6 @@ async function load(){
 // ══════════════════════════════════════════════════════
 // CLUB HUB — directory, flyer generator, submit
 // ══════════════════════════════════════════════════════
-const CH_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5ZbiAKCcnRVp6t7re8yKSwFvNUc8VQOd1ukIso_loJSfS_ATRepCgJENmEaiaZE_ioVy9RZS37hB3/pub?gid=0&single=true&output=csv';
 let chAllClubs = [], chActiveCategory = '', chLoaded = false;
 
 const CH_CATEGORY_RULES = [
@@ -1994,29 +1994,6 @@ function chSelectCat(cat, el) {
  });
  if (el) { el.style.background = 'var(--purple-ui)'; el.style.color = '#fff'; el.style.borderColor = 'var(--purple-ui)'; }
  chFilter();
-}
-
-function chSplitCSVLine(line) {
- const vals = []; let inQ = false, cur = '';
- for (const c of line) {
- if (c === '"') { inQ = !inQ; }
- else if (c === ',' && !inQ) { vals.push(cur); cur = ''; }
- else cur += c;
- }
- vals.push(cur);
- return vals;
-}
-
-function chParseCSV(text) {
- const lines = text.trim().split('\n');
- if (lines.length< 2) return [];
- const headers = chSplitCSVLine(lines[0]).map(h =>h.trim());
- return lines.slice(1).map(line => {
- const vals = chSplitCSVLine(line);
- const obj = {};
- headers.forEach((h, i) => { obj[h] = (vals[i] || '').trim(); });
- return obj;
- }).filter(r =>r['CLUB']);
 }
 
 const CAT_BADGE_COLORS = {
@@ -2139,19 +2116,12 @@ async function chLoadClubDetails() {
 async function chLoadClubs() {
  if (chLoaded) return;
  try {
- const [r] = await Promise.all([
- fetch('/api/sheet?url=' + encodeURIComponent(CH_CSV_URL), { cache: 'no-store' }),
+ const [raw] = await Promise.all([
+ fetchTab(GIDS.clubs),
  chLoadClubDetails()
  ]);
- let text = '';
- if (r.ok) text = await r.text();
- if (!text || text.includes('<!DOCTYPE')) {
- const r2 = await fetch(CH_CSV_URL, { cache: 'no-store' });
- if (r2.ok) text = await r2.text();
- }
- if (!text) throw new Error('no data');
- const raw = chParseCSV(text);
- chAllClubs = raw.map(c => ({ ...c, _cat: chAssignCategory(c['CLUB'] || '') }));
+ if (!raw || !raw.length) throw new Error('no data');
+ chAllClubs = raw.filter(c => c['CLUB']).map(c => ({ ...c, _cat: chAssignCategory(c['CLUB'] || '') }));
  chAllClubs.sort((a, b) =>a['CLUB'].localeCompare(b['CLUB']));
  chLoaded = true;
  const tot = document.getElementById('ch-total');
