@@ -761,33 +761,12 @@ img{max-width:100%;display:block;}
 
  <!-- SUBMIT -->
  <div id="ch-submit" style="display:none">
- <div class="blk-title" style="margin-bottom:6px">Submit a New Club</div>
- <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6">Submissions are sent to Mr. Scott Beverly, Student Life Coordinator, and reviewed within 5 school days.</div>
- <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:580px;display:flex;flex-direction:column;gap:13px;">
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club Name</label><input id="ch-f-name" type="text" placeholder="e.g. Robotics Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Category</label>
- <select id="ch-f-cat" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
- <option>Academic</option><option>Arts</option><option>Athletics &amp; Fitness</option><option>Community Service</option><option>Cultural</option><option>Identity &amp; Affinity</option><option>STEM</option><option>Other</option>
- </select>
- </div>
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Day</label>
- <select id="ch-f-day" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
- <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
- </select>
- </div>
- </div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="ch-f-advisor" type="text" placeholder="Ms. Smith" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Room / Location</label><input id="ch-f-room" type="text" placeholder="Room 204" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
- </div>
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Description</label><textarea id="ch-f-desc" rows="3" placeholder="What does this club do? Who should join?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name &amp; Student ID</label><input id="ch-f-student" type="text" placeholder="Jane Doe #12345" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
- <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact Email</label><input id="ch-f-email" type="email" placeholder="you@obhs.edu" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
- </div>
- <button onclick="chSubmitForm()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">Submit for Review →</button>
- <p style="font-size:11px;color:var(--faint);text-align:center">Reviewed within 5 school days.</p>
+ <div class="blk-title" style="margin-bottom:6px">Start a New Club</div>
+ <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;max-width:520px;">Have an idea for a club that doesn't exist yet? Here's what you need and how approval works &mdash; then you can submit right from there.</div>
+ <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px;max-width:480px;text-align:center;">
+ <div style="font-size:15px;color:#fff;font-weight:600;margin-bottom:8px;">Ready to make it official?</div>
+ <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">See the requirements, the approval process, and submit your club for review.</div>
+ <button onclick="openNewClub()" style="background:var(--purple-ui);color:#fff;border:none;padding:13px 26px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Start a New Club &rarr;</button>
  </div>
  </div>
 
@@ -2139,23 +2118,6 @@ async function chLoadClubs() {
  const g = document.getElementById('ch-grid');
  if (g) g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">Could not load club data. Please try again.</div>';
  }
-}
-
-function chSubmitForm() {
- const name = document.getElementById('ch-f-name')?.value.trim();
- if (!name) { showToast('Please enter a club name.'); return; }
- const fields = {
- 'Club Name': name,
- 'Category': document.getElementById('ch-f-cat')?.value || '',
- 'Meeting Day': document.getElementById('ch-f-day')?.value || '',
- 'Advisor': document.getElementById('ch-f-advisor')?.value || '',
- 'Room': document.getElementById('ch-f-room')?.value || '',
- 'Description': document.getElementById('ch-f-desc')?.value || '',
- 'Submitted by': document.getElementById('ch-f-student')?.value || '',
- 'Email': document.getElementById('ch-f-email')?.value || '',
- };
- const body = Object.entries(fields).map(([k,v]) =>k + ': ' + v).join('\n');
- window.open('mailto:sbeverly@obps.org?subject=' + encodeURIComponent('New Club Submission: ' + name) + '&body=' + encodeURIComponent(body));
 }
 
 
