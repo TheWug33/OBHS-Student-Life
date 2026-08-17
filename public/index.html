@@ -804,15 +804,20 @@ img{max-width:100%;display:block;}
  <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Faculty Advisor</label><input id="fl-advisor" type="text" value="Ms. Carter" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
  <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">About This Club</label><textarea id="fl-about" rows="3" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;">Open to all students who love drawing, painting, and design. No experience needed - just creativity!</textarea></div>
  <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Contact / Instagram</label><input id="fl-contact" type="text" value="@OBHSArtClub" oninput="chUpdateFlyer()" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+ <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Flyer Accent Color</label><div style="display:flex;align-items:center;gap:10px;"><input id="fl-accent" type="color" value="#F5C842" oninput="chUpdateFlyer()" style="width:46px;height:38px;padding:2px;border-radius:8px;border:1px solid var(--line);cursor:pointer;background:none;"><span style="font-size:12px;color:var(--muted);">Pick a color that represents your club</span></div></div>
  <button onclick="chPrintFlyer()" style="background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;">Print / Save as PDF</button>
  </div>
  <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
  <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:600;margin-bottom:12px;">Live Preview</div>
  <div id="ch-flyer-output" style="border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;font-family:Georgia,serif;">
- <div style="background:#26215C;color:#EEEDFE;padding:18px 16px;text-align:center;">
+ <div style="position:relative;background:#26215C;color:#EEEDFE;padding:18px 16px;text-align:center;overflow:hidden;">
+ <div id="fp-stripe1" style="position:absolute;top:-18px;right:-10px;width:70px;height:130px;background:#F5C842;transform:rotate(-15deg);transform-origin:top right;opacity:.92;"></div>
+ <div style="position:absolute;top:-18px;right:38px;width:14px;height:130px;background:#26215C;transform:rotate(-15deg);transform-origin:top right;opacity:.35;"></div>
+ <div style="position:relative;z-index:2;">
  <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Old Bridge High School &nbsp;·&nbsp; Go Knights!</div>
  <div id="fp-name" style="font-size:22px;font-weight:700;margin-bottom:4px;line-height:1.2;">Art Club</div>
  <div id="fp-tag" style="font-size:12px;opacity:.75;font-style:italic;">Where creativity comes to life</div>
+ </div>
  </div>
  <div style="height:4px;background:linear-gradient(90deg,#534AB7,#AFA9EC,#D3D1C7);"></div>
  <div style="padding:16px;background:#fff;color:#222;">
@@ -2185,16 +2190,19 @@ function fsub(btn, id) {
 // Flyer helpers
 function chFlyerPrintHTML(ids) {
  const n=v=>document.getElementById(ids.name)?.value||'Club';
+ const accent = document.getElementById(ids.accent)?.value || '#F5C842';
  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${document.getElementById(ids.name)?.value||'Club'} — OBHS Flyer</title>
  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;max-width:520px;margin:40px auto;padding:0 20px}
- .fo-header{background:#26215C;color:#EEEDFE;padding:24px 20px;text-align:center}.fo-school{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:8px;font-family:sans-serif}
- .fo-name{font-size:26px;font-weight:700;margin-bottom:5px}.fo-tag{font-size:13px;opacity:.75;font-style:italic}
+ .fo-header{position:relative;background:#26215C;color:#EEEDFE;padding:24px 20px;text-align:center;overflow:hidden}.fo-school{position:relative;z-index:2;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:8px;font-family:sans-serif}
+ .fo-s1{position:absolute;top:-24px;right:-14px;width:100px;height:180px;background:${accent};transform:rotate(-15deg);transform-origin:top right;opacity:.92}
+ .fo-s2{position:absolute;top:-24px;right:54px;width:20px;height:180px;background:#26215C;transform:rotate(-15deg);transform-origin:top right;opacity:.35}
+ .fo-name{position:relative;z-index:2;font-size:26px;font-weight:700;margin-bottom:5px}.fo-tag{position:relative;z-index:2;font-size:13px;opacity:.75;font-style:italic}
  .fo-divider{height:4px;background:linear-gradient(90deg,#534AB7,#AFA9EC,#D3D1C7)}
  .fo-body{padding:20px;background:#fff;color:#222}.sh{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#534AB7;font-weight:700;margin:14px 0 5px;font-family:sans-serif}.sh:first-child{margin-top:0}
  p{font-size:13px;line-height:1.6;color:#333}.pills{display:flex;gap:8px;flex-wrap:wrap}.pill{font-size:11px;background:#EEEDFE;color:#534AB7;padding:4px 12px;border-radius:20px;font-family:sans-serif;font-weight:500}
  .fo-footer{background:#3C3489;color:#AFA9EC;padding:12px 20px;font-size:10px;text-align:center;font-family:sans-serif}
  @media print{body{margin:0;padding:0;max-width:100%}}</style></head><body>
- <div class="fo-header"><div class="fo-school">Old Bridge High School &nbsp;·&nbsp; Go Knights!</div>
+ <div class="fo-header"><div class="fo-s1"></div><div class="fo-s2"></div><div class="fo-school">Old Bridge High School &nbsp;·&nbsp; Go Knights!</div>
  <div class="fo-name">${document.getElementById(ids.name)?.value||''}</div>
  <div class="fo-tag">${document.getElementById(ids.tag)?.value||''}</div></div>
  <div class="fo-divider"></div>
@@ -2216,9 +2224,10 @@ function chUpdateFlyer() {
  if(g('fp-where'))g('fp-where').textContent= g('fl-where')?.value||'';
  if(g('fp-advisor'))g('fp-advisor').textContent=g('fl-advisor')?.value||'';
  if(g('fp-contact'))g('fp-contact').textContent=g('fl-contact')?.value||'';
+ if(g('fp-stripe1')) g('fp-stripe1').style.background = g('fl-accent')?.value||'#F5C842';
 }
 function chPrintFlyer() {
- printInPlace(chFlyerPrintHTML({name:'fl-name',tag:'fl-tag',about:'fl-about',when:'fl-when',where:'fl-where',advisor:'fl-advisor',contact:'fl-contact'}));
+ printInPlace(chFlyerPrintHTML({name:'fl-name',tag:'fl-tag',about:'fl-about',when:'fl-when',where:'fl-where',advisor:'fl-advisor',contact:'fl-contact',accent:'fl-accent'}));
 }
 // ══════════════════════════════════════════════════════
 // CLASS PAGES — per-grade announcements & resources
