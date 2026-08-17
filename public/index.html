@@ -3302,6 +3302,16 @@ function closeWaiver() {
   document.getElementById('waiver-modal').style.display = 'none';
   document.body.style.overflow = '';
 }
+async function downloadWaiver() {
+  try {
+    const res = await fetch('/student-transportation-waiver.pdf');
+    const blob = await res.blob();
+    await shareOrDownload(blob, 'Student-Transportation-Waiver.pdf', 'application/pdf', 'Student Transportation Waiver');
+  } catch (e) {
+    console.warn('[downloadWaiver] failed', e);
+    showToast('Could not download right now \u2014 try again in a moment.');
+  }
+}
 function printWaiver() {
   // Prints the on-screen image directly via the browser's normal print flow —
   // deliberately avoids opening the PDF itself, since iOS hijacks that into a
@@ -3556,7 +3566,7 @@ observeReveal();
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 4px 14px;">
       <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin:0;">Transportation Waiver</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="/student-transportation-waiver.pdf" download style="background:var(--purple-ui);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;">Download</a>
+        <button onclick="downloadWaiver()" style="background:var(--purple-ui);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Download</button>
         <button onclick="printWaiver()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line-bright);padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Print</button>
         <button onclick="closeWaiver()" class="cal-modal-x" style="position:static;" aria-label="Close">✕</button>
       </div>
