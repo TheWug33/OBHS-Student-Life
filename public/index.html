@@ -478,6 +478,12 @@ img{max-width:100%;display:block;}
 @media (max-width:767px){
   .s-hub-theme-banner{font-size:12.5px;padding:10px 14px;}
 }
+
+@media print{
+  body *{visibility:hidden;}
+  #waiver-print-target,#waiver-print-target *{visibility:visible;}
+  #waiver-print-target{position:absolute;top:0;left:0;width:100%;border:none;padding:0;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
@@ -3297,30 +3303,10 @@ function closeWaiver() {
   document.body.style.overflow = '';
 }
 function printWaiver() {
-  // Prints the real PDF (full quality) via a hidden iframe, reusing the same
-  // in-place technique as the Meeting Log / EOY Report print buttons — never
-  // opens a separate tab/window, which is what stranded people before.
-  let frame = document.getElementById('waiver-print-frame');
-  if (!frame) {
-    frame = document.createElement('iframe');
-    frame.id = 'waiver-print-frame';
-    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
-    frame.src = '/student-transportation-waiver.pdf';
-    document.body.appendChild(frame);
-  }
-  const doPrint = () => {
-    try {
-      frame.contentWindow.focus();
-      frame.contentWindow.print();
-    } catch (e) {
-      window.open('/student-transportation-waiver.pdf', '_blank');
-    }
-  };
-  if (frame.dataset.loaded) {
-    doPrint();
-  } else {
-    frame.onload = () => { frame.dataset.loaded = '1'; setTimeout(doPrint, 200); };
-  }
+  // Prints the on-screen image directly via the browser's normal print flow —
+  // deliberately avoids opening the PDF itself, since iOS hijacks that into a
+  // full-screen native preview (QuickLook) with no reliable way back in standalone mode.
+  window.print();
 }
 
 load();
@@ -3575,7 +3561,7 @@ observeReveal();
         <button onclick="closeWaiver()" class="cal-modal-x" style="position:static;" aria-label="Close">✕</button>
       </div>
     </div>
-    <div style="flex:1;overflow-y:auto;border:1px solid var(--line-bright);border-radius:10px;background:#fff;padding:8px;"><img src="/waiver-page.png" alt="Student Transportation Waiver" style="display:block;width:100%;height:auto;border-radius:4px;"></div>
+    <div id="waiver-print-target" style="flex:1;overflow-y:auto;border:1px solid var(--line-bright);border-radius:10px;background:#fff;padding:8px;"><img src="/waiver-page.png" alt="Student Transportation Waiver" style="display:block;width:100%;height:auto;border-radius:4px;"></div>
   </div>
 </div>
 
