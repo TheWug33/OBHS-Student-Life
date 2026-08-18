@@ -766,7 +766,7 @@ img{max-width:100%;display:block;}
  <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px;max-width:480px;text-align:center;">
  <div style="font-size:15px;color:#fff;font-weight:600;margin-bottom:8px;">Ready to make it official?</div>
  <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">See the requirements, the approval process, and submit your club for review.</div>
- <button onclick="openNewClub()" style="background:var(--purple-ui);color:#fff;border:none;padding:13px 26px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Start a New Club &rarr;</button>
+ <button onclick="openNewClub('student')" style="background:var(--purple-ui);color:#fff;border:none;padding:13px 26px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Start a New Club &rarr;</button>
  </div>
  </div>
 
@@ -1124,7 +1124,7 @@ img{max-width:100%;display:block;}
  <div class="flr" onclick="openHandbook()"><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openNewClub()"><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openNewClub('faculty')"><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openEoy()"><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openClubDetailsSubmit()"><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — submissions are reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
  </div>
@@ -3105,7 +3105,16 @@ async function submitToSheet(tab, fields, btn, successMsg) {
   }
 }
 
-function openNewClub() {
+function openNewClub(audience) {
+ const intro = document.getElementById('ncr-intro');
+ const advisorBullet = document.getElementById('ncr-advisor-bullet');
+ if (audience === 'student') {
+ if (intro) intro.textContent = 'Have an idea for a club that doesn\u2019t exist yet? Here\u2019s what you need before you submit \u2014 so your request has the best shot at getting approved quickly.';
+ if (advisorBullet) advisorBullet.textContent = 'A faculty advisor willing to commit to the role \u2014 line someone up before you submit';
+ } else {
+ if (intro) intro.textContent = 'Students come to you first when they want to start a club \u2014 here\u2019s what to know before you say yes, so you can set them up for a smooth approval instead of a stalled one.';
+ if (advisorBullet) advisorBullet.textContent = 'A faculty advisor willing to commit to the role (that\u2019s you)';
+ }
  document.getElementById('new-club-modal').style.display = 'block';
  document.body.style.overflow = 'hidden';
 }
@@ -3700,13 +3709,13 @@ observeReveal();
 
  <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
  <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Something New at OBHS</div>
- <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">Students come to you first when they want to start a club — here's what to know before you say yes, so you can set them up for a smooth approval instead of a stalled one.</p>
+ <p id="ncr-intro" style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">Students come to you first when they want to start a club — here's what to know before you say yes, so you can set them up for a smooth approval instead of a stalled one.</p>
  </div>
 
  <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
  <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Requirements to Start a Club</div>
  <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
- <li>A faculty advisor willing to commit to the role (that's you)</li>
+ <li id="ncr-advisor-bullet">A faculty advisor willing to commit to the role (that's you)</li>
  <li>A core group of interested students — a handful of names to start, not the whole roster on day one</li>
  <li>A clear purpose or mission that doesn't significantly overlap with an existing club</li>
  <li>A realistic plan for regular meetings for the rest of the year</li>
