@@ -28,7 +28,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 
 /* Slides */
 .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;padding:120px 60px 90px;}
-.slide{position:absolute;inset:120px 60px 90px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .9s,transform .9s;pointer-events:none;}
+.slide{position:absolute;inset:120px 60px 90px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .9s,transform .9s;pointer-events:none;overflow:hidden;}
 .slide.on{opacity:1;transform:none;}
 .slide-tag{font-family:'Arial Narrow',sans-serif;font-size:20px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#AFA9EC;margin-bottom:28px;display:flex;align-items:center;gap:14px;}
 .slide-tag::before{content:'';width:44px;height:3px;background:var(--purple-glow);border-radius:2px;}
