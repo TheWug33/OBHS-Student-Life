@@ -2657,19 +2657,38 @@ function buildIcsContent(events) {
 // SUBSCRIBE — one-time setup that keeps a calendar app auto-synced forever
 // (different from Export, which is a one-time snapshot)
 // ══════════════════════════════════════════════════════
+const CALENDAR_FEED_URL = 'https://obhs-student-life-ob.vercel.app/api/calendar';
+
 function subscribeCalendar() {
- const httpsUrl = 'https://obhs-student-life-ob.vercel.app/api/calendar';
- const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
- // On iOS/macOS this opens Calendar's native "Subscribe" prompt directly
- window.location.href = webcalUrl;
- // Also put the link on the clipboard for Outlook / Google Calendar / Android,
- // which need it pasted into a "Subscribe from web" field instead
- const msg = 'Calendar link copied!\n\n' + httpsUrl + '\n\nOutlook: Add calendar \u2192 Subscribe from web\nGoogle Calendar: Other calendars + \u2192 From URL\n\nPaste this link there to link these dates to your calendar \u2014 it\u2019ll stay current automatically with no duplicates.';
- if (navigator.clipboard) {
- navigator.clipboard.writeText(httpsUrl).then(() =>setTimeout(() =>showInfoModal(msg), 250)).catch(() =>showInfoModal(msg));
- } else {
- showInfoModal(msg);
- }
+  document.getElementById('cal-choice-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeCalChoice() {
+  document.getElementById('cal-choice-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function linkAppleCalendar() {
+  window.location.href = CALENDAR_FEED_URL.replace(/^https?:\/\//, 'webcal://');
+  closeCalChoice();
+}
+function linkGoogleCalendar() {
+  window.open('https://calendar.google.com/calendar/u/0/r?cid=' + encodeURIComponent(CALENDAR_FEED_URL), '_blank');
+  closeCalChoice();
+}
+async function linkOutlookCalendar() {
+  try { await navigator.clipboard.writeText(CALENDAR_FEED_URL); } catch (e) {}
+  window.open('https://outlook.office.com/calendar/', '_blank');
+  showToast('Link copied! In Outlook: Add calendar \u2192 Subscribe from web \u2192 paste \u2192 Import');
+  closeCalChoice();
+}
+async function linkCopyOnly() {
+  try {
+    await navigator.clipboard.writeText(CALENDAR_FEED_URL);
+    showToast('Calendar link copied to your clipboard!');
+  } catch (e) {
+    showInfoModal('Copy this link:\n\n' + CALENDAR_FEED_URL);
+  }
+  closeCalChoice();
 }
 
 async function exportCalendar() {
@@ -3490,6 +3509,21 @@ observeReveal();
 
 <!-- Generic Info Modal (replaces alert() for longer messages — alert/confirm/prompt
  are unreliable inside installed home-screen apps on iOS) -->
+<!-- Calendar Choice Modal — routes to the best possible flow per platform -->
+<div id="cal-choice-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);width:100%;box-shadow:0 24px 70px rgba(0,0,0,0.6);position:relative;">
+    <button onclick="closeCalChoice()" class="cal-modal-x" aria-label="Close" style="position:absolute;top:-14px;right:-14px;">✕</button>
+    <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">Link to My Calendar</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.6;">Choose your calendar app for the smoothest setup.</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <button onclick="linkAppleCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">iPhone / iPad / Mac Calendar</button>
+      <button onclick="linkGoogleCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Google Calendar</button>
+      <button onclick="linkOutlookCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Outlook</button>
+      <button onclick="linkCopyOnly()" style="width:100%;text-align:left;background:none;border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Just copy the link</button>
+    </div>
+  </div>
+</div>
+
 <div id="info-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
  <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);box-shadow:0 24px 70px rgba(0,0,0,0.6);">
  <div id="info-modal-body" style="font-size:14px;color:var(--silver);line-height:1.7;white-space:pre-line;margin-bottom:18px;"></div>
