@@ -1086,9 +1086,9 @@ img{max-width:100%;display:block;}
  <div class="two">
  <div class="cs">
  <div class="cs-ttl">Field Trip Request</div>
- <div class="info"><div class="info-t">Minimum 2-week advance notice required</div><div class="info-d">Submit your request early. Trips requiring buses need additional lead time for transportation scheduling.</div></div>
+ <div class="info"><div class="info-t">Submit six (6) weeks in advance</div><div class="info-d">All field trip requests must be submitted six weeks before the trip date. Incomplete requests will be returned and could delay approval.</div></div>
  <div class="flr" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account</div></div><div class="flr-arr">→</div></div>
- <div class="flr"><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openFtInstructions()"><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
  </div>
  <div class="cs">
  <div class="cs-ttl">Early Dismissal</div>
@@ -3458,6 +3458,18 @@ async function submitFlyer() {
   }
 }
 
+// ══════════════════════════════════════════════════════
+// FIELD TRIP SUBMISSION INSTRUCTIONS
+// ══════════════════════════════════════════════════════
+function openFtInstructions() {
+  document.getElementById('ft-instructions-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeFtInstructions() {
+  document.getElementById('ft-instructions-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 
@@ -3682,6 +3694,48 @@ observeReveal();
 </div>
 
 <!-- Physical Information Modal -->
+<!-- Field Trip Submission Instructions Modal -->
+<div id="ft-instructions-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:640px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeFtInstructions()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge High School</div>
+      <h2 class="cal-modal-ttl">Field Trip Submission Instructions</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Submission Deadline</div>
+      <p style="font-size:15px;color:#fff;line-height:1.6;margin:0;font-weight:600;">All field trip requests must be submitted <u>six (6) weeks in advance</u> of the trip date.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Before Submitting, Make Sure You Include</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Completed Field Trip Authorization Form</li>
+        <li>Tentative student roster with each student's full name, ID number, and grade</li>
+        <li>All staff members attending the trip are listed</li>
+        <li>Substitute/coverage needs are indicated, if applicable</li>
+        <li>Supervisor/Director signature has been obtained</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Day of the Trip</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Updated/final student roster goes to <strong style="color:var(--silver)">Maria DelPino</strong> (nurse) and <strong style="color:var(--silver)">Marilyn Zino</strong> (attendance)</li>
+        <li>Roster includes: student full name, student ID number, and grade</li>
+        <li>Roster must reflect actual attendance for that day</li>
+        <li>Students must report to first period for attendance before departing for the trip</li>
+      </ul>
+    </div>
+
+    <div style="background:rgba(224,160,48,0.15);border:1px solid #E0A030;border-radius:14px;padding:18px 20px;">
+      <p style="font-size:14px;color:#F0C878;line-height:1.6;margin:0;font-weight:700;">Incomplete field trip requests will be returned and could delay approval.</p>
+    </div>
+
+  </div>
+</div>
+
 <div id="physical-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
   <div style="max-width:720px;margin:0 auto;">
     <div class="cal-modal-head">
