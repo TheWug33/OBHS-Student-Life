@@ -676,6 +676,7 @@ img{max-width:100%;display:block;}
  </div>
 
  <div class="feat">
+<div class="fc" onclick="openBellSchedule()"><div class="fc-ttl">Bell Schedules</div><div class="fc-dsc">Full day, delayed opening, and half day — new for 2026&ndash;27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New this year</span></div>
 <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-classes')"><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
  <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
@@ -1159,6 +1160,7 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Document Library</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">All standard Student Life forms and policy documents in one place. Click any document to open or download.</p>
+ <div class="flr" onclick="openBellSchedule()"><div><div class="flr-t">Bell Schedules</div><div class="flr-d">Full day, delayed opening, and half day &mdash; new for 2026&ndash;27</div></div><div class="flr-arr">→</div></div>
  <div class="flr"><div><div class="flr-t">Permission slip template</div><div class="flr-d">Standard field trip permission form</div></div><div class="flr-arr">↓</div></div>
  
  <div class="flr"><div><div class="flr-t">Community service verification form</div><div class="flr-d">Supervisor sign-off sheet for students</div></div><div class="flr-arr">↓</div></div>
@@ -3413,6 +3415,18 @@ function renderABDayBadge() {
 
 renderABDayBadge();
 
+// ══════════════════════════════════════════════════════
+// BELL SCHEDULES — new for 2026-27, shared by Student Hub and Faculty Hub
+// ══════════════════════════════════════════════════════
+function openBellSchedule() {
+  document.getElementById('bell-schedule-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeBellSchedule() {
+  document.getElementById('bell-schedule-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 load();
 observeReveal();
 
@@ -3834,6 +3848,63 @@ observeReveal();
 </div>
 
 <!-- Full Calendar Modal -->
+<!-- Bell Schedules Modal -->
+<div id="bell-schedule-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeBellSchedule()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Bell Schedules</h2>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">New for 2026&ndash;27. Applies to students and faculty. * Lunch waves run simultaneously &mdash; while one group eats Period 3 Lunch, the other continues Periods 3&ndash;6, and vice versa for Period 7 Lunch.</p>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;overflow-x:auto;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Full Day Schedule &mdash; A and B Days</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Period</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Period</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Start</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">End</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Pd 3 Lunch</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Pd 7 Lunch</th></tr>
+        
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1A or 1B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">7:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">9:00 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 1</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 1</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2A or 2B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">9:05 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:30 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 2</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 2</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">3</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">3A or 3B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">11:01 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(199,201,209,0.08);">Period 3 Lunch*</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(91,63,192,0.28);color:#fff;font-weight:600;">Periods 3&ndash;6</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">4&ndash;6</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">A or B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">11:05 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:01 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(91,63,192,0.28);color:#fff;font-weight:600;">Periods 4&ndash;7</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">&nbsp;</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">7</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">7A or 7B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:05 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:31 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">&nbsp;</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(199,201,209,0.08);">Period 7 Lunch*</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8A or 8B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:35 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2:00 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 8</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 8</td></tr>
+
+      </table>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;overflow-x:auto;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Delayed Opening Schedule</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Period</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Start</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">End</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Pd 3 Lunch</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Pd 7 Lunch</th></tr>
+        
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1A/1B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">9:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:30 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 1</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 1</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2A/2B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">11:30 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 2</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 2</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">3A/3B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">11:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:00 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(199,201,209,0.08);">Period 3 Lunch*</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(91,63,192,0.28);color:#fff;font-weight:600;">Periods 3&ndash;6</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">4/6 A/B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:05 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:30 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(91,63,192,0.28);color:#fff;font-weight:600;">Periods 4&ndash;7</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">&nbsp;</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">7A/7B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">12:35 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1:00 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">&nbsp;</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);background:rgba(199,201,209,0.08);">Period 7 Lunch*</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8A/8B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1:05 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2:00 PM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 8</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">Period 8</td></tr>
+
+      </table>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;overflow-x:auto;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Half Day Schedule</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Period</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">Start</th><th style="padding:8px 10px;background:var(--purple-mid);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;border:1px solid var(--line);">End</th></tr>
+        
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">1A/1B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">7:35 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8:31 AM</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">2A/2B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8:36 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">9:32 AM</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">3/7A/B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">9:37 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:33 AM</td></tr>
+<tr><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">8 A/B</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">10:38 AM</td><td style="padding:8px 10px;color:var(--silver);font-size:12.5px;text-align:center;border:1px solid var(--line);">11:35 AM</td></tr>
+
+      </table>
+    </div>
+
+  </div>
+</div>
+
 <div id="cal-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
  <div style="max-width:720px;margin:0 auto;">
  <div class="cal-modal-head">
