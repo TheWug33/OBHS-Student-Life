@@ -582,7 +582,7 @@ img{max-width:100%;display:block;}
  </div>
  </div>
  <div class="reveal" id="flyers-block" style="margin-top:36px">
- <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openResourceLink(FLYER_FORM_URL,'Flyer submission')">Submit →</button></div>
+ <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openFlyerSubmit()">Submit →</button></div>
  <div class="fly-row" id="fly-row" style="grid-template-columns:repeat(4,1fr)">
  <div class="fly"><span class="fly-label">Loading…</span></div>
  <div class="fly"></div>
@@ -676,6 +676,7 @@ img{max-width:100%;display:block;}
  </div>
 
  <div class="feat">
+<div class="fc" onclick="openFlyerSubmit()"><div class="fc-ttl">Submit a Flyer</div><div class="fc-dsc">Have your flyer featured on the homepage and TV displays.</div></div>
 <div class="fc" onclick="openBellSchedule()"><div class="fc-ttl">Bell Schedules</div><div class="fc-dsc">Full day, delayed opening, and half day — new for 2026&ndash;27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New this year</span></div>
 <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-classes')"><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
  <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
@@ -1160,6 +1161,7 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Document Library</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">All standard Student Life forms and policy documents in one place. Click any document to open or download.</p>
+ <div class="flr" onclick="openFlyerSubmit()"><div><div class="flr-t">Submit a Flyer</div><div class="flr-d">Get your flyer featured on the homepage and TV displays</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openBellSchedule()"><div><div class="flr-t">Bell Schedules</div><div class="flr-d">Full day, delayed opening, and half day &mdash; new for 2026&ndash;27</div></div><div class="flr-arr">→</div></div>
  <div class="flr"><div><div class="flr-t">Permission slip template</div><div class="flr-d">Standard field trip permission form</div></div><div class="flr-arr">↓</div></div>
  
@@ -1281,7 +1283,6 @@ const BUDGET_URL = '#'; // ← Budget & Purchasing guide/form link
 const MEETING_LOG_URL = '#'; // ← Meeting log / attendance template link
 const NEW_CLUB_URL = 'https://forms.gle/geeiZsqVoFPidXYR9';
 const EOY_REPORT_URL = '#'; // ← End-of-Year Reporting form link
-const FLYER_FORM_URL = '#'; // ← replace with your flyer submission Google Form link
 const CLUB_DETAILS_FORM_URL = 'https://forms.gle/zomCeDgnZHKWj6Zy5'; // ← no longer used, kept for reference only
 const FORM_RECEIVER_URL = 'https://script.google.com/macros/s/AKfycbx2MPfAIdmvArt8JKI4thzkxsffjzDGTve1K-NTLFdVRwIaS_BXbsZ98u7xosfPptLPdg/exec';
 const SPORT_PHYSICAL_FORM_URL = 'https://drive.google.com/file/d/1_vzBSsjpakjlvB_Xr1IAbF-17uVInj0y/view?usp=drivesdk';
@@ -1608,7 +1609,7 @@ function renderQL(rows){
 }
 function renderFlyers(rows){
  const el=document.getElementById('fly-row');
- const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.IMAGE_URL&&r.IMAGE_URL.startsWith('http')).slice(0,6);
+ const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.IMAGE_URL&&r.IMAGE_URL.startsWith('http')&&/^y/i.test((r.APPROVED||'').trim())).slice(0,6);
  if(!clean.length){el.innerHTML='<div class="fly" style="grid-column:1/-1"><span class="fly-label">Flyers appear here once teachers submit them</span></div>';return;}
  el.style.gridTemplateColumns=`repeat(${Math.min(clean.length,4)},1fr)`;
  window._flyerData=clean;
@@ -3427,6 +3428,35 @@ function closeBellSchedule() {
   document.body.style.overflow = '';
 }
 
+// ══════════════════════════════════════════════════════
+// FLYER SUBMISSION — native form, posts straight to the Flyers tab
+// ══════════════════════════════════════════════════════
+function openFlyerSubmit() {
+  document.getElementById('flyer-submit-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeFlyerSubmit() {
+  document.getElementById('flyer-submit-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitFlyer() {
+  const title = document.getElementById('fs-title')?.value.trim();
+  const image = document.getElementById('fs-image')?.value.trim();
+  if (!title) { showToast('Please enter a flyer title.'); return; }
+  if (!image || !image.startsWith('http')) { showToast('Please enter a valid image link.'); return; }
+  const btn = document.getElementById('fs-submit-btn');
+  const ok = await submitToSheet('Flyers', {
+    'TITLE': title,
+    'IMAGE_URL': image,
+  }, btn, 'Submitted! It\u2019ll appear once Student Life reviews it.');
+  if (ok) {
+    ['fs-title','fs-image'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+}
+
 load();
 observeReveal();
 
@@ -3759,6 +3789,32 @@ observeReveal();
 
 <!-- Start a New Club Modal -->
 <!-- Club Details Submission Modal (native form, no external redirect) -->
+<!-- Submit a Flyer Modal (native form, no external redirect) -->
+<div id="flyer-submit-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeFlyerSubmit()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Submit a Flyer</h2>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Getting an image link</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;margin:0;">Upload your flyer image to Google Drive and use "Copy link" (set to Anyone with the link), or if it's a Canva design, use Share &rarr; Download as PNG, then upload that file to Drive. Paste the resulting link below.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Flyer Title</label><input id="fs-title" type="text" placeholder="e.g. Fall Blood Drive - Nov 14" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Image Link</label><input id="fs-image" type="text" placeholder="https://drive.google.com/..." style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <button id="fs-submit-btn" onclick="submitFlyer()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+        <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it appears on the site.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div id="club-details-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
   <div style="max-width:560px;margin:0 auto;">
     <div class="cal-modal-head">
