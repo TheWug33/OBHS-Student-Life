@@ -1518,8 +1518,9 @@ function renderEv(rows){
  const today=new Date(); today.setHours(0,0,0,0);
  const currentYear=today.getFullYear();
 
- // Filter: real rows only, not placeholder
+ // Filter: real rows only, not placeholder, and must be approved by Student Life
  const clean=rows.filter(r=>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY!=='0'
+ && /^y/i.test((r.APPROVED||'').trim())
  );
 
  // Parse each row into a sortable date and filter out past events
