@@ -549,10 +549,10 @@ img{max-width:100%;display:block;}
  <div class="portal-title">Student Hub</div>
  <div class="portal-links">
  <span class="portal-link">Club directory &amp; flyer generator</span>
- <span class="portal-link">Community service hours</span>
- <span class="portal-link">Battle of the Classes</span>
- <span class="portal-link">Senior leadership committees</span>
- <span class="portal-link">Event sign-ups &amp; spirit wear</span>
+ <span class="portal-link" id="portal-service">Community service hours</span>
+ <span class="portal-link">Battle of the Classes <span style="opacity:.65">(spring sign-ups)</span></span>
+ <span class="portal-link" id="portal-committees">Senior leadership committees</span>
+ <span class="portal-link" id="portal-spirit-events">Event sign-ups &amp; spirit wear</span>
  </div>
  <span class="portal-cta">Enter Student Hub<span class="portal-cta-arrow">→</span></span>
  </button>
@@ -561,7 +561,7 @@ img{max-width:100%;display:block;}
  
  <div class="portal-title">Faculty Hub</div>
  <div class="portal-links">
- <span class="portal-link">Field trip &amp; early dismissal forms</span>
+ <span class="portal-link" id="portal-fieldtrip">Field trip &amp; early dismissal forms</span>
  <span class="portal-link">Submit an event or meeting</span>
  <span class="portal-link">Club advisor resources</span>
  <span class="portal-link">Help desk &amp; IT work orders</span>
@@ -1096,6 +1096,7 @@ img{max-width:100%;display:block;}
  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;">I Want To&hellip;</div>
  <div class="feat">
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ttl">Take my class or team off campus</div><div class="fc-dsc">Field trip requests, early dismissals, and the departure log — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Field Trips &amp; Dismissals</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ttl">See who's leaving today</div><div class="fc-dsc">Check the Field Trip &amp; Departure Log for groups out of the building right now, or look back on any past date.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Departure Log</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ttl">Run my club</div><div class="fc-dsc">Handbook, budget requests, meeting logs, new club approval, and end-of-year reporting.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Advisor Resources</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ttl">Get my event on the calendar</div><div class="fc-dsc">In-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ttl">Get help — IT, a room, or a real person</div><div class="fc-dsc">Tech support, reserving spaces like the auditorium or cafeteria, or reach Student Life directly.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Help Desk</span></div>
@@ -1108,14 +1109,14 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Field Trip Request</div>
  <div class="info"><div class="info-t">Submit six (6) weeks in advance</div><div class="info-d">All field trip requests must be submitted six weeks before the trip date. Incomplete requests will be returned and could delay approval.</div></div>
- <div class="flr" id="ft-request-live" style="display:none" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account</div></div><div class="flr-arr">→</div></div>
- <div class="flr" id="ft-request-paper" style="opacity:0.85;cursor:default"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Paper copy only for now — pick up a form and submit through the Main Office.</div></div></div>
+ <div class="flr" id="ft-request-live" style="display:none" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" id="ft-request-paper" style="opacity:0.85;cursor:default"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Paper copy only for now — pick up a form and submit through the Main Office. They'll date-stamp it as received.</div></div></div>
  <div class="flr" onclick="openFtInstructions()"><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
  </div>
  <div class="cs">
  <div class="cs-ttl">Early Dismissal</div>
  <div class="info"><div class="info-t">Submit at least 48 hours in advance</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
- <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 48 hours in advance and approved before communicating to students or parents.</div></div></div>
  </div>
  </div>
@@ -1123,7 +1124,7 @@ img{max-width:100%;display:block;}
  <div class="cs" style="margin-top:24px;">
  <div class="cs-ttl">Field Trip &amp; Departure Log</div>
  <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
- <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time — appears in "Leaving Today" below right after you submit</div></div><div class="flr-arr">→</div></div>
 
  <div style="margin-top:22px;">
  <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Leaving Today</div>
@@ -1160,7 +1161,7 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Submit an Event / Meeting</div>
  <div class="info"><div class="info-t">For school meetings, assemblies, and events — during the school day or after</div><div class="info-d">Use this form for assemblies, meetings, or activities happening during the school day or after school hours. Not for field trips (students leaving the building) — use the Field Trip Request for those.</div></div>
- <div class="flr" onclick="window.open(EVT_URL,'_blank')"><div><div class="flr-t">Submit an event / meeting</div><div class="flr-d">During school or after — assemblies, meetings, activities</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="window.open(EVT_URL,'_blank')"><div><div class="flr-t">Submit an event / meeting</div><div class="flr-d">During school or after — assemblies, meetings, activities · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Event guidelines</div><div class="flr-d">All school events and meetings need Student Life approval at least 1 week in advance. Contact Room 845 to confirm scheduling.</div></div></div>
  <div class="flr" onclick="window.open(FACILITIES_URL,'_blank')"><div><div class="flr-t">Reserve a space</div><div class="flr-d">Auditorium, cafeteria, and other facilities</div></div><div class="flr-arr">→</div></div>
@@ -1311,6 +1312,17 @@ function applyComingSoonToggles(){
  live.style.display = show ? '' : 'none';
  soon.style.display = show ? 'none' : '';
  });
+
+ // Homepage portal teaser bullets — keep the very first thing people see honest
+ // about what's actually live right now, instead of a separate hand-edited copy.
+ const portalService = document.getElementById('portal-service');
+ if(portalService) portalService.textContent = SHOW_COMMUNITY_SERVICE ? 'Community service hours' : 'Community service (coming soon)';
+ const portalCommittees = document.getElementById('portal-committees');
+ if(portalCommittees) portalCommittees.textContent = SHOW_COMMITTEES ? 'Senior leadership committees' : 'Leadership committees (coming soon)';
+ const portalSpiritEvents = document.getElementById('portal-spirit-events');
+ if(portalSpiritEvents) portalSpiritEvents.innerHTML = SHOW_SPIRIT_WEAR ? 'Event sign-ups &amp; spirit wear' : 'Event sign-ups &amp; spirit wear <span style="opacity:.65">(spirit wear soon)</span>';
+ const portalFieldtrip = document.getElementById('portal-fieldtrip');
+ if(portalFieldtrip) portalFieldtrip.textContent = SHOW_ONLINE_FIELDTRIP_REQUEST ? 'Field trip & early dismissal forms' : 'Early dismissal forms & paper field trip requests';
 }
 applyComingSoonToggles();
 
