@@ -680,11 +680,11 @@ img{max-width:100%;display:block;}
 <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-classes')"><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
  <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-service')"><div class="fc-ttl">Community Service</div><div class="fc-dsc">Online hour tracking is coming soon — check back once it's live.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-service')" id="ov-service-card" style="display:none"><div class="fc-ttl">Community Service</div><div class="fc-dsc">Online hour tracking is coming soon — check back once it's live.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(9)'),'s-committees')"><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Committee sign-ups are coming soon — check back for details.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(9)'),'s-committees')" id="ov-committees-card" style="display:none"><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Committee sign-ups are coming soon — check back for details.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-events')"><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')" id="ov-spirit-card" style="display:none"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  </div>
 
  <!-- CLASS CUP -->
@@ -1324,6 +1324,18 @@ function applyComingSoonToggles(){
  if(portalSpiritEvents) portalSpiritEvents.innerHTML = SHOW_SPIRIT_WEAR ? 'Event sign-ups &amp; spirit wear' : 'Event sign-ups &amp; spirit wear <span style="opacity:.65">(spirit wear soon)</span>';
  const portalFieldtrip = document.getElementById('portal-fieldtrip');
  if(portalFieldtrip) portalFieldtrip.textContent = SHOW_ONLINE_FIELDTRIP_REQUEST ? 'Field trip & early dismissal forms' : 'Early dismissal forms & paper field trip requests';
+
+ // Student Hub Overview cards — only show a feature's card once it's actually live,
+ // rather than showing it with a "Coming soon" tag.
+ const overviewCards = [
+ ['ov-service-card', SHOW_COMMUNITY_SERVICE],
+ ['ov-committees-card', SHOW_COMMITTEES],
+ ['ov-spirit-card', SHOW_SPIRIT_WEAR],
+ ];
+ overviewCards.forEach(([id, show])=>{
+ const el = document.getElementById(id);
+ if(el) el.style.display = show ? '' : 'none';
+ });
 }
 applyComingSoonToggles();
 
