@@ -681,11 +681,11 @@ img{max-width:100%;display:block;}
 <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-classes')"><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
  <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ttl">Community Service</div><div class="fc-dsc">Log hours, upload verification, and track progress toward the 10-hour graduation requirement.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">10 hrs required</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-service')"><div class="fc-ttl">Community Service</div><div class="fc-dsc">Online hour tracking is coming soon — check back once it's live.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-committees')"><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Join a leadership committee and help shape school culture for 2026–27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New · 2026–27</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(4)'),'s-events')"><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Browse and buy OBHS Knights gear. Pick up in the Student Life office.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">In-office pickup</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  </div>
 
  <!-- CLASS CUP -->
@@ -707,12 +707,17 @@ img{max-width:100%;display:block;}
  </div>
  <button class="cta">Join a committee →</button>
  </div>
- <div class="cs">
+ <div class="cs" id="cs-preview-live" style="display:none">
  <div class="cs-ttl">Community Service</div>
  <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span>onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Complete hours at any district-approved organization and submit your verification form here.</div></div>
  <div class="flr" onclick="window.open(CS_URL,'_blank')"><div><div class="flr-t">Submit service hours</div><div class="flr-d">Upload verification &amp; log hours</div></div><div class="flr-arr">→</div></div>
  <div class="flr"><div><div class="flr-t">View my hours</div><div class="flr-d">Check your running total</div></div><div class="flr-arr">→</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Approved organizations list</div><div class="flr-d">Any 501(c)(3) or district-approved organization qualifies. Not sure if yours counts? Ask Mr. Beverly in Room 845.</div></div></div>
+ </div>
+ <div class="cs" id="cs-preview-soon">
+ <div class="cs-ttl">Community Service</div>
+ <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Online hour tracking and verification submission aren't live yet — check back once it's ready.</div></div>
+ <div class="flr" style="opacity:0.5;cursor:default"><div><div class="flr-t">Submit &amp; track service hours</div><div class="flr-d">Coming soon</div></div><div class="flr-arr" style="font-size:10px">SOON</div></div>
  </div>
  </div>
  </div>
@@ -945,7 +950,11 @@ img{max-width:100%;display:block;}
 </div>
 
  <div id="s-service" class="subbody" style="display:none">
- <div class="two">
+ <div class="cs" id="s-service-soon" style="max-width:560px">
+ <div class="cs-ttl">Community Service</div>
+ <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Online hour logging and verification submission aren't available yet. We'll post sign-up details here once it's ready — hours info in the meantime is available from Student Life, Room 845.</div></div>
+ </div>
+ <div class="two" id="s-service-live" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Submit Your Hours</div>
  <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span>onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Phase-in begins with the Class of 2030. Complete hours at any district-approved organization and submit verification within 2 weeks.</div></div>
@@ -1034,7 +1043,11 @@ img{max-width:100%;display:block;}
  </div>
 
  <div id="s-spirit" class="subbody" style="display:none">
- <div class="cs">
+ <div class="cs" id="s-spirit-soon" style="max-width:560px">
+ <div class="cs-ttl">Spirit Wear</div>
+ <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Online ordering for OBHS Knights gear isn't live yet. Check back soon for sizes, pricing, and how to order.</div></div>
+ </div>
+ <div class="cs" id="s-spirit-live" style="display:none">
  <div class="cs-ttl">Spirit Wear</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Browse and purchase OBHS Knights gear through Student Life. All items available for in-office pickup.</p>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">View current inventory</div><div class="flr-d">T-shirts, hoodies, hats & more — see current stock and pricing at the Student Life office, Room 845.</div></div></div>
@@ -1087,7 +1100,8 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Field Trip Request</div>
  <div class="info"><div class="info-t">Submit six (6) weeks in advance</div><div class="info-d">All field trip requests must be submitted six weeks before the trip date. Incomplete requests will be returned and could delay approval.</div></div>
- <div class="flr" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" id="ft-request-live" style="display:none" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" id="ft-request-paper" style="opacity:0.85;cursor:default"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Paper copy only for now — pick up a form and submit through the Main Office.</div></div></div>
  <div class="flr" onclick="openFtInstructions()"><div><div class="flr-t">Field trip policy &amp; guidelines</div><div class="flr-d">What's required before approval</div></div><div class="flr-arr">→</div></div>
  </div>
  <div class="cs">
@@ -1267,6 +1281,27 @@ const GIDS = {
   newclubs: '1905544186',
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
+const SHOW_COMMUNITY_SERVICE = false; // ← set to true when online hour tracking goes live
+const SHOW_SPIRIT_WEAR = false; // ← set to true when online spirit wear ordering goes live
+const SHOW_ONLINE_FIELDTRIP_REQUEST = false; // ← set to true when the online field trip form is back in use
+
+// Swaps each "live" block for its "coming soon" / paper-only counterpart based on the flags above.
+// No other code changes needed — just flip a flag and redeploy when a feature is ready.
+function applyComingSoonToggles(){
+ const pairs = [
+ ['cs-preview-live','cs-preview-soon', SHOW_COMMUNITY_SERVICE],
+ ['s-service-live','s-service-soon', SHOW_COMMUNITY_SERVICE],
+ ['s-spirit-live','s-spirit-soon', SHOW_SPIRIT_WEAR],
+ ['ft-request-live','ft-request-paper', SHOW_ONLINE_FIELDTRIP_REQUEST],
+ ];
+ pairs.forEach(([liveId,soonId,show])=>{
+ const live=document.getElementById(liveId), soon=document.getElementById(soonId);
+ if(!live||!soon) return;
+ live.style.display = show ? '' : 'none';
+ soon.style.display = show ? 'none' : '';
+ });
+}
+applyComingSoonToggles();
 
 // ── FORM LINKS ──
 // Replace any of these with new URLs as needed — no other code changes required
