@@ -29,7 +29,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 
 /* Slides */
 .stage{position:fixed;inset:var(--safe-y) var(--safe-x);display:flex;align-items:center;justify-content:center;z-index:3;padding:120px 60px 90px;}
-.slide{position:absolute;inset:120px 60px 90px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .9s,transform .9s;pointer-events:none;overflow:hidden;}
+.slide{position:absolute;inset:120px 230px 90px 60px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(18px);transition:opacity .9s,transform .9s;pointer-events:none;overflow:hidden;}
 .slide.on{opacity:1;transform:none;}
 .slide-tag{font-family:'Arial Narrow',sans-serif;font-size:20px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#AFA9EC;margin-bottom:28px;display:flex;align-items:center;gap:14px;}
 .slide-tag::before{content:'';width:44px;height:3px;background:var(--purple-glow);border-radius:2px;}
@@ -45,13 +45,13 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 .ev-date.cross .ev-arrow{color:rgba(255,255,255,0.35);font-size:22px;padding-bottom:4px;}
 .ev-mon{font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#CDC6F5;}
 .ev-day{font-size:38px;font-weight:800;line-height:1.05;}
-.ev-t{font-size:33px;font-weight:700;}
-.ev-m{font-size:19px;color:var(--muted);margin-top:3px;}
+.ev-t{font-size:33px;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;}
+.ev-m{font-size:19px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* Announcements slide */
 .an-row{padding:22px 0;border-bottom:1px solid var(--line);}
-.an-t{font-size:34px;font-weight:700;line-height:1.25;}
-.an-m{font-size:19px;color:var(--muted);margin-top:5px;}
+.an-t{font-size:34px;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.an-m{font-size:19px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* Class Cup slide */
 .cup-row{display:flex;align-items:center;gap:26px;margin-bottom:30px;}
