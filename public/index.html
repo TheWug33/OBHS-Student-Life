@@ -1086,6 +1086,7 @@ img{max-width:100%;display:block;}
  <div class="subnav" id="f-subnav">
  <button class="sn active" onclick="fsub(this,'f-overview')">Overview</button>
  <button class="sn" onclick="fsub(this,'f-forms')">Field Trips &amp; Dismissals</button>
+ <button class="sn" onclick="fsub(this,'f-departure')">Departure Log</button>
  <button class="sn" onclick="fsub(this,'f-clubs')">Club Advisor Resources</button>
  <button class="sn" onclick="fsub(this,'f-events')">Events &amp; Meetings</button>
  <button class="sn" onclick="fsub(this,'f-helpdesk')">Help Desk</button>
@@ -1096,11 +1097,11 @@ img{max-width:100%;display:block;}
  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;">I Want To&hellip;</div>
  <div class="feat">
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ttl">Take my class or team off campus</div><div class="fc-dsc">Field trip requests, early dismissals, and the departure log — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Field Trips &amp; Dismissals</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ttl">See who's leaving today</div><div class="fc-dsc">Check the Field Trip &amp; Departure Log for groups out of the building right now, or look back on any past date.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Departure Log</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-clubs')"><div class="fc-ttl">Run my club</div><div class="fc-dsc">Handbook, budget requests, meeting logs, new club approval, and end-of-year reporting.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Advisor Resources</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-events')"><div class="fc-ttl">Get my event on the calendar</div><div class="fc-dsc">In-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-helpdesk')"><div class="fc-ttl">Get help — IT, a room, or a real person</div><div class="fc-dsc">Tech support, reserving spaces like the auditorium or cafeteria, or reach Student Life directly.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Help Desk</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-docs')"><div class="fc-ttl">Find a form or document</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Document Library</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-departure')"><div class="fc-ttl">See who's leaving today</div><div class="fc-dsc">Check the Field Trip &amp; Departure Log for groups out of the building right now, or look back on any past date.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Departure Log</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-clubs')"><div class="fc-ttl">Run my club</div><div class="fc-dsc">Handbook, budget requests, meeting logs, new club approval, and end-of-year reporting.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Advisor Resources</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-events')"><div class="fc-ttl">Get my event on the calendar</div><div class="fc-dsc">In-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-helpdesk')"><div class="fc-ttl">Get help — IT, a room, or a real person</div><div class="fc-dsc">Tech support, reserving spaces like the auditorium or cafeteria, or reach Student Life directly.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Help Desk</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(7)'),'f-docs')"><div class="fc-ttl">Find a form or document</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Document Library</span></div>
  </div>
  </div>
 
@@ -1121,7 +1122,8 @@ img{max-width:100%;display:block;}
  </div>
  </div>
 
- <div class="cs" style="margin-top:24px;">
+ <div id="f-departure" class="subbody" style="display:none">
+ <div class="cs">
  <div class="cs-ttl">Field Trip &amp; Departure Log</div>
  <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
  <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time — appears in "Leaving Today" below right after you submit</div></div><div class="flr-arr">→</div></div>
@@ -1137,7 +1139,6 @@ img{max-width:100%;display:block;}
  <input id="ft-search" type="text" placeholder="Search by group, teacher, or destination..." oninput="renderFieldTrips()" style="flex:1;max-width:280px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;">
  </div>
  <div id="ft-archive-list"><div class="skel" style="height:56px"></div></div>
- </div>
  </div>
  </div>
 
@@ -2196,7 +2197,7 @@ async function chLoadClubs() {
 
 // Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
 const sPages = ['s-overview','s-clubs','s-classes','s-events','s-botc','s-spirit','s-service','s-committees'];
-const fPages = ['f-overview','f-forms','f-clubs','f-events','f-helpdesk','f-docs'];
+const fPages = ['f-overview','f-forms','f-departure','f-clubs','f-events','f-helpdesk','f-docs'];
 
 function ssub(btn, id) {
  document.querySelectorAll('#s-subnav .sn').forEach(b =>b.classList.remove('active'));
