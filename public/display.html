@@ -222,6 +222,21 @@ function autosizeTitle(el, maxHeight, minSize){
  el.style.fontSize = size + 'px';
  guard++;
  }
+ return size;
+}
+// Applies autosizeTitle to every element matching selector, then sets them ALL to
+// whichever ended up smallest — so every row in a list reads at one consistent size
+// rather than each row shrinking independently to a different size.
+function unifyTitleSizes(selector, maxHeight, minSize, baseSize){
+ const els = document.querySelectorAll(selector);
+ if(!els.length) return;
+ let smallest = baseSize;
+ els.forEach(el=>{
+ el.style.fontSize = baseSize + 'px';
+ const finalSize = autosizeTitle(el, maxHeight, minSize);
+ if(finalSize < smallest) smallest = finalSize;
+ });
+ els.forEach(el=>{ el.style.fontSize = smallest + 'px'; });
 }
 function splitLine(line){const r=[];let c='',q=false;for(const ch of line){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
 const KNOWN=['TITLE','DATE','SOURCE','TAG','MONTH','DAY','END_MONTH','END_DAY','TIME','LOCATION','LABEL','TARGET_DATE','CLASS','POINTS','LYRIC','SONG','ARTIST'];
@@ -310,14 +325,14 @@ async function loadData(){
  '<div class="ev-row">'+buildEventTile(r._mon,r._day,r.END_MONTH,r.END_DAY)+
  '<div><div class="ev-t">'+r.TITLE+'</div><div class="ev-m">'+(r.TIME||'All Day')+(r.LOCATION?' · '+r.LOCATION:'')+'</div></div></div>'
  ).join(''):'<div class="empty">No upcoming events posted.</div>';
- document.querySelectorAll('#ev-list .ev-t').forEach(el=>autosizeTitle(el, 79, 18));
+ unifyTitleSizes('#ev-list .ev-t', 79, 18, 33);
 
  // Announcements
  const cleanAnn=ann.filter(a=>a.TITLE&&!a.TITLE.includes('ADD YOUR')).slice(0,4);
  document.getElementById('an-list').innerHTML=cleanAnn.length?cleanAnn.map(a=>
  '<div class="an-row"><div class="an-t">'+a.TITLE+'</div><div class="an-m">'+(a.DATE||'')+(a.SOURCE?' · '+a.SOURCE:'')+'</div></div>'
  ).join(''):'<div class="empty">No announcements right now.</div>';
- document.querySelectorAll('#an-list .an-t').forEach(el=>autosizeTitle(el, 84, 18));
+ unifyTitleSizes('#an-list .an-t', 84, 18, 34);
  // Footer ticker: continuous crawl of all announcements
  const tickerAnn = ann.filter(a=>a.TITLE&&!a.TITLE.includes('ADD YOUR')).slice(0,8);
  const track = document.getElementById('ftr-track');
