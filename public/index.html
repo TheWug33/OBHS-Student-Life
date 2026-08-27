@@ -186,8 +186,7 @@ img{max-width:100%;display:block;}
 .ev:last-child{border-bottom:none;}
 .ev:hover{background:rgba(91,63,192,0.12);}
 .ev-date{width:44px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,#4A2F94,#241454);border:1px solid var(--line-bright);border-radius:9px;padding:6px 4px;}
-.ev-date.range{width:58px;}
-.ev-date.cross{width:auto;min-width:98px;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;}
+.ev-date.cross{width:104px;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;}
 .ev-date.cross .ev-half{display:flex;flex-direction:column;align-items:center;}
 .ev-date.cross .ev-mo{font-size:8px;}
 .ev-date.cross .ev-dy{font-size:18px;}
@@ -1555,13 +1554,10 @@ function buildEventTile(r) {
  if (endDayRaw && endDayRaw !== '0') {
  const endMon = endMonRaw || mon;
  const endDay = parseInt(endDayRaw) || endDayRaw;
- const sameMonth = endMon === mon;
  const sameDay = String(endDay) === String(day);
  if (!sameDay) {
- if (sameMonth) {
- return `<div class="ev-date range"><div class="ev-mo">${mon}</div><div class="ev-dy" style="font-size:16px;letter-spacing:-0.5px;">${day}–${endDay}</div></div>`;
- }
- // Cross-month range: two matching mini date-chips, same size, side by side
+ // Any multi-day range — same month or crossing months — uses the same
+ // two-sided spread-out badge, at a fixed width, so ranges line up consistently.
  return `<div class="ev-date cross">
  <div class="ev-half"><div class="ev-mo">${mon}</div><div class="ev-dy">${day}</div></div>
  <div class="ev-arrow">–</div>
