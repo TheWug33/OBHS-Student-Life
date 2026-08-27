@@ -548,10 +548,12 @@ img{max-width:100%;display:block;}
  <div class="portal-title">Student Hub</div>
  <div class="portal-links">
  <span class="portal-link">Club directory &amp; flyer generator</span>
- <span class="portal-link" id="portal-service">Community service hours</span>
+ <span class="portal-link">Class pages by grade</span>
+ <span class="portal-link">Event sign-ups</span>
  <span class="portal-link">Battle of the Classes <span style="opacity:.65">(spring sign-ups)</span></span>
- <span class="portal-link" id="portal-committees">Senior leadership committees</span>
- <span class="portal-link" id="portal-spirit-events">Event sign-ups &amp; spirit wear</span>
+ <span class="portal-link" id="portal-service" style="display:none">Community service hours</span>
+ <span class="portal-link" id="portal-committees" style="display:none">Senior leadership committees</span>
+ <span class="portal-link" id="portal-spirit" style="display:none">Spirit wear</span>
  </div>
  <span class="portal-cta">Enter Student Hub<span class="portal-cta-arrow">→</span></span>
  </button>
@@ -1314,14 +1316,14 @@ function applyComingSoonToggles(){
  soon.style.display = show ? 'none' : '';
  });
 
- // Homepage portal teaser bullets — keep the very first thing people see honest
- // about what's actually live right now, instead of a separate hand-edited copy.
+ // Homepage portal teaser bullets — only list a feature once it's actually live,
+ // instead of showing it with a "(coming soon)" note.
  const portalService = document.getElementById('portal-service');
- if(portalService) portalService.textContent = SHOW_COMMUNITY_SERVICE ? 'Community service hours' : 'Community service (coming soon)';
+ if(portalService) portalService.style.display = SHOW_COMMUNITY_SERVICE ? '' : 'none';
  const portalCommittees = document.getElementById('portal-committees');
- if(portalCommittees) portalCommittees.textContent = SHOW_COMMITTEES ? 'Senior leadership committees' : 'Leadership committees (coming soon)';
- const portalSpiritEvents = document.getElementById('portal-spirit-events');
- if(portalSpiritEvents) portalSpiritEvents.innerHTML = SHOW_SPIRIT_WEAR ? 'Event sign-ups &amp; spirit wear' : 'Event sign-ups &amp; spirit wear <span style="opacity:.65">(spirit wear soon)</span>';
+ if(portalCommittees) portalCommittees.style.display = SHOW_COMMITTEES ? '' : 'none';
+ const portalSpirit = document.getElementById('portal-spirit');
+ if(portalSpirit) portalSpirit.style.display = SHOW_SPIRIT_WEAR ? '' : 'none';
  const portalFieldtrip = document.getElementById('portal-fieldtrip');
  if(portalFieldtrip) portalFieldtrip.textContent = SHOW_ONLINE_FIELDTRIP_REQUEST ? 'Field trip & early dismissal forms' : 'Early dismissal forms & paper field trip requests';
 
