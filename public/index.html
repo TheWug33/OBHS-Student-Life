@@ -1596,7 +1596,8 @@ function renderStaffFresh(rows) {
  const sched = (fn, ms) => { window._staffFreshTimer = setTimeout(fn, ms); };
 
  function draw(it) {
- line.innerHTML = '<span class="fresh-textwrap"><span class="fresh-text-inner">' + it.html + '</span></span>';
+ line.innerHTML = '<span class="fresh-tag">Faculty Update</span>'
+ + '<span class="fresh-textwrap"><span class="fresh-text-inner">' + it.html + '</span></span>';
  }
 
  function step() {
