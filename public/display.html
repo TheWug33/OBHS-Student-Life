@@ -105,6 +105,10 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 /* ── Poster slide ── */
 .poster-wrap{height:100%;display:flex;align-items:center;justify-content:center;}
 .poster-wrap img{max-height:100%;max-width:100%;border-radius:16px;box-shadow:0 22px 70px rgba(0,0,0,0.6);}
+/* Two flyers side by side in one frame. Falls back to a single centered flyer
+   automatically when there's an odd one left over — the flex row just has one child. */
+.poster-pair{height:100%;width:100%;display:flex;align-items:center;justify-content:center;gap:48px;}
+.poster-pair .poster-wrap{flex:1 1 0;min-width:0;height:100%;}
 /* Removed: kotw phone-preview overrides — obsolete under the canvas-scaling
    approach (see note above). */
 </style>
@@ -350,7 +354,8 @@ async function loadData(){
  hasKotw=false;
  }
 
- // Club flyers — each approved flyer becomes its own slide
+ // Club flyers — pair them up two per slide, side by side. A trailing odd
+ // flyer just gets a slide to itself (the flex row centers a single child fine).
  document.querySelectorAll('.flyer-slide').forEach(el=>el.remove());
  flyerIds=[];
  const flyClean=fly.filter(r=>{
@@ -359,14 +364,16 @@ async function loadData(){
  return url.startsWith('http')&&approved&&(r.TITLE||'')!==''&&!(r.TITLE||'').includes('ADD');
  }).slice(0,8);
  const stage=document.querySelector('.stage');
- flyClean.forEach((r,i)=>{
+ for(let i=0;i<flyClean.length;i+=2){
+ const pair=flyClean.slice(i,i+2);
  const d=document.createElement('div');
  d.className='slide full-art flyer-slide';
- d.id='slide-flyer-'+i;
- d.innerHTML='<div class="poster-wrap"><img src="'+r.IMAGE_URL+'" alt="'+(r.TITLE||'Club flyer')+'"></div>';
+ d.id='slide-flyer-'+(i/2);
+ const imgs=pair.map(r=>'<div class="poster-wrap"><img src="'+r.IMAGE_URL+'" alt="'+(r.TITLE||'Club flyer')+'"></div>').join('');
+ d.innerHTML='<div class="poster-pair">'+imgs+'</div>';
  stage.appendChild(d);
  flyerIds.push(d.id);
- });
+ }
 
  rebuildSlides();
 
