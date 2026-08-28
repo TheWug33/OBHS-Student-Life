@@ -1465,6 +1465,12 @@ function go(id, btn) {
  if(id==='athletics'){
  try{loadAthletics();}catch(e){}
  }
+ if(id==='faculty' && !GIDS.facultybulletin.includes('_GID')){
+ // Restart the ticker now that the tab is actually visible and measurable —
+ // starting it while hidden (during initial load) permanently breaks its
+ // scroll-distance math since a hidden element always measures 0 width.
+ try{renderStaffFresh(window._lastFacultyBulletin||[]);}catch(e){}
+ }
 }
 
 // ── Sub-nav ──
@@ -2067,21 +2073,22 @@ async function load(){
  continue;
  }
  window._lastAnn=ann; window._lastEvt=evt; window._lastDates=dates; window._lastQL=ql;
+ window._lastFacultyBulletin=facultyBulletin;
  window._dataLoaded=true;
  // Hide flyers block gracefully if the tab isn't configured yet
  if (GIDS.flyers.includes('_GID')) {
  const fb = document.getElementById('flyers-block');
  if (fb) fb.style.display = 'none';
  }
- // Staff Bulletin — show nothing until GIDS.facultybulletin is configured
- try{
+ // Staff Bulletin — show nothing until GIDS.facultybulletin is configured.
+ // NOTE: we don't animate it here — the Faculty Hub tab is hidden at this point
+ // (Home is the default active page), and measuring a hidden element's width
+ // always returns 0, which breaks the scroll math permanently. The actual
+ // animation kicks off in go() once the tab is genuinely visible.
  if (GIDS.facultybulletin.includes('_GID')) {
  const sb = document.getElementById('staff-fresh-strip');
  if (sb) sb.style.display = 'none';
- } else {
- renderStaffFresh(facultyBulletin);
  }
- }catch(e){console.warn('[render] staff bulletin',e);}
  // Fresh strip: What's New + Lyric of the Week
  try{
  const lyricRows = GIDS.lyric && !GIDS.lyric.includes('_GID') ? await fetchTab(GIDS.lyric) : [];
