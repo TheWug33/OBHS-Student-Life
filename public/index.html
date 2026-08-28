@@ -1571,7 +1571,6 @@ function renderStaffFresh(rows) {
  if (!strip || !line) return;
  if (window._staffFreshTimer) clearTimeout(window._staffFreshTimer);
 
- const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const HOLD_FIT = 6500;
  const HOLD_EDGE = 1500;
  const SCROLL_SPEED = 45;
@@ -1581,7 +1580,7 @@ function renderStaffFresh(rows) {
  .slice(0, 8)
  .forEach(a => {
  const date = a['DATE'] || '';
- items.push({ tag: 'Staff Bulletin', html: a['TITLE'] + (date ? '<em>· ' + date + '</em>' : '') });
+ items.push({ html: a['TITLE'] + (date ? '<em>· ' + date + '</em>' : '') });
  });
 
  if (!items.length) { strip.style.display = 'none'; return; }
@@ -1591,8 +1590,7 @@ function renderStaffFresh(rows) {
  const sched = (fn, ms) => { window._staffFreshTimer = setTimeout(fn, ms); };
 
  function draw(it) {
- line.innerHTML = '<span class="fresh-tag">' + it.tag + '</span>'
- + '<span class="fresh-textwrap"><span class="fresh-text-inner">' + it.html + '</span></span>';
+ line.innerHTML = '<span class="fresh-textwrap"><span class="fresh-text-inner">' + it.html + '</span></span>';
  }
 
  function step() {
@@ -1601,7 +1599,9 @@ function renderStaffFresh(rows) {
  if (!inner || !wrap) return;
  const overflow = inner.scrollWidth - wrap.clientWidth;
 
- if (overflow > 8 && !reduceMotion) {
+ // Always scroll overflowing text horizontally here — this is a small internal
+ // strip, so we skip the reduced-motion ellipsis fallback the public ticker uses.
+ if (overflow > 8) {
  const dist = overflow + 16;
  const dur = Math.max(2, dist / SCROLL_SPEED);
  sched(() => {
@@ -1610,8 +1610,7 @@ function renderStaffFresh(rows) {
  sched(rollNext, dur * 1000 + HOLD_EDGE);
  }, HOLD_EDGE);
  } else {
- if (overflow > 8 && reduceMotion) inner.classList.add('ellip');
- if (items.length < 2 && overflow <= 8) return;
+ if (items.length < 2) return;
  sched(rollNext, HOLD_FIT);
  }
  }
