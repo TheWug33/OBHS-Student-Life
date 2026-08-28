@@ -1095,6 +1095,11 @@ img{max-width:100%;display:block;}
  </div>
 
  <div id="f-overview" class="subbody">
+ <div class="cs" id="staff-bulletin" style="margin-bottom:28px;">
+ <div class="cs-ttl">Staff Bulletin<span style="font-weight:300;letter-spacing:0;text-transform:none;font-family:'DM Sans';font-size:11px;color:var(--faint)">Faculty only</span></div>
+ <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">PLC schedules, department meetings, staff socials, and anything else just for OBHS staff.</p>
+ <div id="staff-bulletin-list"><p style="font-size:13px;color:var(--faint);padding:12px 0">Loading…</p></div>
+ </div>
  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;">I Want To&hellip;</div>
  <div class="feat">
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(2)'),'f-forms')"><div class="fc-ttl">Take my class or team off campus</div><div class="fc-dsc">Field trip requests, early dismissals, and the departure log — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Field Trips &amp; Dismissals</span></div>
@@ -1291,6 +1296,7 @@ const GIDS = {
  clubdetails: '1026862323',
   clubs: '1167760475',
   newclubs: '1905544186',
+ facultybulletin: 'FACULTY_BULLETIN_GID', // ← replace with the GID of a new "Faculty Bulletin" sheet tab when ready
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
 const SHOW_COMMUNITY_SERVICE = false; // ← set to true when online hour tracking goes live
@@ -1556,6 +1562,15 @@ function renderAnn(rows){
  const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD YOUR'));
  if(!clean.length){el.innerHTML='<p style="font-size:13px;color:var(--faint);padding:12px 0">No announcements right now.</p>';return;}
  el.innerHTML=clean.slice(0,3).map(r=>`<div class="ann"><div class="ann-dot" style="background:${dotC(r.TAG)};color:${dotC(r.TAG)}"></div><div class="ann-body"><div class="ann-t">${r.TITLE}</div><div class="ann-m">${r.DATE||''}${r.SOURCE?' · '+r.SOURCE:''}</div></div>${r.TAG?`<span class="ann-badge" style="${badgeS(r.TAG)}">${r.TAG}</span>`:''}</div>`).join('');
+}
+// Staff Bulletin — Faculty Hub only. Pulls from its own sheet tab (GIDS.facultybulletin),
+// completely separate from the public student-facing announcements above.
+function renderStaffBulletin(rows){
+ const el=document.getElementById('staff-bulletin-list');
+ if(!el) return;
+ const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD YOUR'));
+ if(!clean.length){el.innerHTML='<p style="font-size:13px;color:var(--faint);padding:12px 0">No staff announcements right now.</p>';return;}
+ el.innerHTML=clean.slice(0,6).map(r=>`<div class="ann"><div class="ann-dot" style="background:${dotC(r.TAG)};color:${dotC(r.TAG)}"></div><div class="ann-body"><div class="ann-t">${r.TITLE}</div><div class="ann-m">${r.DATE||''}${r.SOURCE?' · '+r.SOURCE:''}</div></div>${r.TAG?`<span class="ann-badge" style="${badgeS(r.TAG)}">${r.TAG}</span>`:''}</div>`).join('');
 }
 // Month name → number map for date comparison
 const MONTH_NUM={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
@@ -1978,12 +1993,13 @@ function renderFresh(ann, lyricRows) {
 
 async function load(){
  for(let attempt=1; attempt<=4; attempt++){
- const [ann,evt,dates,ql,flyers] = await Promise.all([
+ const [ann,evt,dates,ql,flyers,facultyBulletin] = await Promise.all([
  fetchTab(GIDS.announcements),
  fetchTab(GIDS.events),
  fetchTab(GIDS.dates),
  fetchTab(GIDS.quicklinks),
- GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([])
+ GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([]),
+ GIDS.facultybulletin!=='FACULTY_BULLETIN_GID' ? fetchTab(GIDS.facultybulletin) : Promise.resolve([])
  ]);
  const gotData = ann.length || evt.length || dates.length || ql.length;
  console.log('[Load] attempt='+attempt+' ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
@@ -1998,6 +2014,15 @@ async function load(){
  const fb = document.getElementById('flyers-block');
  if (fb) fb.style.display = 'none';
  }
+ // Staff Bulletin — show a "not set up yet" note until GIDS.facultybulletin is configured
+ try{
+ if (GIDS.facultybulletin.includes('_GID')) {
+ const sb = document.getElementById('staff-bulletin-list');
+ if (sb) sb.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Staff Bulletin isn\'t connected to a sheet yet.</p>';
+ } else {
+ renderStaffBulletin(facultyBulletin);
+ }
+ }catch(e){console.warn('[render] staff bulletin',e);}
  // Fresh strip: What's New + Lyric of the Week
  try{
  const lyricRows = GIDS.lyric && !GIDS.lyric.includes('_GID') ? await fetchTab(GIDS.lyric) : [];
