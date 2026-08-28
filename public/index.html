@@ -867,7 +867,7 @@ img{max-width:100%;display:block;}
  </div>
  <!-- Posts/Resources from Sheet -->
  <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
- <div id="cls-2027-posts" style="display:flex;flex-direction:column;gap:10px;">
+ <div id="cls-2027-posts" style="display:flex;flex-direction:column;gap:8px;">
  <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
  </div>
  </div>
@@ -895,7 +895,7 @@ img{max-width:100%;display:block;}
  </div>
  </div>
  <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
- <div id="cls-2028-posts" style="display:flex;flex-direction:column;gap:10px;">
+ <div id="cls-2028-posts" style="display:flex;flex-direction:column;gap:8px;">
  <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
  </div>
  </div>
@@ -923,7 +923,7 @@ img{max-width:100%;display:block;}
  </div>
  </div>
  <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
- <div id="cls-2029-posts" style="display:flex;flex-direction:column;gap:10px;">
+ <div id="cls-2029-posts" style="display:flex;flex-direction:column;gap:8px;">
  <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
  </div>
  </div>
@@ -950,7 +950,7 @@ img{max-width:100%;display:block;}
  </div>
  </div>
  <div class="blk-title" style="margin-bottom:12px;">Announcements &amp; Resources</div>
- <div id="cls-2030-posts" style="display:flex;flex-direction:column;gap:10px;">
+ <div id="cls-2030-posts" style="display:flex;flex-direction:column;gap:8px;">
  <div style="font-size:13px;color:var(--faint);padding:20px 0;">Loading class posts…</div>
  </div>
  </div>
@@ -2411,7 +2411,7 @@ function clsRenderPosts(yr, rows) {
  const link = r['LINK'] || r['Link'] || r['link'] || r['URL'] || r['Url'] || '';
  const type = (r['TYPE'] || r['Type'] || r['type'] || 'post').toLowerCase();
  const icon = type.includes('event') ? '' : type.includes('resource') ? '' : type.includes('form') ? '' : '';
- return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;transition:border-color .2s;" class="cls-post-card">'
+ return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;transition:border-color .2s;" class="cls-post-card">'
  + '<div style="display:flex;align-items:flex-start;gap:12px;">'
  + '<span style="font-size:18px;flex-shrink:0;margin-top:2px;">' + icon + '</span>'
  + '<div style="flex:1;min-width:0;">'
