@@ -262,6 +262,8 @@ img{max-width:100%;display:block;}
 .info{background:linear-gradient(150deg,#392478,#1C1040);border:1px solid var(--line-bright);border-radius:11px;padding:13px 16px;margin-bottom:16px;}
 .info-t{font-size:12.5px;font-weight:600;color:var(--silver);margin-bottom:4px;}
 .info-d{font-size:11.5px;color:var(--muted);line-height:1.55;}
+.src-meta{font-size:10.5px;color:var(--faint);letter-spacing:.02em;margin:-10px 0 18px;line-height:1.7;}
+.src-meta b{color:var(--muted);font-weight:600;}
 
 /* Committee tiles */
 .comm{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
@@ -1114,6 +1116,7 @@ img{max-width:100%;display:block;}
  <div class="two">
  <div class="cs">
  <div class="cs-ttl">Field Trip Request</div>
+ <div class="src-meta"><b>Last updated</b> Aug 2026 · <b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="info"><div class="info-t">Submit six (6) weeks in advance</div><div class="info-d">All field trip requests must be submitted six weeks before the trip date. Incomplete requests will be returned and could delay approval.</div></div>
  <div class="flr" id="ft-request-live" style="display:none" onclick="window.open(FIELDTRIP_URL,'_blank')"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Microsoft Form · sign in with your obps.org account · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  <div class="flr" id="ft-request-paper" style="opacity:0.85;cursor:default"><div><div class="flr-t">Submit a field trip request</div><div class="flr-d">Paper copy only for now — pick up a form and submit through the Main Office. They'll date-stamp it as received.</div></div></div>
@@ -1121,6 +1124,7 @@ img{max-width:100%;display:block;}
  </div>
  <div class="cs">
  <div class="cs-ttl">Early Dismissal</div>
+ <div class="src-meta"><b>Last updated</b> Aug 2026 · <b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="info"><div class="info-t">Submit at least 48 hours in advance</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
  <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 48 hours in advance and approved before communicating to students or parents.</div></div></div>
@@ -1131,6 +1135,7 @@ img{max-width:100%;display:block;}
  <div id="f-departure" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Field Trip &amp; Departure Log</div>
+ <div class="src-meta"><b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
  <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time — appears in "Leaving Today" below right after you submit</div></div><div class="flr-arr">→</div></div>
 
@@ -1152,15 +1157,21 @@ img{max-width:100%;display:block;}
  <div id="f-clubs" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Club Advisor Resources</div>
+ <div class="src-meta"><b>Last updated</b> Aug 2026 · <b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="info"><div class="info-t">Everything you need to run a club at OBHS</div><div class="info-d">Guides, forms, and templates for advising a student organization — from day-to-day meetings to funding to end-of-year wrap-up.</div></div>
 
+ <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:24px 0 10px;">Before the School Year</div>
  <div class="flr" onclick="openHandbook()"><div><div class="flr-t">Club Advisor Handbook</div><div class="flr-d">Your comprehensive guide to advising a student organization</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openNewClub('faculty')"><div><div class="flr-t">Start a New Club</div><div class="flr-d">Review the approval process and application requirements</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openEoy()"><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
- <div class="flr" onclick="openClubDetailsSubmit()"><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — submissions are reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openClubDetailsSubmit()"><div><div class="flr-t">Add/update your club's public page</div><div class="flr-d">Description, meeting info & Instagram — can be updated anytime, reviewed by Student Life before going live</div></div><div class="flr-arr">→</div></div>
+
+ <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:26px 0 10px;">During the Year</div>
+ <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openFlyerSubmit()"><div><div class="flr-t">Submit a Flyer</div><div class="flr-d">Get your club's flyer featured on the homepage and TV displays</div></div><div class="flr-arr">→</div></div>
+
+ <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:26px 0 10px;">End of Year</div>
+ <div class="flr" onclick="openEoy()"><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
  </div>
  </div>
 
@@ -1168,6 +1179,7 @@ img{max-width:100%;display:block;}
  <div id="f-events" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Submit an Event / Meeting</div>
+ <div class="src-meta"><b>Last updated</b> Aug 2026 · <b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="info"><div class="info-t">For school meetings, assemblies, and events — during the school day or after</div><div class="info-d">Use this form for assemblies, meetings, or activities happening during the school day or after school hours. Not for field trips (students leaving the building) — use the Field Trip Request for those.</div></div>
  <div class="flr" onclick="window.open(EVT_URL,'_blank')"><div><div class="flr-t">Submit an event / meeting</div><div class="flr-d">During school or after — assemblies, meetings, activities · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  
@@ -1178,6 +1190,7 @@ img{max-width:100%;display:block;}
  <div id="f-helpdesk" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Help Desk</div>
+ <div class="src-meta"><b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <div class="flr" onclick="window.open(IT_URL,'_blank')"><div><div class="flr-t">Submit an IT work order</div><div class="flr-d">Hardware, software, network issues</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="window.open(ABSENCE_URL,'_blank')"><div><div class="flr-t">Request a day off</div><div class="flr-d">Sick, personal, or professional day (Frontline)</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="window.open(PHONE_MANUAL_URL,'_blank')"><div><div class="flr-t">Phone System Manual</div><div class="flr-d">How to use your classroom/office phone</div></div><div class="flr-arr">→</div></div>
@@ -1191,6 +1204,7 @@ img{max-width:100%;display:block;}
  <div id="f-docs" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Document Library</div>
+ <div class="src-meta"><b>Last updated</b> Aug 2026 · <b>Owner</b> Student Life Office · <b>Questions</b> Scott Beverly, Room 845</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">All standard Student Life forms and policy documents in one place. Click any document to open or download.</p>
  <div class="flr" onclick="openFlyerSubmit()"><div><div class="flr-t">Submit a Flyer</div><div class="flr-d">Get your flyer featured on the homepage and TV displays</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openBellSchedule()"><div><div class="flr-t">Bell Schedules</div><div class="flr-d">Full day, delayed opening, and half day &mdash; new for 2026&ndash;27</div></div><div class="flr-arr">→</div></div>
