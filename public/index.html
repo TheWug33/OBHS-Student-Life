@@ -564,8 +564,7 @@ img{max-width:100%;display:block;}
  <span class="portal-link">Club directory &amp; flyer generator</span>
  <span class="portal-link">Class pages by grade</span>
  <span class="portal-link">Event sign-ups</span>
- <span class="portal-link">Battle of the Classes <span style="opacity:.65">(spring sign-ups)</span></span>
- <span class="portal-link" id="portal-service" style="display:none">Community service hours</span>
+ <span class="portal-link" id="portal-service" style="display:none">Community service ideas &amp; opportunities</span>
  <span class="portal-link" id="portal-committees" style="display:none">Senior leadership committees</span>
  <span class="portal-link" id="portal-spirit" style="display:none">Spirit wear</span>
  </div>
@@ -670,9 +669,9 @@ img{max-width:100%;display:block;}
  <button class="sn" onclick="ssub(this,'s-classes')">Class Pages</button>
  <button class="sn" onclick="window.open('https://knightlifeob.com','_blank')">Knight Life</button>
  <button class="sn" onclick="ssub(this,'s-events')">Events &amp; Sign-Ups</button>
+ <button class="sn" onclick="ssub(this,'s-service')">Community Service</button>
  <button class="sn" onclick="ssub(this,'s-botc')">Battle of the Classes</button>
  <button class="sn" onclick="ssub(this,'s-spirit')">Spirit Wear</button>
- <button class="sn" onclick="ssub(this,'s-service')">Community Service</button>
  <button class="sn" onclick="ssub(this,'s-committees')">Committees</button>
  </div>
 
@@ -695,12 +694,12 @@ img{max-width:100%;display:block;}
 <div class="fc" onclick="openBellSchedule()"><div class="fc-ttl">Bell Schedules</div><div class="fc-dsc">Full day, delayed opening, and half day — new for 2026&ndash;27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New this year</span></div>
 <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(3)'),'s-classes')"><div class="fc-ttl">Class Pages</div><div class="fc-dsc">News, events, and resources from your Class Advisors — Class of 2027, 2028, 2029 &amp; 2030.</div></div>
  <div class="fc" onclick="window.open('https://knightlifeob.com','_blank')"><div class="fc-ttl">Knight Life</div><div class="fc-dsc">Read the latest news, features, and stories from OBHS's student newspaper.</div></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-service')" id="ov-service-card" style="display:none"><div class="fc-ttl">Community Service</div><div class="fc-dsc">Online hour tracking is coming soon — check back once it's live.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-service')" id="ov-service-card"><div class="fc-ttl">Community Service</div><div class="fc-dsc">What counts, ideas to get started, and real volunteer opportunities near you.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Get Involved</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(2)'),'s-clubs')"><div class="fc-ttl">Club Hub</div><div class="fc-dsc">Find your club, generate a flyer, or submit a new club for Student Life approval.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">70+ clubs</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(9)'),'s-committees')" id="ov-committees-card" style="display:none"><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Committee sign-ups are coming soon — check back for details.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(5)'),'s-events')"><div class="fc-ttl">Event Sign-Ups</div><div class="fc-dsc">Register for school events, dances, and activities — no Main Office trip needed.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New flow</span></div>
- <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')" id="ov-spirit-card" style="display:none"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-spirit')" id="ov-spirit-card" style="display:none"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  </div>
 
  <!-- CLASS CUP -->
@@ -726,17 +725,10 @@ img{max-width:100%;display:block;}
  <div class="cs-ttl">Leadership Committees</div>
  <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Committee sign-ups for 2026–27 aren't open yet — check back soon.</div></div>
  </div>
- <div class="cs" id="cs-preview-live" style="display:none">
+ <div class="cs" id="cs-preview-live">
  <div class="cs-ttl">Community Service</div>
- <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span>onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Complete hours at any district-approved organization and submit your verification form here.</div></div>
- <div class="flr" onclick="window.open(CS_URL,'_blank')"><div><div class="flr-t">Submit service hours</div><div class="flr-d">Upload verification &amp; log hours</div></div><div class="flr-arr">→</div></div>
- <div class="flr"><div><div class="flr-t">View my hours</div><div class="flr-d">Check your running total</div></div><div class="flr-arr">→</div></div>
- <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Approved organizations list</div><div class="flr-d">Any 501(c)(3) or district-approved organization qualifies. Not sure if yours counts? Ask Mr. Beverly in Room 845.</div></div></div>
- </div>
- <div class="cs" id="cs-preview-soon">
- <div class="cs-ttl">Community Service</div>
- <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Online hour tracking and verification submission aren't live yet — check back once it's ready.</div></div>
- <div class="flr" style="opacity:0.5;cursor:default"><div><div class="flr-t">Submit &amp; track service hours</div><div class="flr-d">Coming soon</div></div><div class="flr-arr" style="font-size:10px">SOON</div></div>
+ <div class="info"><div class="info-t">What counts, ideas to get started</div><div class="info-d">Community service isn't required at OBHS, but colleges and scholarships often look for it — and it's a good way to give back. Browse ideas and real opportunities below.</div></div>
+ <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-service')"><div><div class="flr-t">What is community service?</div><div class="flr-d">Examples of what counts, and how to find something you care about</div></div><div class="flr-arr">→</div></div>
  </div>
  </div>
  </div>
@@ -971,29 +963,26 @@ img{max-width:100%;display:block;}
  <div id="s-service" class="subbody" style="display:none">
  <div class="cs" id="s-service-soon" style="max-width:560px">
  <div class="cs-ttl">Community Service</div>
- <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Online hour logging and verification submission aren't available yet. We'll post sign-up details here once it's ready — hours info in the meantime is available from Student Life, Room 845.</div></div>
+ <div class="info"><div class="info-t">Coming soon</div><div class="info-d">This page isn\'t ready yet — check back soon.</div></div>
  </div>
- <div class="two" id="s-service-live" style="display:none">
+ <div id="s-service-live" style="display:none">
  <div class="cs">
- <div class="cs-ttl">Submit Your Hours</div>
- <div class="info"><div class="info-t"><span class="cs-class-start">Class of 2030</span>onward — <span class="cs-hours">10 hrs</span>/year required</div><div class="info-d">Phase-in begins with the Class of 2030. Complete hours at any district-approved organization and submit verification within 2 weeks.</div></div>
- <div class="flr" onclick="window.open(CS_URL,'_blank')"><div><div class="flr-t">Submit service hours form</div><div class="flr-d">Upload your supervisor verification</div></div><div class="flr-arr">→</div></div>
- <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">View my running total</div><div class="flr-d">Hours are tracked by Student Life. Stop by Room 845 anytime for your current total.</div></div></div>
- <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Recognition &amp; cords</div><div class="flr-d">Students exceeding hours earn recognition at Senior Awards Night</div></div></div>
- </div>
- <div class="cs">
- <div class="cs-ttl">What Counts as Service?</div>
- <div style="font-size:13px;color:var(--muted);line-height:1.7">
- <p style="margin-bottom:8px">Service hours must be completed at a<strong style="color:#fff">district-approved organization</strong>. Students may also propose an independent opportunity for approval.</p>
- <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>School-sponsored volunteer events</div>
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>Food banks &amp; community pantries</div>
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>Environmental cleanups</div>
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>Tutoring &amp; mentoring programs</div>
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>Animal shelters</div>
- <div style="display:flex;align-items:center;gap:9px;font-size:12px"><span></span>Senior care facilities</div>
+ <div class="cs-ttl">What Is Community Service?</div>
+ <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px">Community service is volunteer work you do to help your school or community — no pay, just giving your time. It\'s not required at OBHS, but colleges and scholarships often look for it, and it\'s a genuinely good way to build skills and give back.</p>
+ <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:18px 0 10px;">Ideas to Get Started</div>
+ <div style="display:flex;flex-direction:column;gap:7px;">
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>School-sponsored volunteer events</div>
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>Food banks &amp; community pantries</div>
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>Environmental cleanups</div>
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>Tutoring &amp; mentoring programs</div>
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>Animal shelters</div>
+ <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)"><span></span>Senior care facilities</div>
  </div>
  </div>
+ <div class="cs" style="margin-top:24px;">
+ <div class="cs-ttl">Current Opportunities</div>
+ <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6">Real local organizations looking for volunteers — tap one to learn more.</p>
+ <div id="service-opps-list"><div style="font-size:13px;color:var(--faint);padding:8px 0;">Loading…</div></div>
  </div>
  </div>
  </div>
@@ -1003,7 +992,7 @@ img{max-width:100%;display:block;}
  <div class="cs-ttl">Event Sign-Ups</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6">Register for school events right here in Student Life — no trip to the Main Office needed. Sign-ups open when each event is announced.</p>
  <div class="flr" style="opacity:0.5;cursor:default"><div><div class="flr-t">Upcoming event sign-ups</div><div class="flr-d">Sign-ups posted here when available</div></div><div class="flr-arr" style="font-size:10px">TBA</div></div>
- <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div><div class="flr-t">Battle of the Classes</div><div class="flr-d">View class sign-ups &amp; payment info</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-botc')"><div><div class="flr-t">Battle of the Classes</div><div class="flr-d">View class sign-ups &amp; payment info</div></div><div class="flr-arr">→</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Senior events</div><div class="flr-d">Senior tailgate, awards night, parking passes</div></div></div>
  </div>
  </div>
@@ -1321,9 +1310,10 @@ const GIDS = {
   clubs: '1167760475',
   newclubs: '1905544186',
  facultybulletin: '931535024', // Faculty Bulletin — Faculty Hub only, separate from student announcements
+ serviceopps: 'SERVICE_OPPS_GID', // ← replace with the GID of a "Community Service Opportunities" sheet tab
 };
 const SHOW_CLASS_CUP = false; // ← set to true to bring the Class Cup back
-const SHOW_COMMUNITY_SERVICE = false; // ← set to true when online hour tracking goes live
+const SHOW_COMMUNITY_SERVICE = true; // Informational hub — always on, no hour tracking
 const SHOW_SPIRIT_WEAR = false; // ← set to true when online spirit wear ordering goes live
 const SHOW_ONLINE_FIELDTRIP_REQUEST = false; // ← set to true when the online field trip form is back in use
 const SHOW_COMMITTEES = false; // ← set to true when committee sign-ups open
@@ -1332,7 +1322,6 @@ const SHOW_COMMITTEES = false; // ← set to true when committee sign-ups open
 // No other code changes needed — just flip a flag and redeploy when a feature is ready.
 function applyComingSoonToggles(){
  const pairs = [
- ['cs-preview-live','cs-preview-soon', SHOW_COMMUNITY_SERVICE],
  ['s-service-live','s-service-soon', SHOW_COMMUNITY_SERVICE],
  ['s-spirit-live','s-spirit-soon', SHOW_SPIRIT_WEAR],
  ['ft-request-live','ft-request-paper', SHOW_ONLINE_FIELDTRIP_REQUEST],
@@ -1596,6 +1585,32 @@ function renderAnn(rows){
 // Staff Bulletin — Faculty Hub only, single-line scrolling ticker (same mechanics as
 // the public "What's New" strip above). Pulls from its own sheet tab (GIDS.facultybulletin),
 // completely separate from the public student-facing announcements.
+// Community Service opportunities — a simple browsable list, sourced from its own
+// sheet tab (GIDS.serviceopps). Expected columns: TITLE, ORG, DATE, DESCRIPTION, LINK.
+function renderServiceOpps(rows){
+ const el = document.getElementById('service-opps-list');
+ if(!el) return;
+ const clean = (rows||[]).filter(r=>(r['TITLE']||'').trim() && !(r['TITLE']||'').includes('ADD YOUR'));
+ if(!clean.length){
+ el.innerHTML = '<div style="font-size:13px;color:var(--faint);padding:8px 0;">No opportunities posted right now — check back soon, or ask Student Life about local organizations looking for volunteers.</div>';
+ return;
+ }
+ el.innerHTML = clean.map(r=>{
+ const title = r['TITLE']||'';
+ const org = r['ORG']||'';
+ const date = r['DATE']||'';
+ const desc = r['DESCRIPTION']||'';
+ const link = r['LINK']||'';
+ const meta = [org, date].filter(Boolean).join(' · ');
+ const body = '<div><div class="flr-t">' + title + '</div>'
+ + (meta ? '<div class="flr-d">' + meta + '</div>' : '')
+ + (desc ? '<div class="flr-d" style="margin-top:2px;">' + desc + '</div>' : '')
+ + '</div>';
+ return link
+ ? '<div class="flr" onclick="window.open(\'' + link + '\',\'_blank\')">' + body + '<div class="flr-arr">→</div></div>'
+ : '<div class="flr" style="cursor:default">' + body + '</div>';
+ }).join('');
+}
 function renderStaffFresh(rows) {
  const strip = document.getElementById('staff-fresh-strip');
  const line = document.getElementById('staff-fresh-line');
@@ -2084,13 +2099,14 @@ function renderFresh(ann, lyricRows) {
 
 async function load(){
  for(let attempt=1; attempt<=4; attempt++){
- const [ann,evt,dates,ql,flyers,facultyBulletin] = await Promise.all([
+ const [ann,evt,dates,ql,flyers,facultyBulletin,serviceOpps] = await Promise.all([
  fetchTab(GIDS.announcements),
  fetchTab(GIDS.events),
  fetchTab(GIDS.dates),
  fetchTab(GIDS.quicklinks),
  GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([]),
- GIDS.facultybulletin!=='FACULTY_BULLETIN_GID' ? fetchTab(GIDS.facultybulletin) : Promise.resolve([])
+ GIDS.facultybulletin!=='FACULTY_BULLETIN_GID' ? fetchTab(GIDS.facultybulletin) : Promise.resolve([]),
+ GIDS.serviceopps!=='SERVICE_OPPS_GID' ? fetchTab(GIDS.serviceopps) : Promise.resolve([])
  ]);
  const gotData = ann.length || evt.length || dates.length || ql.length;
  console.log('[Load] attempt='+attempt+' ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
@@ -2106,6 +2122,8 @@ async function load(){
  const fb = document.getElementById('flyers-block');
  if (fb) fb.style.display = 'none';
  }
+ // Community Service opportunities — informational listing, not tied to any toggle
+ try{ renderServiceOpps(serviceOpps); }catch(e){console.warn('[render] service opps',e);}
  // Staff Bulletin — show nothing until GIDS.facultybulletin is configured.
  // NOTE: we don't animate it here — the Faculty Hub tab is hidden at this point
  // (Home is the default active page), and measuring a hidden element's width
@@ -2324,7 +2342,7 @@ async function chLoadClubs() {
 
 
 // Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
-const sPages = ['s-overview','s-clubs','s-classes','s-events','s-botc','s-spirit','s-service','s-committees'];
+const sPages = ['s-overview','s-clubs','s-classes','s-events','s-service','s-botc','s-spirit','s-committees'];
 const fPages = ['f-overview','f-forms','f-departure','f-clubs','f-events','f-helpdesk','f-docs'];
 
 function ssub(btn, id) {
