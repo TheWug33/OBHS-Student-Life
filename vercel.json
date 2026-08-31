@@ -1,5 +1,9 @@
 {
   "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/faculty", "destination": "/faculty.html" },
+    { "source": "/faculty/:path*", "destination": "/faculty.html" }
+  ],
   "headers": [
     {
       "source": "/display.html",
