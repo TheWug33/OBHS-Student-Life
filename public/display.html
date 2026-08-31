@@ -296,7 +296,7 @@ async function loadData(){
 
  // Events
  const today=new Date();today.setHours(0,0,0,0);
- const upcoming=evt.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.DAY&&r.DAY!=='0').map(r=>{
+ const upcoming=evt.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.DAY&&r.DAY!=='0'&&/^y/i.test((r.APPROVED||'').trim())).map(r=>{
  const rawDay=(r.DAY||'').toString().trim();
  const dy=rawDay.includes('/')?parseInt(rawDay.split('/')[1]):parseInt(rawDay)||1;
  let mo=(r.MONTH||'').toString().trim().toUpperCase().slice(0,3);
