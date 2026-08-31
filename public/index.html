@@ -1161,6 +1161,7 @@ img{max-width:100%;display:block;}
  <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:26px 0 10px;">During the Year</div>
  <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openResourceLink(BUDGET_URL,'Budget & Purchasing')"><div><div class="flr-t">Budget &amp; Purchasing</div><div class="flr-d">Learn how to request funding and make purchases</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openDepositGuide()"><div><div class="flr-t">Deposits &amp; Check Requests</div><div class="flr-d">How to submit a deposit or request a check — step by step</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openFlyerSubmit()"><div><div class="flr-t">Submit a Flyer</div><div class="flr-d">Get your club's flyer featured on the homepage and TV displays</div></div><div class="flr-arr">→</div></div>
 
  <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:26px 0 10px;">End of Year</div>
@@ -1698,6 +1699,13 @@ function renderEv(rows){
  const el=document.getElementById('ev-list');
  const today=new Date(); today.setHours(0,0,0,0);
  const currentYear=today.getFullYear();
+ // Anchor event years to a fixed school-year reference (Aug–Dec = school-year-
+ // start year, Jan–Jul = start year + 1) instead of comparing each event's
+ // same-year date against "today." The old dynamic comparison was the bug:
+ // once "today" moved past a one-time event's date, it assumed that must mean
+ // the event belongs to NEXT year and wrongly resurrected it at the bottom of
+ // the list, instead of just letting the existing "past events" filter drop it.
+ const schoolYearStartYear = today.getMonth() >= 7 ? currentYear : currentYear - 1;
 
  // Filter: real rows only, not placeholder, and must be approved by Student Life
  const clean=rows.filter(r=>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY!=='0'
@@ -1717,13 +1725,8 @@ function renderEv(rows){
  rawMonth = Object.keys(MONTH_NUM).find(k =>MONTH_NUM[k] === mNum) || '';
  }
  const mo = MONTH_NUM[rawMonth];
- let yr = currentYear;
  if(mo !== undefined){
- const evDate = new Date(yr, mo, dy);
- // Only push to next year if event was more than 1 day ago
- // This prevents yesterday's events from wrapping to next year
- const oneDayAgo = new Date(today); oneDayAgo.setDate(oneDayAgo.getDate() - 1);
- if(evDate< oneDayAgo) yr = currentYear + 1;
+ const yr = mo >= 7 ? schoolYearStartYear : schoolYearStartYear + 1;
  r._date = new Date(yr, mo, dy);
  // Fix display values in case they came in wrong
  if(!r.MONTH || r.MONTH.includes('/')) r.MONTH = rawMonth.slice(0,6);
@@ -2763,16 +2766,15 @@ async function loadAthletics() {
  try {
  const rows = await fetchTab(GIDS.athletics);
  const today = new Date(); today.setHours(0,0,0,0);
- const oneDayAgo = new Date(today.getTime() - 86400000);
+ // Same fixed school-year anchor as renderEv — see the comment there for why.
+ const athSchoolYearStartYear = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear() - 1;
  const clean = rows.filter(r =>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
  const rawDay = (r.DAY||'').toString().trim();
  const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
  let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
  const mo = MONTH_NUM[rawMonth.slice(0,3)];
- let yr = today.getFullYear();
  if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
- let evDate = new Date(yr, mo, dy);
- if (evDate< oneDayAgo) yr = today.getFullYear() + 1;
+ const yr = mo >= 7 ? athSchoolYearStartYear : athSchoolYearStartYear + 1;
  r._date = new Date(yr, mo, dy);
  r.MONTH = rawMonth.slice(0,3);
  r.DAY = String(dy);
@@ -3446,16 +3448,15 @@ async function openSchedule() {
  try {
  const rows = await fetchTab(GIDS.athletics);
  const today = new Date(); today.setHours(0,0,0,0);
- const oneDayAgo = new Date(today.getTime() - 86400000);
+ // Same fixed school-year anchor as renderEv — see the comment there for why.
+ const schedSchoolYearStartYear = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear() - 1;
  const clean = rows.filter(r =>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
  const rawDay = (r.DAY||'').toString().trim();
  const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
  let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
  const mo = MONTH_NUM[rawMonth.slice(0,3)];
- let yr = today.getFullYear();
  if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
- let evDate = new Date(yr, mo, dy);
- if (evDate< oneDayAgo) yr = today.getFullYear() + 1;
+ const yr = mo >= 7 ? schedSchoolYearStartYear : schedSchoolYearStartYear + 1;
  r._date = new Date(yr, mo, dy);
  r.MONTH = rawMonth.slice(0,3);
  r.DAY = String(dy);
@@ -3703,6 +3704,14 @@ function openFtInstructions() {
 }
 function closeFtInstructions() {
   document.getElementById('ft-instructions-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function openDepositGuide() {
+  document.getElementById('deposit-guide-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeDepositGuide() {
+  document.getElementById('deposit-guide-modal').style.display = 'none';
   document.body.style.overflow = '';
 }
 
@@ -3967,6 +3976,41 @@ observeReveal();
 
     <div style="background:rgba(224,160,48,0.15);border:1px solid #E0A030;border-radius:14px;padding:18px 20px;">
       <p style="font-size:14px;color:#F0C878;line-height:1.6;margin:0;font-weight:700;text-align:center;">Incomplete field trip requests will be returned and could delay approval.</p>
+    </div>
+
+  </div>
+</div>
+
+<div id="deposit-guide-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:640px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeDepositGuide()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge High School</div>
+      <h2 class="cal-modal-ttl">Deposits &amp; Check Requests</h2>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Making a Deposit</div>
+      <ol style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Complete the approved deposit form</li>
+        <li>When submitting cash, make sure it's all facing the same direction</li>
+        <li>When submitting checks, write each one individually on the form — if submitting more than 10 checks, attach a separate list</li>
+        <li>All change will be counted by the change machine in Amboy</li>
+      </ol>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Requesting a Check</div>
+      <ol style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Complete the check request form — attach all invoices and/or receipts</li>
+        <li>Submit the request to <strong style="color:var(--silver)">Lori Obdyke</strong> via mailbox</li>
+        <li>Once administration approves the request, the check will be written and submitted for signatures</li>
+        <li>Please allow 2–3 days for this process</li>
+      </ol>
+    </div>
+
+    <div style="background:rgba(224,160,48,0.15);border:1px solid #E0A030;border-radius:14px;padding:18px 20px;">
+      <p style="font-size:13.5px;color:#F0C878;line-height:1.6;margin:0;text-align:center;">Deposit slips and check request forms can be found in the main office, in the drawer closest to the mailboxes. Any questions, don't hesitate to ask — <strong>Lori Obdyke</strong>.</p>
     </div>
 
   </div>
