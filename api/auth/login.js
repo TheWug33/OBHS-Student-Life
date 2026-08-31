@@ -15,6 +15,15 @@
 
 import { createSessionCookie } from '../../lib/session.js';
 
+// Without this, Vercel runs this file as a classic Node.js function,
+// which expects a different, older-style set of arguments than the
+// modern Request/Response API this file actually uses below — that
+// mismatch is what caused the crash. This line tells Vercel to run
+// it the same way middleware.js already runs: as an Edge Function.
+export const config = {
+  runtime: 'edge',
+};
+
 export default async function handler(request) {
   const url = new URL(request.url);
 
