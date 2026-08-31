@@ -3757,6 +3757,196 @@ observeReveal();
  </div>
 </div>
 
+<div id="cal-choice-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);width:100%;box-shadow:0 24px 70px rgba(0,0,0,0.6);position:relative;">
+    <button onclick="closeCalChoice()" class="cal-modal-x" aria-label="Close" style="position:absolute;top:-14px;right:-14px;">✕</button>
+    <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">Link to My Calendar</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.6;">Choose your calendar app for the smoothest setup.</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <button onclick="linkAppleCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">iPhone / iPad / Mac Calendar</button>
+      <button onclick="linkGoogleCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Google Calendar</button>
+      <button onclick="linkOutlookCalendar()" style="width:100%;text-align:left;background:rgba(199,201,209,0.08);border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Outlook</button>
+      <button onclick="linkCopyOnly()" style="width:100%;text-align:left;background:none;border:1px solid var(--line);padding:13px 16px;border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Just copy the link</button>
+    </div>
+  </div>
+</div>
+
+<div id="info-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
+ <div style="background:var(--card-solid);border:1px solid var(--line-bright);border-radius:16px;padding:26px 24px;max-width:min(90vw,420px);box-shadow:0 24px 70px rgba(0,0,0,0.6);">
+ <div id="info-modal-body" style="font-size:14px;color:var(--silver);line-height:1.7;white-space:pre-line;margin-bottom:18px;"></div>
+ <button onclick="closeInfoModal()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:11px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Got it</button>
+ </div>
+</div>
+
+<div id="club-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+ <div style="max-width:560px;margin:0 auto;position:relative;">
+ <button onclick="closeClubModal()" class="cal-modal-x" aria-label="Close">✕</button>
+ <div id="club-modal-body"></div>
+ </div>
+</div>
+
+<!-- Full Athletics Schedule Modal -->
+<div id="schedule-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+ <div style="max-width:720px;margin:0 auto;">
+ <div class="cal-modal-head">
+ <button onclick="closeSchedule()" class="cal-modal-x" aria-label="Close">✕</button>
+ <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+ <h2 class="cal-modal-ttl">Full Fall Schedule</h2>
+ </div>
+ <div id="schedule-list"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
+ </div>
+</div>
+
+<!-- Physical Information Modal -->
+<!-- Field Trip Submission Instructions Modal -->
+<div id="ft-instructions-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:640px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeFtInstructions()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge High School</div>
+      <h2 class="cal-modal-ttl">Field Trip Submission Instructions</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Submission Deadline</div>
+      <p style="font-size:15px;color:#fff;line-height:1.6;margin:0;font-weight:600;">All field trip requests must be submitted <u>six (6) weeks in advance</u> of the trip date.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Before Submitting, Make Sure You Include</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Completed Field Trip Authorization Form</li>
+        <li>Tentative student roster with each student's full name, ID number, and grade</li>
+        <li>All staff members attending the trip are listed</li>
+        <li>Substitute/coverage needs are indicated, if applicable</li>
+        <li>Supervisor/Director signature has been obtained</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Day of the Trip</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Updated/final student roster goes to <strong style="color:var(--silver)">Maria DelPino</strong>, the nurse, and <strong style="color:var(--silver)">Marilyn Zino</strong> (attendance)</li>
+        <li>Roster includes: student full name, student ID number, and grade</li>
+        <li>Roster must reflect actual attendance for that day</li>
+        <li>Students must report to first period for attendance before departing for the trip</li>
+      </ul>
+    </div>
+
+    <div style="background:rgba(224,160,48,0.15);border:1px solid #E0A030;border-radius:14px;padding:18px 20px;">
+      <p style="font-size:14px;color:#F0C878;line-height:1.6;margin:0;font-weight:700;text-align:center;">Incomplete field trip requests will be returned and could delay approval.</p>
+    </div>
+
+  </div>
+</div>
+
+<div id="deposit-guide-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:640px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeDepositGuide()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge High School</div>
+      <h2 class="cal-modal-ttl">Deposits &amp; Check Requests</h2>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Making a Deposit</div>
+      <ol style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Complete the approved deposit form</li>
+        <li>When submitting cash, make sure it's all facing the same direction</li>
+        <li>When submitting checks, write each one individually on the form — if submitting more than 10 checks, attach a separate list. All checks must be made out to <strong style="color:var(--silver)">Old Bridge High School</strong></li>
+        <li>All change will be counted by the change machine in Amboy</li>
+      </ol>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:12px;">Requesting a Check</div>
+      <ol style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Complete the check request form — attach all invoices and/or receipts</li>
+        <li>Submit the request to <strong style="color:var(--silver)">Lori Obdyke</strong> via mailbox</li>
+        <li>Once administration approves the request, the check will be written and submitted for signatures</li>
+        <li>Please allow 2–3 days for this process</li>
+      </ol>
+    </div>
+
+    <div style="background:rgba(224,160,48,0.15);border:1px solid #E0A030;border-radius:14px;padding:18px 20px;">
+      <p style="font-size:13.5px;color:#F0C878;line-height:1.6;margin:0;text-align:center;">Deposit slips and check request forms can be found in the main office, in the drawer closest to the mailboxes. Any questions, don't hesitate to ask — <strong>Lori Obdyke</strong>.</p>
+    </div>
+
+  </div>
+</div>
+
+<div id="physical-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closePhysicals()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">Old Bridge Public Schools</div>
+      <h2 class="cal-modal-ttl">Physical Information</h2>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">Trying Out for a Fall Sport?</div>
+      <p style="font-size:14px;color:var(--silver);line-height:1.7;margin:0;">Every athlete &mdash; middle school or high school &mdash; needs a cleared physical on file before tryouts. <strong style="color:#fff">There are no exceptions.</strong> Physicals are valid for 365 days from the date the physician performs the exam.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Your Physical Must Not Expire Before</div>
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+          <span style="color:#fff;font-weight:600;">August 10, 2026</span>
+          <span style="color:var(--muted);text-align:right;">Football, Cheerleading, Dance, Tennis</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+          <span style="color:#fff;font-weight:600;">August 17, 2026</span>
+          <span style="color:var(--muted);text-align:right;">Cross Country, Field Hockey, Gymnastics, Soccer, Volleyball</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;">
+          <span style="color:#fff;font-weight:600;">September 1, 2026</span>
+          <span style="color:var(--muted);text-align:right;">All Fall Middle School Sports</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">What You Need to Do</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
+        <li>Physicals for fall sports are due by <strong style="color:var(--silver)">July 15, 2026</strong> if not already submitted</li>
+        <li>Drop off physicals at Old Bridge High School &mdash; 4209 Route 516, Matawan, NJ 07747, <strong style="color:var(--silver)">Door 0</strong></li>
+        <li>Sign up for your fall sport through the parent portal, and review all athletic forms</li>
+        <li>Parents are responsible for knowing the status of their child's physical &mdash; check the parent portal directly</li>
+        <li>Athletic Trainers contact students through <strong style="color:var(--silver)">Microsoft Teams</strong> if a physical is expired or a Health History update is needed, 2&ndash;3 weeks before the season starts</li>
+      </ul>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+      <button onclick="openResourceLink(SPORT_PHYSICAL_FORM_URL,'The sport physical form')" style="flex:1;min-width:200px;background:var(--purple-ui);color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Sport Physical Form</button>
+      <button onclick="openResourceLink(PHYSICAL_CLEARANCE_URL,'The clearance submission link')" style="flex:1;min-width:200px;background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:13px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Clearance Submission</button>
+    </div>
+
+    <div style="background:linear-gradient(155deg,var(--purple-mid),var(--purple));border:1px solid var(--line-bright);border-radius:16px;padding:22px 24px;text-align:center;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Athletic Department</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;">Daniel DiMino</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">Director of Athletics &middot; (732) 290-3900 ext. 3924</div>
+      <a href="mailto:ddimino@obps.org" style="font-size:13px;color:var(--purple-glow);text-decoration:underline;">ddimino@obps.org</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Transportation Waiver Viewer Modal -->
+<div id="waiver-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(19,10,40,0.96);padding:16px;">
+  <div style="max-width:900px;margin:0 auto;height:100%;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 4px 14px;">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin:0;">Transportation Waiver</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="downloadWaiver()" style="background:var(--purple-ui);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Download</button>
+        <button onclick="printWaiver()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line-bright);padding:9px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Print</button>
+        <button onclick="closeWaiver()" class="cal-modal-x" style="position:static;" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;border:1px solid var(--line-bright);border-radius:10px;background:#fff;padding:8px;"><img src="/waiver-page.png" alt="Student Transportation Waiver" style="display:block;width:100%;height:auto;border-radius:4px;"></div>
+  </div>
+</div>
+
 <!-- Full Calendar Modal -->
 <!-- Bell Schedules Modal -->
 <div id="bell-schedule-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
