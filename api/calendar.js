@@ -111,6 +111,7 @@ export default async function handler(req, res) {
     rows.forEach(row => {
       const title = (row.TITLE || '').trim();
       if (!title || title.includes('ADD YOUR')) return;
+      if (!/^y/i.test((row.APPROVED || '').trim())) return;
       const rawDay = (row.DAY || '').toString().trim();
       if (!rawDay || rawDay === '0') return;
       const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : (parseInt(rawDay) || 1);
