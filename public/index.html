@@ -2778,12 +2778,13 @@ async function linkOutlookCalendar() {
   const body = document.getElementById('info-modal-body');
   const modal = document.getElementById('info-modal');
   if (body && modal) {
-    body.innerHTML = 'Outlook can\'t subscribe automatically like Apple or Google can \u2014 one extra step is needed on their end:'
+    body.innerHTML = 'Outlook doesn\'t support one-click subscribing the way Apple and Google do \u2014 it takes a few manual clicks, and it\'s easiest on a computer rather than a phone (the mobile site hides the option this needs).'
       + '<br><br>' + (copied ? 'The calendar link is already copied to your clipboard.' : 'Copy this link first: <br><span style="font-size:11.5px;color:var(--purple-glow);word-break:break-all;">' + CALENDAR_FEED_URL + '</span>')
-      + '<br><br><strong>1.</strong> Click "Open Outlook" below'
-      + '<br><strong>2.</strong> Click <strong>Add calendar</strong> in the left sidebar'
-      + '<br><strong>3.</strong> Choose <strong>Subscribe from web</strong>'
-      + '<br><strong>4.</strong> Paste the link and click <strong>Import</strong>'
+      + '<br><br><strong>On a computer, in Outlook:</strong>'
+      + '<br><strong>1.</strong> Click <strong>Add calendar</strong> in the left sidebar'
+      + '<br><strong>2.</strong> Choose <strong>Subscribe from web</strong>'
+      + '<br><strong>3.</strong> Paste the link and click <strong>Import</strong>'
+      + '<br><br>Once it\'s added this way, it\'ll show up on your phone\'s Outlook automatically too \u2014 no need to repeat these steps on mobile.'
       + '<br><br><button onclick="window.open(\'https://outlook.office.com/calendar/\',\'_blank\')" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:11px;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Open Outlook</button>';
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
