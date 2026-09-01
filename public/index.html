@@ -122,12 +122,6 @@ img{max-width:100%;display:block;}
 .hero-sub{margin-top:20px;font-size:13px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:0;animation:rise 0.8s cubic-bezier(.2,.8,.2,1) 0.56s forwards;}
 @keyframes rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 
-/* ═══ DATES BAR ═══ */
-.dates{background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);padding:11px 40px 11px 76px;display:flex;align-items:center;gap:30px;flex-wrap:wrap;border-bottom:1px solid var(--line);position:relative;z-index:4;}
-.date-chip{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
-.date-chip strong{color:rgba(255,255,255,.9);font-weight:500;}
-.dates-stamp{margin-left:auto;font-size:10px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;}
-.dates-loading{font-size:11px;color:var(--faint);}
 
 /* ═══════════════════════════════════════════
  PORTALS
@@ -1152,7 +1146,6 @@ const SHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7o0_FUyuW1Amale
 const GIDS = {
  announcements: '1447819289',
  events: '424739582',
- dates: '979441454',
  quicklinks: '605046719',
  countdown: '1732793405',
  flyers: '523531820',
@@ -1332,7 +1325,6 @@ function go(id, btn) {
  try{renderAnn(window._lastAnn||[]);}catch(e){}
  try{renderEv(window._lastEvt||[]);}catch(e){}
  try{renderWeekStrip();}catch(e){}
- try{renderDates(window._lastDates||[]);}catch(e){}
  try{renderQL(window._lastQL||[]);}catch(e){}
  }
  if(id==='athletics'){
@@ -1655,15 +1647,6 @@ function renderEv(rows){
  </div>
  `).join('');
 }
-function renderDates(rows){
- const _el=document.getElementById('dates');
- if(!_el) return;
- const el=document.getElementById('dates');
- const clean=rows.filter(r=>r.DATE&&r.LABEL&&!r.LABEL.includes('ADD YOUR')&&r.DATE!=='Mon DD');
- if(!clean.length){el.innerHTML='';return;}
- // Note: intentionally ignores any EMOJI column in the sheet — see renderQL for the same policy.
- el.innerHTML=clean.map(r=>`<div class="date-chip"><span><strong>${r.DATE}</strong> ${r.LABEL}</span></div>`).join('')+`<span class="dates-stamp">Updated ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`;
-}
 function renderQL(rows){
  const el=document.getElementById('ql-list');
  const clean=rows.filter(r=>{if(!r.LABEL)return false;let u=(r.URL||'').trim();return u&&u!=='#'&&!u.includes('PASTE YOUR')&&!u.includes('DesignPageV2')&&u.startsWith('http');});
@@ -1976,22 +1959,21 @@ function renderFresh(ann, lyricRows) {
 
 async function load(){
  for(let attempt=1; attempt<=4; attempt++){
- const [ann,evt,dates,ql,flyers,facultyBulletin,serviceOpps] = await Promise.all([
+ const [ann,evt,ql,flyers,facultyBulletin,serviceOpps] = await Promise.all([
  fetchTab(GIDS.announcements),
  fetchTab(GIDS.events),
- fetchTab(GIDS.dates),
  fetchTab(GIDS.quicklinks),
  GIDS.flyers!=='FLYERS_GID' ? fetchTab(GIDS.flyers) : Promise.resolve([]),
  GIDS.facultybulletin!=='FACULTY_BULLETIN_GID' ? fetchTab(GIDS.facultybulletin) : Promise.resolve([]),
  GIDS.serviceopps!=='SERVICE_OPPS_GID' ? fetchTab(GIDS.serviceopps) : Promise.resolve([])
  ]);
- const gotData = ann.length || evt.length || dates.length || ql.length;
- console.log('[Load] attempt='+attempt+' ann:',ann.length,'evt:',evt.length,'dates:',dates.length,'ql:',ql.length);
+ const gotData = ann.length || evt.length || ql.length;
+ console.log('[Load] attempt='+attempt+' ann:',ann.length,'evt:',evt.length,'ql:',ql.length);
  if(!gotData && attempt< 4){
  await new Promise(r=>setTimeout(r, attempt*800));
  continue;
  }
- window._lastAnn=ann; window._lastEvt=evt; window._lastDates=dates; window._lastQL=ql;
+ window._lastAnn=ann; window._lastEvt=evt; window._lastQL=ql;
  window._lastFacultyBulletin=facultyBulletin;
  window._dataLoaded=true;
  // Hide flyers block gracefully if the tab isn't configured yet
@@ -2020,7 +2002,6 @@ async function load(){
  try{renderWeekStrip();}catch(e){console.warn('[render] week',e);}
  try{loadClassCup();}catch(e){console.warn('[render] cup',e);}
  try{loadSpotlight();}catch(e){console.warn('[render] spotlight',e);}
- try{renderDates(dates);}catch(e){console.warn('[render] dates',e);}
  try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
  try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers',e);}
  try{await fetchCountdown(GIDS.countdown);}catch(e){setupCD('Days until Graduation','2026-06-23');}
