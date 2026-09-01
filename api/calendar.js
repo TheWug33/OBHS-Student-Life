@@ -95,7 +95,18 @@ export default async function handler(req, res) {
     ];
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const oneDayAgo = new Date(today.getTime() - 86400000);
+    // Anchor every event's year to a fixed school-year reference (Aug–Dec =
+    // the year the school year started, Jan–Jul = the year after) instead of
+    // comparing each event's same-year date against "today". The old
+    // approach re-decided an event's year on every single fetch — so a
+    // one-time event that had already passed (like an early-August kickoff
+    // party) would silently jump forward to next year once "today" moved
+    // past it. Because each event's stable ID is built from its title AND
+    // date, that meant the ID itself changed too, breaking the exact
+    // duplicate-prevention this feed is designed around. Anchoring to the
+    // school year means an event's date — and therefore its ID — never
+    // moves once published, no matter how many days go by.
+    const schoolYearStartYear = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear() - 1;
 
     rows.forEach(row => {
       const title = (row.TITLE || '').trim();
@@ -107,9 +118,8 @@ export default async function handler(req, res) {
       const mo = MONTH_NUM[rawMonth];
       if (mo === undefined) return;
 
-      let yr = today.getFullYear();
+      const yr = mo >= 7 ? schoolYearStartYear : schoolYearStartYear + 1;
       let start = new Date(yr, mo, dy);
-      if (start < oneDayAgo) { yr += 1; start = new Date(yr, mo, dy); }
 
       let end = start;
       const endDayRaw = (row.END_DAY || '').toString().trim();
