@@ -2772,10 +2772,22 @@ function linkGoogleCalendar() {
   closeCalChoice();
 }
 async function linkOutlookCalendar() {
-  try { await navigator.clipboard.writeText(CALENDAR_FEED_URL); } catch (e) {}
-  window.open('https://outlook.office.com/calendar/', '_blank');
-  showToast('Link copied! In Outlook: Add calendar \u2192 Subscribe from web \u2192 paste \u2192 Import');
+  let copied = true;
+  try { await navigator.clipboard.writeText(CALENDAR_FEED_URL); } catch (e) { copied = false; }
   closeCalChoice();
+  const body = document.getElementById('info-modal-body');
+  const modal = document.getElementById('info-modal');
+  if (body && modal) {
+    body.innerHTML = 'Outlook can\'t subscribe automatically like Apple or Google can \u2014 one extra step is needed on their end:'
+      + '<br><br>' + (copied ? 'The calendar link is already copied to your clipboard.' : 'Copy this link first: <br><span style="font-size:11.5px;color:var(--purple-glow);word-break:break-all;">' + CALENDAR_FEED_URL + '</span>')
+      + '<br><br><strong>1.</strong> Click "Open Outlook" below'
+      + '<br><strong>2.</strong> Click <strong>Add calendar</strong> in the left sidebar'
+      + '<br><strong>3.</strong> Choose <strong>Subscribe from web</strong>'
+      + '<br><strong>4.</strong> Paste the link and click <strong>Import</strong>'
+      + '<br><br><button onclick="window.open(\'https://outlook.office.com/calendar/\',\'_blank\')" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:11px;border-radius:8px;font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Open Outlook</button>';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
 }
 async function linkCopyOnly() {
   try {
