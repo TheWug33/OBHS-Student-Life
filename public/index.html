@@ -216,7 +216,7 @@ img{max-width:100%;display:block;}
 .ql:hover .ql-arr{transform:translateX(3px);}
 
 /* Flyers */
-.fly-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.fly-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,150px));gap:9px;}
 .fly{aspect-ratio:8.5/11;border-radius:9px;overflow:hidden;cursor:pointer;border:1px solid var(--line);position:relative;display:flex;align-items:flex-end;padding:8px;transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;background:linear-gradient(155deg,#392478,#130A28);}
 @media (hover:hover){.fly:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
 .fly-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);position:relative;z-index:2;}
@@ -595,7 +595,7 @@ img{max-width:100%;display:block;}
  </div>
  <div class="reveal" id="flyers-block" style="margin-top:36px">
  <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openFlyerSubmit()">Submit →</button></div>
- <div class="fly-row" id="fly-row" style="grid-template-columns:repeat(4,1fr)">
+ <div class="fly-row" id="fly-row">
  <div class="fly"><span class="fly-label">Loading…</span></div>
  <div class="fly"></div>
  <div class="fly"></div>
