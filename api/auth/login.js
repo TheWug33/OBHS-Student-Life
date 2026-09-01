@@ -73,6 +73,13 @@ function renderLoginPage({ error, returnTo }) {
   .box {
     background: rgba(45,27,105,0.35); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 16px; padding: 40px 36px; max-width: 360px; width: 90%; text-align: center;
+    position: relative;
+  }
+  .close-link {
+    position: absolute; top: -14px; right: -14px; width: 32px; height: 32px;
+    border-radius: 50%; background: rgba(19,10,40,0.95); border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 15px; line-height: 1;
   }
   h1 {
     font-family: 'Barlow Condensed', sans-serif; font-size: 22px; letter-spacing: .08em;
@@ -95,6 +102,7 @@ function renderLoginPage({ error, returnTo }) {
 </head>
 <body>
   <div class="box">
+    <a href="/" class="close-link" aria-label="Back to site">✕</a>
     <h1>Faculty Hub</h1>
     <p class="sub">Staff access only — enter the password shared with your team.</p>
     ${error ? '<div class="err">Incorrect password — try again.</div>' : ''}
