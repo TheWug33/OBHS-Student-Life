@@ -1127,7 +1127,7 @@ img{max-width:100%;display:block;}
  </div>
  <div class="cs">
  <div class="cs-ttl">Early Dismissal</div>
- <div class="info"><div class="info-t">Submit at least 24 hours in advance</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
+ <div class="info"><div class="info-t">Use the link below to submit your final roster for all early dismissals and field trips</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
  <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 24 hours in advance and approved before communicating to students or parents.</div></div></div>
  </div>
@@ -1137,8 +1137,7 @@ img{max-width:100%;display:block;}
  <div id="f-departure" class="subbody" style="display:none">
  <div class="cs">
  <div class="cs-ttl">Field Trip &amp; Departure Log</div>
- <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">Log a group leaving for a field trip, competition, or off-site event — coaches use this most when taking a team out early. It shows up here right away for the whole staff, and stays on record so you can look back later to confirm which students were out on a given day.</div></div>
- <div class="flr" onclick="openResourceLink(FIELDTRIP_LOG_FORM_URL,'The departure log form')"><div><div class="flr-t">Log a departure</div><div class="flr-d">Group/team, dismissal time, destination, return time — appears in "Leaving Today" below right after you submit</div></div><div class="flr-arr">→</div></div>
+ <div class="info"><div class="info-t">See who's leaving the building today</div><div class="info-d">A live record of groups leaving for field trips, competitions, and off-site events. Entries appear here automatically once an early dismissal request is submitted, and stay on record so you can look back later to confirm which students were out on a given day.</div></div>
 
  <div style="margin-top:22px;">
  <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;">Leaving Today</div>
@@ -1368,7 +1367,6 @@ const PHONE_MANUAL_URL = 'https://obps-my.sharepoint.com/:w:/g/personal/sfazio_o
 const NEW_EDUCATOR_BINDER_URL = 'https://www.canva.com/design/DAGMoiOJuiU/q77SbfCEG4k_PiUnZmmMug/view?utm_content=DAGMoiOJuiU&utm_campaign=designshare&utm_medium=link&utm_source=editor'; // OBTPS New Educator Digital Binder
 const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
 const ATHLETICS_URL = 'https://www.oldbridgeadmin.org/o/obhs/page/old-bridge-athletics'; // Full schedules, rosters, scores
-const FIELDTRIP_LOG_FORM_URL = 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7bKCJrldMUOOD8M0xrkhaIu1IRdxhJtFsyzwNwmeVSJUMzFSSkJCTk5RS1hHN01UQlg1SUpLMkY5TC4u';
 const HANDBOOK_URL = '#'; // ← Club Advisor Handbook doc link
 const BUDGET_URL = '#'; // ← Budget & Purchasing guide/form link
 const MEETING_LOG_URL = '#'; // ← Meeting log / attendance template link
@@ -1546,10 +1544,14 @@ function parseCSV(text){
  const hdrs=split(lines[hi]).map(clean);
  return lines.slice(hi+1).map(line=>{const vals=split(line).map(clean);const o={};hdrs.forEach((h,i)=>o[h]=vals[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
 }
-async function fetchTab(gid){
- // Calls our own Vercel serverless proxy — bypasses CORS entirely
+async function fetchTab(gid, bust){
+ // Calls our own Vercel serverless proxy — bypasses CORS entirely.
+ // `bust` adds a unique timestamp so the serverless proxy's own edge cache
+ // can't serve a stale copy — used by the Departure Log, which has to be
+ // accurate for TODAY and can't tolerate even a few minutes of staleness.
  try{
- const r=await fetch('/api/sheet?gid='+gid,{cache:'no-store'});
+ const bustParam = bust ? '&_t=' + Date.now() : '';
+ const r=await fetch('/api/sheet?gid='+gid+bustParam,{cache:'no-store'});
  if(r.ok){
  const text=await r.text();
  if(text&&text.length>10&&!text.includes('<!DOCTYPE')){
@@ -3122,26 +3124,26 @@ function closeCoaches() {
 // FIELD TRIP & DEPARTURE LOG — who's leaving the building, plus a searchable history
 // ══════════════════════════════════════════════════════
 let ftData = [];
-let ftLoaded = false;
 
 async function loadFieldTrips() {
  const todayEl = document.getElementById('ft-today-list');
  const archEl = document.getElementById('ft-archive-list');
  if (!todayEl || !archEl) return;
- if (ftLoaded) { renderFieldTrips(); return; }
  if (!GIDS.fieldtrips || GIDS.fieldtrips.includes('_GID')) {
  todayEl.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:10px 0">Not set up yet \u2014 check back soon.</p>';
  archEl.innerHTML = '';
  return;
  }
  try {
- const rows = await fetchTab(GIDS.fieldtrips);
+ // Always refetch (with a cache-buster) rather than reusing a cached copy.
+ // "Leaving Today" has to reflect submissions made minutes ago, so a stale
+ // read here is worse than a slightly slower load.
+ const rows = await fetchTab(GIDS.fieldtrips, true);
  ftData = rows.filter(r => (r.GROUP||'').trim() && (r.DATE||'').trim()).map(r => {
  const d = new Date((r.DATE||'').trim() + 'T00:00:00');
  r._date = isNaN(d.getTime()) ? null : d;
  return r;
  }).filter(r =>r._date).sort((a, b) =>b._date - a._date);
- ftLoaded = true;
  renderFieldTrips();
  } catch (e) {
  console.warn('[FieldTrips] load failed', e);
@@ -3992,6 +3994,7 @@ observeReveal();
       <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.9;">
         <li>Updated/final student roster goes to <strong style="color:var(--silver)">Maria DelPino</strong>, the nurse, and <strong style="color:var(--silver)">Marilyn Zino</strong> (attendance)</li>
  <li>EMGNC student rosters go to <strong style="color:var(--silver)">Roxanne LaConti</strong> and the nurse's office</li>
+ <li>Final rosters must also be submitted on this site using the <strong style="color:var(--silver)">Early Dismissal request form</strong></li>
         <li>Roster includes: student full name, student ID number, and grade</li>
         <li>Roster must reflect actual attendance for that day</li>
         <li>Students must report to first period for attendance before departing for the trip</li>
