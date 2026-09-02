@@ -1478,7 +1478,18 @@ function go(id, btn) {
  // Restart the ticker now that the tab is actually visible and measurable —
  // starting it while hidden (during initial load) permanently breaks its
  // scroll-distance math since a hidden element always measures 0 width.
- try{renderStaffFresh(window._lastFacultyBulletin||[]);}catch(e){}
+ //
+ // If the initial page-load fetch came back empty (usually a failed request
+ // rather than a genuinely empty bulletin), re-fetch here instead of
+ // rendering a blank ticker that stays blank until a full page reload.
+ if (window._lastFacultyBulletin && window._lastFacultyBulletin.length) {
+ try{renderStaffFresh(window._lastFacultyBulletin);}catch(e){}
+ } else {
+ fetchTab(GIDS.facultybulletin, true).then(rows => {
+ window._lastFacultyBulletin = rows;
+ try{renderStaffFresh(rows);}catch(e){}
+ }).catch(()=>{});
+ }
  }
 }
 
@@ -1548,23 +1559,36 @@ async function fetchTab(gid, bust){
  // `bust` adds a unique timestamp so the serverless proxy's own edge cache
  // can't serve a stale copy — used by the Departure Log, which has to be
  // accurate for TODAY and can't tolerate even a few minutes of staleness.
+ //
+ // Retries up to 3 times with a short backoff. Google's published-CSV
+ // endpoint intermittently returns 502s/timeouts regardless of traffic, and
+ // a single failure used to leave a section permanently blank until the
+ // whole page was reloaded — that was the "hit or miss" loading. Sections
+ // that fetch on their own (Faculty ticker, Athletics calendar) sit outside
+ // load()'s retry loop, so the retry has to live here to protect them.
+ const ATTEMPTS = 3;
+ for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
  try{
- const bustParam = bust ? '&_t=' + Date.now() : '';
+ // Always bust the cache on a retry — no point re-fetching a bad cached copy.
+ const bustParam = (bust || attempt > 1) ? '&_t=' + Date.now() : '';
  const r=await fetch('/api/sheet?gid='+gid+bustParam,{cache:'no-store'});
  if(r.ok){
  const text=await r.text();
  if(text&&text.length>10&&!text.includes('<!DOCTYPE')){
  const rows=parseCSV(text);
- console.log('[fetchTab] ok gid='+gid+' rows='+rows.length);
+ console.log('[fetchTab] ok gid='+gid+' rows='+rows.length+(attempt>1?' (attempt '+attempt+')':''));
  return rows;
  }
- console.warn('[fetchTab] bad response body for gid='+gid);
+ console.warn('[fetchTab] bad response body for gid='+gid+' (attempt '+attempt+')');
  } else {
- console.warn('[fetchTab] HTTP '+r.status+' for gid='+gid);
+ console.warn('[fetchTab] HTTP '+r.status+' for gid='+gid+' (attempt '+attempt+')');
  }
  }catch(e){
- console.warn('[fetchTab] failed gid='+gid,e.message);
+ console.warn('[fetchTab] failed gid='+gid+' (attempt '+attempt+')',e.message);
  }
+ if (attempt < ATTEMPTS) await new Promise(res => setTimeout(res, attempt * 600));
+ }
+ console.warn('[fetchTab] giving up on gid='+gid+' after '+ATTEMPTS+' attempts');
  return[];
 }
 
