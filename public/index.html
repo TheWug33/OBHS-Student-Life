@@ -3113,7 +3113,11 @@ function closeInfoModal() {
  const modal = document.getElementById('info-modal');
  if (!modal) return;
  modal.style.display = 'none';
- document.body.style.overflow = '';
+ // Only unlock scrolling if no other modal is still open behind this one
+ // (e.g. the schedule modal, when this was a calendar day detail).
+ const sched = document.getElementById('schedule-modal');
+ const schedOpen = sched && sched.style.display !== 'none' && sched.style.display !== '';
+ if (!schedOpen) document.body.style.overflow = '';
 }
 
 function openResourceLink(url, label) {
@@ -3395,6 +3399,7 @@ function renderScheduleCalendar() {
  const k = g._date.getFullYear() + '-' + g._date.getMonth() + '-' + g._date.getDate();
  (byDay[k] = byDay[k] || []).push(g);
  });
+ window._scheduleByDay = byDay;
 
  // Every month that actually contains a game, in order
  const months = [];
@@ -3423,7 +3428,9 @@ function renderScheduleCalendar() {
  const isToday = cellDate.getTime() === today.getTime();
  const has = dayGames.length > 0;
  const tips = dayGames.map(g => (g.TITLE || '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
- cells += '<div title="' + tips.replace(/"/g,'&quot;') + '" style="min-height:64px;border:1px solid ' + (isToday ? 'var(--purple-glow)' : 'var(--line)') + ';border-radius:8px;padding:5px 6px;background:' + (has ? 'rgba(91,63,192,0.16)' : 'transparent') + ';overflow:hidden;">'
+ // Tappable when there are games — hover tooltips don't exist on touch
+ // devices, so the full list has to be reachable by tap/click too.
+ cells += '<div ' + (has ? 'onclick="openScheduleDay(\'' + k + '\')" ' : '') + 'title="' + tips.replace(/"/g,'&quot;') + '" style="min-height:64px;border:1px solid ' + (isToday ? 'var(--purple-glow)' : 'var(--line)') + ';border-radius:8px;padding:5px 6px;background:' + (has ? 'rgba(91,63,192,0.16)' : 'transparent') + ';overflow:hidden;' + (has ? 'cursor:pointer;' : '') + '">'
  + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;color:' + (has ? '#fff' : 'var(--faint)') + ';margin-bottom:2px;">' + d + '</div>'
  + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g._sport || '') + '</div>').join('')
  + (dayGames.length > 3 ? '<div style="font-size:8px;color:var(--purple-glow);">+' + (dayGames.length - 3) + ' more</div>' : '')
@@ -3438,6 +3445,28 @@ function renderScheduleCalendar() {
  + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">' + cells + '</div>'
  + '</div>';
  }).join('');
+}
+
+// Shows every game on a tapped calendar day — the full list, including any
+// hidden behind "+N more" in the compact cell.
+function openScheduleDay(key) {
+ const games = (window._scheduleByDay || {})[key];
+ if (!games || !games.length) return;
+ const body = document.getElementById('info-modal-body');
+ const modal = document.getElementById('info-modal');
+ if (!body || !modal) return;
+ const d = games[0]._date;
+ const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+ body.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:4px;">'
+ + DAY_NAMES[d.getDay()] + '</div>'
+ + '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:14px;">' + MONTH_NAMES[d.getMonth()] + ' ' + d.getDate() + '</div>'
+ + games.map(g =>
+ '<div style="border-top:1px solid var(--line);padding:10px 0;">'
+ + '<div style="font-size:14px;font-weight:600;color:#fff;">' + (g.TITLE || '') + '</div>'
+ + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
+ + '</div>').join('');
+ modal.style.display = 'flex';
 }
 
 function setScheduleView(view) {
