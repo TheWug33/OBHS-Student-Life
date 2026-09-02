@@ -1168,6 +1168,7 @@ img{max-width:100%;display:block;}
  <div class="flr" onclick="openMeetingLog()"><div><div class="flr-t">Meeting Logs &amp; Attendance</div><div class="flr-d">Download templates to document club meetings</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openDepositGuide()"><div><div class="flr-t">Deposits &amp; Check Requests</div><div class="flr-d">How to submit a deposit or request a check — step by step</div></div><div class="flr-arr">→</div></div>
  <div class="flr" onclick="openFlyerSubmit()"><div><div class="flr-t">Submit a Flyer</div><div class="flr-d">Get your club's flyer featured on the homepage and TV displays</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openFundraiser()"><div><div class="flr-t">Submit a Fundraiser Idea</div><div class="flr-d">Share an idea for your club — Student Life will follow up</div></div><div class="flr-arr">→</div></div>
 
  <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:26px 0 10px;">End of Year</div>
  <div class="flr" onclick="openEoy()"><div><div class="flr-t">End-of-Year Reporting</div><div class="flr-d">Submit your annual club summary and officer transition information</div></div><div class="flr-arr">→</div></div>
@@ -3604,6 +3605,34 @@ async function submitClubDetails() {
   }
 }
 
+function openFundraiser() {
+  document.getElementById('fundraiser-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeFundraiser() {
+  document.getElementById('fundraiser-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitFundraiser() {
+  const idea = document.getElementById('fr-idea')?.value.trim();
+  if (!idea) { showToast('Please describe your fundraiser idea.'); return; }
+  const btn = document.getElementById('fr-submit-btn');
+  const ok = await submitToSheet('Fundraiser Ideas', {
+    'NAME': document.getElementById('fr-name')?.value || '',
+    'CLUB': document.getElementById('fr-club')?.value || '',
+    'IDEA': idea,
+    'DETAILS': document.getElementById('fr-details')?.value || '',
+    'TIMEFRAME': document.getElementById('fr-timeframe')?.value || '',
+    'EMAIL': document.getElementById('fr-email')?.value || '',
+  }, btn, 'Thanks! Student Life will follow up with you.');
+  if (ok) {
+    ['fr-name','fr-club','fr-idea','fr-details','fr-timeframe','fr-email'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+}
+
 // ══════════════════════════════════════════════════════
 // A-DAY / B-DAY SCHEDULE 2026–27 — transcribed from the official district
 // A-Day/B-Day calendar PDF. Static for the school year; update each summer
@@ -4202,6 +4231,35 @@ observeReveal();
           <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Instagram Account</label><input id="cd-insta" type="text" placeholder="@obhs_club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
         </div>
         <button id="cd-submit-btn" onclick="submitClubDetails()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="fundraiser-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeFundraiser()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Submit a Fundraiser Idea</h2>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;">
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 18px;">Have an idea for a fundraiser? Share it here and Student Life will follow up. You'll see an on-screen confirmation once it's submitted.</p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="fr-name" type="text" placeholder="Jane Smith" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club / Group</label><input id="fr-club" type="text" placeholder="Key Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Fundraiser Idea</label><input id="fr-idea" type="text" placeholder="Spirit wear sale, car wash, restaurant night..." style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Details</label><textarea id="fr-details" rows="4" placeholder="How it would work, who it benefits, anything you'd need help with..." style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Timeframe</label><input id="fr-timeframe" type="text" placeholder="Late October" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="fr-email" type="email" placeholder="jsmith@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <button id="fr-submit-btn" onclick="submitFundraiser()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit Idea &rarr;</button>
       </div>
     </div>
 
