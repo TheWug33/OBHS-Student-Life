@@ -3354,6 +3354,7 @@ async function openSchedule() {
  const bySport = {};
  clean.forEach(r => { (bySport[r._sport] = bySport[r._sport] || []).push(r); });
  const sports = Object.keys(bySport).sort();
+ window._scheduleGames = clean;
 
  el.innerHTML = sports.map((sport, i) => `
  <div style="margin-bottom:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;">
@@ -3370,11 +3371,94 @@ async function openSchedule() {
  </div>
  `).join('');
  scheduleLoaded = true;
+ renderScheduleCalendar();
  } catch(e) {
  console.warn('[Schedule] load failed', e);
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Could not load the schedule \u2014 visit the full Knights Athletics site.</p>';
  }
 }
+// ── Month-grid calendar view of the full athletics schedule ──
+// Groups every sport's games by calendar day so you can see everything
+// happening on a given date at a glance, instead of one sport at a time.
+function renderScheduleCalendar() {
+ const el = document.getElementById('schedule-cal');
+ if (!el) return;
+ const games = (window._scheduleGames || []).filter(g => g._date && g._date.getFullYear() < 9000);
+ if (!games.length) {
+ el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
+ return;
+ }
+
+ // Bucket games by YYYY-M-D
+ const byDay = {};
+ games.forEach(g => {
+ const k = g._date.getFullYear() + '-' + g._date.getMonth() + '-' + g._date.getDate();
+ (byDay[k] = byDay[k] || []).push(g);
+ });
+
+ // Every month that actually contains a game, in order
+ const months = [];
+ games.forEach(g => {
+ const key = g._date.getFullYear() + '-' + g._date.getMonth();
+ if (!months.some(m => m.key === key)) {
+ months.push({ key, year: g._date.getFullYear(), month: g._date.getMonth() });
+ }
+ });
+ months.sort((a, b) => a.year - b.year || a.month - b.month);
+
+ const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+ const today = new Date(); today.setHours(0,0,0,0);
+
+ el.innerHTML = months.map(m => {
+ const first = new Date(m.year, m.month, 1);
+ const daysInMonth = new Date(m.year, m.month + 1, 0).getDate();
+ const startDow = first.getDay();
+
+ let cells = '';
+ for (let i = 0; i < startDow; i++) cells += '<div></div>';
+ for (let d = 1; d <= daysInMonth; d++) {
+ const k = m.year + '-' + m.month + '-' + d;
+ const dayGames = byDay[k] || [];
+ const cellDate = new Date(m.year, m.month, d);
+ const isToday = cellDate.getTime() === today.getTime();
+ const has = dayGames.length > 0;
+ const tips = dayGames.map(g => (g.TITLE || '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
+ cells += '<div title="' + tips.replace(/"/g,'&quot;') + '" style="min-height:64px;border:1px solid ' + (isToday ? 'var(--purple-glow)' : 'var(--line)') + ';border-radius:8px;padding:5px 6px;background:' + (has ? 'rgba(91,63,192,0.16)' : 'transparent') + ';overflow:hidden;">'
+ + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;color:' + (has ? '#fff' : 'var(--faint)') + ';margin-bottom:2px;">' + d + '</div>'
+ + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g._sport || '') + '</div>').join('')
+ + (dayGames.length > 3 ? '<div style="font-size:8px;color:var(--purple-glow);">+' + (dayGames.length - 3) + ' more</div>' : '')
+ + '</div>';
+ }
+
+ return '<div style="margin-bottom:22px;">'
+ + '<div class="blk-title sm" style="margin:0 0 10px;">' + MONTH_NAMES[m.month] + ' ' + m.year + '</div>'
+ + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px;">'
+ + ['S','M','T','W','T','F','S'].map(d => '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--faint);">' + d + '</div>').join('')
+ + '</div>'
+ + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">' + cells + '</div>'
+ + '</div>';
+ }).join('');
+}
+
+function setScheduleView(view) {
+ const listEl = document.getElementById('schedule-list');
+ const calEl = document.getElementById('schedule-cal');
+ const sportBtn = document.getElementById('sched-tab-sport');
+ const calBtn = document.getElementById('sched-tab-cal');
+ if (!listEl || !calEl) return;
+ const onCal = view === 'calendar';
+ listEl.style.display = onCal ? 'none' : 'block';
+ calEl.style.display = onCal ? 'block' : 'none';
+ if (sportBtn && calBtn) {
+ sportBtn.style.background = onCal ? 'transparent' : 'var(--purple-ui)';
+ sportBtn.style.color = onCal ? 'var(--muted)' : '#fff';
+ sportBtn.style.borderColor = onCal ? 'var(--line)' : 'var(--line-bright)';
+ calBtn.style.background = onCal ? 'var(--purple-ui)' : 'transparent';
+ calBtn.style.color = onCal ? '#fff' : 'var(--muted)';
+ calBtn.style.borderColor = onCal ? 'var(--line-bright)' : 'var(--line)';
+ }
+}
+
 function toggleScheduleSport(i) {
  const body = document.getElementById('sport-body-' + i);
  const arrow = document.getElementById('sport-arrow-' + i);
@@ -3386,6 +3470,7 @@ function toggleScheduleSport(i) {
 function closeSchedule() {
  document.getElementById('schedule-modal').style.display = 'none';
  document.body.style.overflow = '';
+ setScheduleView('sport');
 }
 
 // ══════════════════════════════════════════════════════
@@ -3790,7 +3875,12 @@ observeReveal();
  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
  <h2 class="cal-modal-ttl">Full Fall Schedule</h2>
  </div>
+ <div style="display:flex;gap:8px;margin-bottom:16px;">
+ <button id="sched-tab-sport" onclick="setScheduleView('sport')" style="flex:1;background:var(--purple-ui);color:#fff;border:1px solid var(--line-bright);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">By Sport</button>
+ <button id="sched-tab-cal" onclick="setScheduleView('calendar')" style="flex:1;background:transparent;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Calendar</button>
+ </div>
  <div id="schedule-list"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
+ <div id="schedule-cal" style="display:none"></div>
  </div>
 </div>
 
