@@ -2156,13 +2156,21 @@ async function load(){
  // Community Service opportunities — informational listing, not tied to any toggle
  try{ renderServiceOpps(serviceOpps); }catch(e){console.warn('[render] service opps',e);}
  // Staff Bulletin — show nothing until GIDS.facultybulletin is configured.
- // NOTE: we don't animate it here — the Faculty Hub tab is hidden at this point
- // (Home is the default active page), and measuring a hidden element's width
- // always returns 0, which breaks the scroll math permanently. The actual
- // animation kicks off in go() once the tab is genuinely visible.
+ //
+ // In this file Faculty Hub is the DEFAULT active page, so unlike index.html
+ // the strip is already visible and measurable here — meaning we can (and
+ // must) start it now. Previously the ticker only started inside go('faculty'),
+ // which never fires when you land directly on /faculty, so the ticker stayed
+ // blank until you clicked away to another tab and back.
  if (GIDS.facultybulletin.includes('_GID')) {
  const sb = document.getElementById('staff-fresh-strip');
  if (sb) sb.style.display = 'none';
+ } else {
+ const facultyVisible = (document.getElementById('page-faculty')||{}).classList
+ && document.getElementById('page-faculty').classList.contains('active');
+ if (facultyVisible) {
+ try{ renderStaffFresh(facultyBulletin); }catch(e){console.warn('[render] staff bulletin',e);}
+ }
  }
  // Fresh strip: What's New + Lyric of the Week
  try{
