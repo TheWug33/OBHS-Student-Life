@@ -181,6 +181,13 @@ const GIDS = {
 const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
+// A blank LEVEL cell means Varsity — matches the same rule on the main site,
+// so JV/Freshman rows added to the Athletics tab don't show up on the TVs.
+function gameLevel(row){
+ const lv=(row.LEVEL||'').toString().trim();
+ return lv || 'Varsity';
+}
+
 // Splits a sheet time like "5:30 PM" / "4:00PM" / "TBD" into two badge lines.
 // Falls back gracefully rather than showing a broken badge on odd input.
 function splitGameTime(raw){
@@ -346,7 +353,7 @@ async function loadData(){
  r._d=new Date(yr,mo,dy);
  return r;
  // Today only — no cap, so every game on the day is listed.
- }).filter(r=>r._d>=today&&r._d<tomorrow).sort((a,b)=>a._d-b._d);
+ }).filter(r=>r._d>=today&&r._d<tomorrow&&gameLevel(r)==='Varsity').sort((a,b)=>a._d-b._d);
  document.getElementById('game-list').innerHTML=games.length?games.map(g=>{
  const t=splitGameTime(g.TIME);
  return '<div class="ev-row">'

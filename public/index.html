@@ -2639,7 +2639,7 @@ async function loadAthletics() {
  r.MONTH = rawMonth.slice(0,3);
  r.DAY = String(dy);
  return r;
- }).filter(r =>r._date >= today).sort((a,b) =>a._date - b._date).slice(0,6);
+ }).filter(r =>r._date >= today && scheduleLevel(r) === 'Varsity').sort((a,b) =>a._date - b._date).slice(0,6);
 
  if (!clean.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted this week — check the full site for the season schedule.</p>';
@@ -3313,6 +3313,13 @@ function scheduleSportName(title) {
  const m = (title || '').match(/^(.*?)\s+(?:vs|@)\s+/i);
  return m ? m[1].trim() : (title || 'Other').trim();
 }
+// A blank LEVEL cell means Varsity — lets the existing Varsity rows stay
+// untouched in the sheet while new JV/Freshman rows just add a LEVEL value.
+function scheduleLevel(row) {
+ const lv = (row.LEVEL || '').toString().trim();
+ return lv || 'Varsity';
+}
+const SCHEDULE_LEVEL_ORDER = ['Varsity', 'JV', 'Freshman'];
 async function openSchedule() {
  document.getElementById('schedule-modal').style.display = 'block';
  document.body.style.overflow = 'hidden';
@@ -3338,6 +3345,7 @@ async function openSchedule() {
  r.MONTH = rawMonth.slice(0,3);
  r.DAY = String(dy);
  r._sport = scheduleSportName(r.TITLE);
+ r._level = scheduleLevel(r);
  return r;
  }).sort((a,b) =>a._date - b._date);
 
@@ -3353,23 +3361,40 @@ async function openSchedule() {
  clean.forEach(r => { (bySport[r._sport] = bySport[r._sport] || []).push(r); });
  const sports = Object.keys(bySport).sort();
  window._scheduleGames = clean;
+ window._scheduleActiveLevel = window._scheduleActiveLevel || {};
 
- el.innerHTML = sports.map((sport, i) => `
+ const gameTile = r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`;
+
+ el.innerHTML = sports.map((sport, i) => {
+ const games = bySport[sport];
+ const levelsPresent = SCHEDULE_LEVEL_ORDER.filter(lv => games.some(g => g._level === lv));
+ const activeLevel = (window._scheduleActiveLevel[sport] && levelsPresent.includes(window._scheduleActiveLevel[sport]))
+ ? window._scheduleActiveLevel[sport] : (levelsPresent[0] || 'Varsity');
+ window._scheduleActiveLevel[sport] = activeLevel;
+ const shown = games.filter(g => g._level === activeLevel);
+ const levelTabs = levelsPresent.length > 1 ? `
+ <div style="display:flex;gap:6px;margin-bottom:10px;">
+ ${levelsPresent.map(lv => `<button id="sport-lvl-${i}-${lv}" onclick="setScheduleSportLevel(${i},'${sport.replace(/'/g,"\\'")}','${lv}')" style="flex:1;background:${lv===activeLevel?'var(--purple-ui)':'transparent'};color:${lv===activeLevel?'#fff':'var(--muted)'};border:1px solid ${lv===activeLevel?'var(--line-bright)':'var(--line)'};padding:6px 8px;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">${lv}</button>`).join('')}
+ </div>` : '';
+ return `
  <div style="margin-bottom:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;">
  <button onclick="toggleScheduleSport(${i})" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:none;padding:14px 16px;cursor:pointer;text-align:left;">
  <span class="blk-title sm" style="margin:0;">${sport}</span>
  <span style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
- <span style="font-size:11px;color:var(--faint);font-weight:600;">${bySport[sport].length} game${bySport[sport].length === 1 ? '' : 's'}</span>
+ <span id="sport-count-${i}" style="font-size:11px;color:var(--faint);font-weight:600;">${shown.length} game${shown.length === 1 ? '' : 's'}</span>
  <span id="sport-arrow-${i}" style="color:var(--purple-glow);font-size:12px;transition:transform .2s;display:inline-block;">\u25be</span>
  </span>
  </button>
  <div id="sport-body-${i}" class="ev-card" style="display:none;border-top:1px solid var(--line);border-radius:0;">
- ${bySport[sport].map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`).join('')}
+ ${levelTabs}
+ <div id="sport-games-${i}">${shown.map(gameTile).join('')}</div>
  </div>
  </div>
- `).join('');
+ `;
+ }).join('');
  scheduleLoaded = true;
  renderScheduleCalendar();
+ populatePrintPicker();
  } catch(e) {
  console.warn('[Schedule] load failed', e);
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Could not load the schedule \u2014 visit the full Knights Athletics site.</p>';
@@ -3381,7 +3406,7 @@ async function openSchedule() {
 function renderScheduleCalendar() {
  const el = document.getElementById('schedule-cal');
  if (!el) return;
- const games = (window._scheduleGames || []).filter(g => g._date && g._date.getFullYear() < 9000);
+ const games = (window._scheduleGames || []).filter(g => g._date && g._date.getFullYear() < 9000 && g._level === 'Varsity');
  if (!games.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
  return;
@@ -3485,22 +3510,19 @@ function toggleScheduleMonth(key) {
 }
 
 function setScheduleView(view) {
- const listEl = document.getElementById('schedule-list');
- const calEl = document.getElementById('schedule-cal');
- const sportBtn = document.getElementById('sched-tab-sport');
- const calBtn = document.getElementById('sched-tab-cal');
- if (!listEl || !calEl) return;
- const onCal = view === 'calendar';
- listEl.style.display = onCal ? 'none' : 'block';
- calEl.style.display = onCal ? 'block' : 'none';
- if (sportBtn && calBtn) {
- sportBtn.style.background = onCal ? 'transparent' : 'var(--purple-ui)';
- sportBtn.style.color = onCal ? 'var(--muted)' : '#fff';
- sportBtn.style.borderColor = onCal ? 'var(--line)' : 'var(--line-bright)';
- calBtn.style.background = onCal ? 'var(--purple-ui)' : 'transparent';
- calBtn.style.color = onCal ? '#fff' : 'var(--muted)';
- calBtn.style.borderColor = onCal ? 'var(--line-bright)' : 'var(--line)';
- }
+ const panels = { calendar: 'schedule-cal', sport: 'schedule-list', print: 'schedule-print' };
+ const tabs = { calendar: 'sched-tab-cal', sport: 'sched-tab-sport', print: 'sched-tab-print' };
+ Object.keys(panels).forEach(v => {
+ const panel = document.getElementById(panels[v]);
+ if (panel) panel.style.display = v === view ? 'block' : 'none';
+ const tab = document.getElementById(tabs[v]);
+ if (!tab) return;
+ const on = v === view;
+ tab.style.background = on ? 'var(--purple-ui)' : 'transparent';
+ tab.style.color = on ? '#fff' : 'var(--muted)';
+ tab.style.borderColor = on ? 'var(--line-bright)' : 'var(--line)';
+ });
+ if (view === 'print') populatePrintPicker();
 }
 
 function toggleScheduleSport(i) {
@@ -3511,10 +3533,81 @@ function toggleScheduleSport(i) {
  body.style.display = open ? 'none' : 'block';
  if (arrow) arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(-180deg)';
 }
+// Switches one sport's card between its Varsity/JV/Freshman game lists —
+// re-renders just that card's games, no re-fetch needed.
+function setScheduleSportLevel(i, sport, level) {
+ window._scheduleActiveLevel = window._scheduleActiveLevel || {};
+ window._scheduleActiveLevel[sport] = level;
+ const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level);
+ const gamesEl = document.getElementById('sport-games-' + i);
+ if (gamesEl) gamesEl.innerHTML = games.map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`).join('');
+ const countEl = document.getElementById('sport-count-' + i);
+ if (countEl) countEl.textContent = games.length + ' game' + (games.length === 1 ? '' : 's');
+ SCHEDULE_LEVEL_ORDER.forEach(lv => {
+ const btn = document.getElementById('sport-lvl-' + i + '-' + lv);
+ if (!btn) return;
+ const on = lv === level;
+ btn.style.background = on ? 'var(--purple-ui)' : 'transparent';
+ btn.style.color = on ? '#fff' : 'var(--muted)';
+ btn.style.borderColor = on ? 'var(--line-bright)' : 'var(--line)';
+ });
+}
 function closeSchedule() {
  document.getElementById('schedule-modal').style.display = 'none';
  document.body.style.overflow = '';
  setScheduleView('calendar');
+}
+
+// ══════════════════════════════════════════════════════
+// PRINT A TEAM'S SCHEDULE — parent-facing sport+level picker that
+// prints (or "Save as PDF"s) a clean single schedule, reusing the
+// same printInPlace() pattern as the meeting log / EOY report.
+// ══════════════════════════════════════════════════════
+function populatePrintPicker() {
+ const sportSel = document.getElementById('print-sport-select');
+ if (!sportSel || sportSel.options.length) return; // already populated
+ const games = window._scheduleGames || [];
+ if (!games.length) return; // schedule hasn't loaded yet — try again next time the tab opens
+ const sports = [...new Set(games.map(g => g._sport))].sort();
+ sportSel.innerHTML = sports.map(s => `<option value="${s.replace(/"/g,'&quot;')}">${s}</option>`).join('');
+ onPrintSportChange();
+}
+function onPrintSportChange() {
+ const sportSel = document.getElementById('print-sport-select');
+ const levelSel = document.getElementById('print-level-select');
+ if (!sportSel || !levelSel) return;
+ const sport = sportSel.value;
+ const games = (window._scheduleGames || []).filter(g => g._sport === sport);
+ const levels = SCHEDULE_LEVEL_ORDER.filter(lv => games.some(g => g._level === lv));
+ levelSel.innerHTML = levels.map(lv => `<option value="${lv}">${lv}</option>`).join('');
+}
+function athleticsSchedulePrintHTML(sport, level, games) {
+ const rows = games.map(g => `<tr><td>${g.MONTH} ${g.DAY}</td><td>${g.TITLE}</td><td>${g.TIME||'TBD'}</td><td>${g.LOCATION||''}</td></tr>`).join('')
+ || '<tr><td colspan="4" style="text-align:center;color:#888;">No games scheduled</td></tr>';
+ return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${sport} \u2014 ${level} Schedule</title>
+ <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;max-width:680px;margin:32px auto;padding:0 24px;color:#222}
+ .as-header{background:#26215C;color:#EEEDFE;padding:20px 22px;text-align:center;border-radius:8px 8px 0 0}
+ .as-school{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:6px;font-family:sans-serif}
+ .as-title{font-size:22px;font-weight:700;}
+ .as-sub{font-size:12px;opacity:.85;margin-top:4px;font-family:sans-serif;text-transform:uppercase;letter-spacing:1px;}
+ table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:12px;border:1px solid #ddd;border-top:none;}
+ th{background:#EEEDFE;color:#3C3489;text-align:left;padding:9px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+ td{border-bottom:1px solid #eee;padding:9px 10px;}
+ .as-footer{background:#3C3489;color:#AFA9EC;padding:10px 22px;font-size:10px;text-align:center;font-family:sans-serif;border-radius:0 0 8px 8px;}
+ @media print{body{margin:0;padding:0;max-width:100%}}</style></head><body>
+ <div class="as-header"><div class="as-school">Old Bridge High School &nbsp;\u00b7&nbsp; Knights Athletics</div><div class="as-title">${sport}</div><div class="as-sub">${level} Schedule</div></div>
+ <table><thead><tr><th>Date</th><th>Game</th><th>Time</th><th>Location</th></tr></thead><tbody>${rows}</tbody></table>
+ <div class="as-footer">Old Bridge High School \u2014 Knights Athletics \u00b7 Schedule subject to change</div>
+ </body></html>`;
+}
+function printAthleticsSchedule() {
+ const sportSel = document.getElementById('print-sport-select');
+ const levelSel = document.getElementById('print-level-select');
+ if (!sportSel || !levelSel || !sportSel.value) { showToast('Schedule is still loading \u2014 try again in a moment.'); return; }
+ const sport = sportSel.value;
+ const level = levelSel.value;
+ const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level).sort((a,b) => a._date - b._date);
+ printInPlace(athleticsSchedulePrintHTML(sport, level, games));
 }
 
 // ══════════════════════════════════════════════════════
@@ -3922,9 +4015,22 @@ observeReveal();
  <div style="display:flex;gap:8px;margin-bottom:16px;">
  <button id="sched-tab-cal" onclick="setScheduleView('calendar')" style="flex:1;background:var(--purple-ui);color:#fff;border:1px solid var(--line-bright);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Calendar</button>
  <button id="sched-tab-sport" onclick="setScheduleView('sport')" style="flex:1;background:transparent;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">By Sport</button>
+ <button id="sched-tab-print" onclick="setScheduleView('print')" style="flex:1;background:transparent;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Print</button>
  </div>
  <div id="schedule-list" style="display:none"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
  <div id="schedule-cal"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
+ <div id="schedule-print" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;">
+ <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;">Print a Team's Schedule</div>
+ <div style="margin-bottom:12px;">
+ <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:6px;">Sport</label>
+ <select id="print-sport-select" onchange="onPrintSportChange()" style="width:100%;background:rgba(255,255,255,0.06);color:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:13px;"></select>
+ </div>
+ <div style="margin-bottom:18px;">
+ <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:6px;">Level</label>
+ <select id="print-level-select" style="width:100%;background:rgba(255,255,255,0.06);color:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:13px;"></select>
+ </div>
+ <button onclick="printAthleticsSchedule()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Print / Save as PDF</button>
+ </div>
  </div>
 </div>
 
