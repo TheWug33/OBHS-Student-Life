@@ -1551,11 +1551,16 @@ function buildEventTile(r) {
  const day = r.DAY || '';
  const endMonRaw = (r.END_MONTH||'').toString().trim().toUpperCase().slice(0,3);
  const endDayRaw = (r.END_DAY||'').toString().trim();
+ // Only treat END_DAY as a real range end if it's actually a plain day
+ // number (1-31) — guards against someone typing a time (e.g. "14:00:00")
+ // into the wrong column, which would otherwise parseInt down to a bogus
+ // "14" and render a garbled, backwards date-range badge.
+ const endDayValid = /^([1-9]|[12]\d|3[01])$/.test(endDayRaw);
  const ab = getABLabel(r._date);
  const abCorner = ab ? `<div class="ab-corner ${ab.toLowerCase()}">${ab}</div>` : '';
- if (endDayRaw && endDayRaw !== '0') {
+ if (endDayValid) {
  const endMon = endMonRaw || mon;
- const endDay = parseInt(endDayRaw) || endDayRaw;
+ const endDay = parseInt(endDayRaw);
  const sameDay = String(endDay) === String(day);
  if (!sameDay) {
  // Any multi-day range — same month or crossing months — uses the same
