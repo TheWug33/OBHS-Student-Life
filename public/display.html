@@ -223,20 +223,31 @@ function parseAthleticsTime(raw) {
  }
  return s;
 }
+// Minutes-since-midnight for sorting same-day games by start time.
+// TBA/unparseable times sort to the end rather than the start.
+function athleticsTimeMinutes(timeStr) {
+ const m = (timeStr || '').toString().trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+ if (!m) return Infinity;
+ let h = parseInt(m[1], 10) % 12;
+ if (m[3].toUpperCase() === 'PM') h += 12;
+ return h * 60 + parseInt(m[2], 10);
+}
 function athleticsSportLabel(sport, gender) {
  if (!gender || ATH_NO_GENDER_PREFIX.includes(sport)) return sport;
  return gender + ' ' + sport;
 }
 // Turns one raw row from the AD's own sheet (Publish/Date/Time/Team/
-// Home-Away/Opponent/Site) into the shape this file renders. Returns
-// null for cancelled or unusable rows.
+// Home-Away/Opponent/Site) into the shape this file renders. Cancelled
+// games are kept (flagged via _cancelled) rather than dropped, so the TV
+// can show that status instead of the game silently disappearing. Returns
+// null only for rows that are genuinely unusable (no date or no opponent).
 function parseAthleticsRow(r) {
  // display.html's own parseCSV() uppercases every header key (unlike
  // index.html's), so this reads PUBLISH/DATE/TEAM/etc., not the mixed-case
  // spelling the AD's sheet actually uses.
  const publish = (r.PUBLISH || '').toString().trim().toUpperCase();
  const homeAway = (r['HOME/AWAY'] || '').toString().trim();
- if (publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED') return null;
+ const cancelled = publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED';
  const date = parseAthleticsDate(r.DATE);
  const opponent = (r.OPPONENT || '').toString().trim();
  if (!date || !opponent) return null;
@@ -254,6 +265,7 @@ function parseAthleticsRow(r) {
  LOCATION: site,
  _sport: sportLabel,
  _level: level,
+ _cancelled: cancelled,
  };
 }
 
@@ -412,12 +424,15 @@ async function loadData(){
  const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
  const games=(ath||[]).map(parseAthleticsRow).filter(Boolean)
  // Today only — no cap, so every game on the day is listed.
- .filter(r=>r._d>=today&&r._d<tomorrow&&r._level==='Varsity').sort((a,b)=>a._d-b._d);
+ .filter(r=>r._d>=today&&r._d<tomorrow&&r._level==='Varsity')
+ .sort((a,b)=>a._d-b._d||athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME));
  document.getElementById('game-list').innerHTML=games.length?games.map(g=>{
  const t=splitGameTime(g.TIME);
+ const titleStyle=g._cancelled?' style="text-decoration:line-through;opacity:.55;"':'';
+ const badge=g._cancelled?' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;">Cancelled</span>':'';
  return '<div class="ev-row">'
  + '<div class="ev-time"><div class="t-hr">'+t.hr+'</div>'+(t.ap?'<div class="t-ap">'+t.ap+'</div>':'')+'</div>'
- + '<div><div class="ev-t">'+g.TITLE+'</div>'
+ + '<div><div class="ev-t"'+titleStyle+'>'+g.TITLE+badge+'</div>'
  + (g.LOCATION?'<div class="ev-m">'+g.LOCATION+'</div>':'')
  + '</div></div>';
  }).join(''):'<div class="empty">No games scheduled today.</div>';

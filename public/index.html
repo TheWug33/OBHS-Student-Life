@@ -2673,6 +2673,16 @@ function parseAthleticsTime(raw) {
  return s;
 }
 
+// Minutes-since-midnight for sorting same-day games by start time.
+// TBA/unparseable times sort to the end rather than the start.
+function athleticsTimeMinutes(timeStr) {
+ const m = (timeStr || '').toString().trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+ if (!m) return Infinity;
+ let h = parseInt(m[1], 10) % 12;
+ if (m[3].toUpperCase() === 'PM') h += 12;
+ return h * 60 + parseInt(m[2], 10);
+}
+
 function athleticsSportLabel(sport, gender) {
  if (!gender || ATH_NO_GENDER_PREFIX.includes(sport)) return sport;
  return gender + ' ' + sport;
@@ -2680,12 +2690,14 @@ function athleticsSportLabel(sport, gender) {
 
 // Turns one raw row from the AD's own sheet (Publish/Date/Time/Team/
 // Home-Away/Opponent/Site — his exact master-schedule headers) into the
-// shape the rest of the Athletics code uses. Returns null for cancelled
-// or unusable rows so callers can just .filter(Boolean).
+// shape the rest of the Athletics code uses. Cancelled games are kept
+// (flagged via _cancelled) rather than dropped, so the site can show that
+// status instead of the game silently disappearing. Returns null only for
+// rows that are genuinely unusable (no date or no opponent).
 function parseAthleticsRow(r) {
  const publish = (r.Publish || '').toString().trim().toUpperCase();
  const homeAway = (r['Home/Away'] || '').toString().trim();
- if (publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED') return null;
+ const cancelled = publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED';
  const date = parseAthleticsDate(r.Date);
  const opponent = (r.Opponent || '').toString().trim();
  if (!date || !opponent) return null;
@@ -2705,7 +2717,17 @@ function parseAthleticsRow(r) {
  // single-gender-by-convention sports (Football, Field Hockey) stay as one.
  _sport: sportLabel,
  _level: level,
+ _cancelled: cancelled,
  };
+}
+
+// One shared tile for every place a single game gets rendered as an .ev
+// row (This Week's Games, By Sport lists) — cancelled games get a red tag
+// and a struck-through title instead of a different function per caller.
+function athleticsGameTileHTML(r) {
+ const titleStyle = r._cancelled ? ' style="text-decoration:line-through;opacity:.55;"' : '';
+ const badge = r._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;">Cancelled</span>' : '';
+ return `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t"${titleStyle}>${r.TITLE}${badge}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`;
 }
 
 let athLoaded = false;
@@ -2722,14 +2744,14 @@ async function loadAthletics() {
  const today = new Date(); today.setHours(0,0,0,0);
  const clean = rows.map(parseAthleticsRow).filter(Boolean)
  .filter(r => r._date >= today && r._level === 'Varsity')
- .sort((a,b) => a._date - b._date).slice(0,6);
+ .sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME)).slice(0,6);
 
  if (!clean.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted this week — check the full site for the season schedule.</p>';
  athLoaded = true;
  return;
  }
- el.innerHTML = clean.map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' · '+r.LOCATION:''}</div></div></div>`).join('');
+ el.innerHTML = clean.map(athleticsGameTileHTML).join('');
  athLoaded = true;
  } catch(e) {
  console.warn('[Athletics] load failed', e);
@@ -3408,7 +3430,7 @@ async function openSchedule() {
  try {
  const rows = await fetchTab(GIDS.athletics);
  const today = new Date(); today.setHours(0,0,0,0);
- const clean = rows.map(parseAthleticsRow).filter(Boolean).sort((a,b) =>a._date - b._date);
+ const clean = rows.map(parseAthleticsRow).filter(Boolean).sort((a,b) =>a._date - b._date || athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME));
 
  if (!clean.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
@@ -3427,8 +3449,6 @@ async function openSchedule() {
  });
  window._scheduleGames = clean;
  window._scheduleActiveLevel = window._scheduleActiveLevel || {};
-
- const gameTile = r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`;
 
  el.innerHTML = sports.map((sport, i) => {
  const games = bySport[sport];
@@ -3452,7 +3472,7 @@ async function openSchedule() {
  </button>
  <div id="sport-body-${i}" class="ev-card" style="display:none;border-top:1px solid var(--line);border-radius:0;">
  ${levelTabs}
- <div id="sport-games-${i}">${shown.map(gameTile).join('')}</div>
+ <div id="sport-games-${i}">${shown.map(athleticsGameTileHTML).join('')}</div>
  </div>
  </div>
  `;
@@ -3511,12 +3531,12 @@ function renderScheduleCalendar() {
  const cellDate = new Date(m.year, m.month, d);
  const isToday = cellDate.getTime() === today.getTime();
  const has = dayGames.length > 0;
- const tips = dayGames.map(g => (g.TITLE || '') + (g._level !== 'Varsity' ? ' (' + g._level + ')' : '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
+ const tips = dayGames.map(g => (g.TITLE || '') + (g._level !== 'Varsity' ? ' (' + g._level + ')' : '') + (g._cancelled ? ' [CANCELLED]' : '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
  // Tappable when there are games — hover tooltips don't exist on touch
  // devices, so the full list has to be reachable by tap/click too.
  cells += '<div ' + (has ? 'onclick="openScheduleDay(\'' + k + '\')" ' : '') + 'title="' + tips.replace(/"/g,'&quot;') + '" style="min-height:64px;border:1px solid ' + (isToday ? 'var(--purple-glow)' : 'var(--line)') + ';border-radius:8px;padding:5px 6px;background:' + (has ? 'rgba(91,63,192,0.16)' : 'transparent') + ';overflow:hidden;' + (has ? 'cursor:pointer;' : '') + '">'
  + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;color:' + (has ? '#fff' : 'var(--faint)') + ';margin-bottom:2px;">' + d + '</div>'
- + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g._sport || '') + (g._level !== 'Varsity' ? ' · ' + g._level : '') + '</div>').join('')
+ + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' + (g._cancelled ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + (g._sport || '') + (g._level !== 'Varsity' ? ' · ' + g._level : '') + '</div>').join('')
  + (dayGames.length > 3 ? '<div style="font-size:8px;color:var(--purple-glow);">+' + (dayGames.length - 3) + ' more</div>' : '')
  + '</div>';
  }
@@ -3559,7 +3579,10 @@ function openScheduleDay(key) {
  + '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:14px;">' + MONTH_NAMES[d.getMonth()] + ' ' + d.getDate() + '</div>'
  + games.map(g =>
  '<div style="border-top:1px solid var(--line);padding:10px 0;">'
- + '<div style="font-size:14px;font-weight:600;color:#fff;">' + (g.TITLE || '') + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;">(' + g._level + ')</span>' : '') + '</div>'
+ + '<div style="font-size:14px;font-weight:600;color:#fff;' + (g._cancelled ? 'text-decoration:line-through;opacity:.55;' : '') + '">' + (g.TITLE || '')
+ + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;">(' + g._level + ')</span>' : '')
+ + (g._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;">Cancelled</span>' : '')
+ + '</div>'
  + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
  + '</div>').join('');
  modal.style.display = 'flex';
@@ -3605,7 +3628,7 @@ function setScheduleSportLevel(i, sport, level) {
  window._scheduleActiveLevel[sport] = level;
  const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level);
  const gamesEl = document.getElementById('sport-games-' + i);
- if (gamesEl) gamesEl.innerHTML = games.map(r => `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t">${r.TITLE}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`).join('');
+ if (gamesEl) gamesEl.innerHTML = games.map(athleticsGameTileHTML).join('');
  const countEl = document.getElementById('sport-count-' + i);
  if (countEl) countEl.textContent = games.length + ' game' + (games.length === 1 ? '' : 's');
  SCHEDULE_LEVEL_ORDER.forEach(lv => {
@@ -3651,7 +3674,7 @@ function onPrintSportChange() {
  levelSel.innerHTML = levels.map(lv => `<option value="${lv}">${lv}</option>`).join('');
 }
 function athleticsSchedulePrintHTML(sport, level, games) {
- const rows = games.map(g => `<tr><td>${g.MONTH} ${g.DAY}</td><td>${g.TITLE}</td><td>${g.TIME||'TBD'}</td><td>${g.LOCATION||''}</td></tr>`).join('')
+ const rows = games.map(g => `<tr${g._cancelled ? ' style="opacity:.55;"' : ''}><td>${g.MONTH} ${g.DAY}</td><td>${g.TITLE}${g._cancelled ? ' <strong style="color:#B91C1C;">\u2014 CANCELLED</strong>' : ''}</td><td>${g.TIME||'TBD'}</td><td>${g.LOCATION||''}</td></tr>`).join('')
  || '<tr><td colspan="4" style="text-align:center;color:#888;">No games scheduled</td></tr>';
  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${sport} \u2014 ${level} Schedule</title>
  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;max-width:680px;margin:32px auto;padding:0 24px;color:#222}
@@ -3675,7 +3698,7 @@ function printAthleticsSchedule() {
  if (!sportSel || !levelSel || !sportSel.value) { showToast('Schedule is still loading \u2014 try again in a moment.'); return; }
  const sport = sportSel.value;
  const level = levelSel.value;
- const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level).sort((a,b) => a._date - b._date);
+ const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level).sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME));
  printInPlace(athleticsSchedulePrintHTML(sport, level, games));
 }
 
