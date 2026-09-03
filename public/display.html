@@ -231,23 +231,26 @@ function athleticsSportLabel(sport, gender) {
 // Home-Away/Opponent/Site) into the shape this file renders. Returns
 // null for cancelled or unusable rows.
 function parseAthleticsRow(r) {
- const publish = (r.Publish || '').toString().trim().toUpperCase();
- const homeAway = (r['Home/Away'] || '').toString().trim();
+ // display.html's own parseCSV() uppercases every header key (unlike
+ // index.html's), so this reads PUBLISH/DATE/TEAM/etc., not the mixed-case
+ // spelling the AD's sheet actually uses.
+ const publish = (r.PUBLISH || '').toString().trim().toUpperCase();
+ const homeAway = (r['HOME/AWAY'] || '').toString().trim();
  if (publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED') return null;
- const date = parseAthleticsDate(r.Date);
- const opponent = (r.Opponent || '').toString().trim();
+ const date = parseAthleticsDate(r.DATE);
+ const opponent = (r.OPPONENT || '').toString().trim();
  if (!date || !opponent) return null;
- const { sport, level, gender } = parseAthleticsTeam(r.Team);
+ const { sport, level, gender } = parseAthleticsTeam(r.TEAM);
  const sportLabel = athleticsSportLabel(sport, gender);
  const vsAt = homeAway.toLowerCase() === 'home' ? 'vs' : '@';
- let site = (r.Site || '').toString().trim();
+ let site = (r.SITE || '').toString().trim();
  if (site.includes('>>')) site = site.split('>>')[0].trim();
  return {
  _d: date,
  MONTH: MONTH_ABBR[date.getMonth()],
  DAY: String(date.getDate()),
  TITLE: sportLabel + ' ' + vsAt + ' ' + opponent,
- TIME: parseAthleticsTime(r.Time),
+ TIME: parseAthleticsTime(r.TIME),
  LOCATION: site,
  _sport: sportLabel,
  _level: level,
