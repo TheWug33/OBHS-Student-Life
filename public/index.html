@@ -711,28 +711,7 @@ img{max-width:100%;display:block;}
  <div id="cup-bars"></div>
  </div>
 
- <div class="two">
- <div class="cs" id="committees-preview-live" style="display:none">
- <div class="cs-ttl">Leadership Committees<span style="font-weight:300;letter-spacing:0;text-transform:none;font-family:'DM Sans';font-size:11px;color:var(--faint)">2026–27</span></div>
- <div class="comm">
- <div class="ct"><div class="ct-t">Community Service</div><div class="ct-d">Manage the 10-hr requirement &amp; approved org list</div></div>
- <div class="ct"><div class="ct-t">Student Events</div><div class="ct-d">Plan and run school events &amp; activities</div></div>
- <div class="ct"><div class="ct-t">School Spirit</div><div class="ct-d">Pep rallies, gear, and spirit campaigns</div></div>
- <div class="ct"><div class="ct-t">Cell Phone Policy</div><div class="ct-d">Student voice on policy proposals</div></div>
- <div class="ct"><div class="ct-t">Communications</div><div class="ct-d">Announcements, Instagram &amp; social media</div></div>
- </div>
- <button class="cta">Join a committee →</button>
- </div>
- <div class="cs" id="committees-preview-soon">
- <div class="cs-ttl">Leadership Committees</div>
- <div class="info"><div class="info-t">Coming soon</div><div class="info-d">Committee sign-ups for 2026–27 aren't open yet — check back soon.</div></div>
- </div>
- <div class="cs" id="cs-preview-live">
- <div class="cs-ttl">Community Service</div>
- <div class="info"><div class="info-t">What counts, ideas to get started</div><div class="info-d">Community service isn't required at OBHS, but colleges and scholarships often look for it — and it's a good way to give back. Browse ideas and real opportunities below.</div></div>
- <div class="flr" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-service')"><div><div class="flr-t">What is community service?</div><div class="flr-d">Examples of what counts, and how to find something you care about</div></div><div class="flr-arr">→</div></div>
- </div>
- </div>
+ 
  </div>
 
 
@@ -1181,7 +1160,6 @@ function applyComingSoonToggles(){
  ['s-service-live','s-service-soon', SHOW_COMMUNITY_SERVICE],
  ['s-spirit-live','s-spirit-soon', SHOW_SPIRIT_WEAR],
  ['ft-request-live','ft-request-paper', SHOW_ONLINE_FIELDTRIP_REQUEST],
- ['committees-preview-live','committees-preview-soon', SHOW_COMMITTEES],
  ['s-committees-live','s-committees-soon', SHOW_COMMITTEES],
  ];
  pairs.forEach(([liveId,soonId,show])=>{
@@ -3464,7 +3442,6 @@ function renderScheduleCalendar() {
  + '<div onclick="toggleScheduleMonth(\'' + m.key + '\')" style="display:flex;align-items:center;gap:8px;margin:0 0 10px;cursor:pointer;">'
  + '<span class="blk-title sm" style="margin:0;">' + MONTH_NAMES[m.month] + ' ' + m.year + '</span>'
  + '<span id="schedchev-' + m.key + '" style="font-size:11px;color:var(--purple-glow);">' + (isPast ? '\u25b8' : '\u25be') + '</span>'
- + (isPast ? '<span style="font-size:10px;color:var(--faint);">(past)</span>' : '')
  + '</div>'
  + '<div id="' + bodyId + '" style="' + (isPast ? 'display:none;' : '') + '">'
  + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px;">'
