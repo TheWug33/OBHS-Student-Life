@@ -1080,6 +1080,10 @@ img{max-width:100%;display:block;}
      <button onclick="openPhysicals()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 10px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;line-height:1.25;">Physical Information</button>
      <button onclick="openWaiver()" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 10px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;line-height:1.25;">Transportation Waiver</button>
    </div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+     <button onclick="window.open(TEAM_APPAREL_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 10px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;line-height:1.25;">Team Apparel</button>
+     <button onclick="window.open(FOOTBALL_TICKETS_URL,'_blank')" style="background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 10px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;line-height:1.25;">Home Football Tickets</button>
+   </div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
      <button onclick="window.open(ATHLETICS_URL,'_blank')" style="grid-column:2;background:rgba(199,201,209,0.1);color:var(--silver);border:1px solid var(--line);padding:11px 10px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;line-height:1.25;">Athletics Site</button>
    </div>
@@ -1204,6 +1208,8 @@ const PHONE_MANUAL_URL = 'https://obps-my.sharepoint.com/:w:/g/personal/sfazio_o
 const NEW_EDUCATOR_BINDER_URL = 'https://www.canva.com/design/DAGMoiOJuiU/q77SbfCEG4k_PiUnZmmMug/view?utm_content=DAGMoiOJuiU&utm_campaign=designshare&utm_medium=link&utm_source=editor'; // OBTPS New Educator Digital Binder
 const FACILITIES_URL = 'https://nj8.mlschedules.com/Login.aspx'; // Room/space reservations
 const ATHLETICS_URL = 'https://www.oldbridgeadmin.org/o/obhs/page/old-bridge-athletics'; // Full schedules, rosters, scores
+const TEAM_APPAREL_URL = 'https://sideline.bsnsports.com/schools/new_jersey/matawan/old-bridge-high-school';
+const FOOTBALL_TICKETS_URL = 'https://events.hometownticketing.com/boxoffice/oldbridge/entity/schools/2'; // Home football ticket purchases
 const FIELDTRIP_LOG_FORM_URL = 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7bKCJrldMUOOD8M0xrkhaIu1IRdxhJtFsyzwNwmeVSJUMzFSSkJCTk5RS1hHN01UQlg1SUpLMkY5TC4u';
 const HANDBOOK_URL = '#'; // ← Club Advisor Handbook doc link
 const BUDGET_URL = '#'; // ← Budget & Purchasing guide/form link
@@ -3458,7 +3464,7 @@ async function openSchedule() {
 function renderScheduleCalendar() {
  const el = document.getElementById('schedule-cal');
  if (!el) return;
- const games = (window._scheduleGames || []).filter(g => g._date && g._date.getFullYear() < 9000 && g._level === 'Varsity');
+ const games = (window._scheduleGames || []).filter(g => g._date && g._date.getFullYear() < 9000);
  if (!games.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
  return;
@@ -3498,12 +3504,12 @@ function renderScheduleCalendar() {
  const cellDate = new Date(m.year, m.month, d);
  const isToday = cellDate.getTime() === today.getTime();
  const has = dayGames.length > 0;
- const tips = dayGames.map(g => (g.TITLE || '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
+ const tips = dayGames.map(g => (g.TITLE || '') + (g._level !== 'Varsity' ? ' (' + g._level + ')' : '') + (g.TIME ? ' \u00b7 ' + g.TIME : '')).join('\n');
  // Tappable when there are games — hover tooltips don't exist on touch
  // devices, so the full list has to be reachable by tap/click too.
  cells += '<div ' + (has ? 'onclick="openScheduleDay(\'' + k + '\')" ' : '') + 'title="' + tips.replace(/"/g,'&quot;') + '" style="min-height:64px;border:1px solid ' + (isToday ? 'var(--purple-glow)' : 'var(--line)') + ';border-radius:8px;padding:5px 6px;background:' + (has ? 'rgba(91,63,192,0.16)' : 'transparent') + ';overflow:hidden;' + (has ? 'cursor:pointer;' : '') + '">'
  + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;color:' + (has ? '#fff' : 'var(--faint)') + ';margin-bottom:2px;">' + d + '</div>'
- + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g._sport || '') + '</div>').join('')
+ + dayGames.slice(0,3).map(g => '<div style="font-size:8.5px;line-height:1.35;color:var(--silver);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (g._sport || '') + (g._level !== 'Varsity' ? ' · ' + g._level : '') + '</div>').join('')
  + (dayGames.length > 3 ? '<div style="font-size:8px;color:var(--purple-glow);">+' + (dayGames.length - 3) + ' more</div>' : '')
  + '</div>';
  }
@@ -3546,7 +3552,7 @@ function openScheduleDay(key) {
  + '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:14px;">' + MONTH_NAMES[d.getMonth()] + ' ' + d.getDate() + '</div>'
  + games.map(g =>
  '<div style="border-top:1px solid var(--line);padding:10px 0;">'
- + '<div style="font-size:14px;font-weight:600;color:#fff;">' + (g.TITLE || '') + '</div>'
+ + '<div style="font-size:14px;font-weight:600;color:#fff;">' + (g.TITLE || '') + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;">(' + g._level + ')</span>' : '') + '</div>'
  + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
  + '</div>').join('');
  modal.style.display = 'flex';
