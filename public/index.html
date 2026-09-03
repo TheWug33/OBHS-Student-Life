@@ -2614,6 +2614,91 @@ document.getElementById('flyer-modal')?.addEventListener('click', function(e){
 // ══════════════════════════════════════════════════════
 // ATHLETICS — this week's games (links to oldbridgeathletics.org for full depth)
 // ══════════════════════════════════════════════════════
+
+// Sports whose game title never carries a gender prefix on this site
+// (Football and Field Hockey are effectively single-team sports here —
+// everything else gets "Boys "/"Girls " prepended when a gender is present).
+const ATH_NO_GENDER_PREFIX = ['Football', 'Field Hockey'];
+
+// "Soccer, Junior Varsity, Boys" -> {sport:'Soccer', level:'JV', gender:'Boys'}
+// Matches the AD's own Team-column convention exactly, so nothing needs
+// retyping when he pastes a fresh Team column in.
+function parseAthleticsTeam(teamRaw) {
+ const parts = (teamRaw || '').toString().split(',').map(s => s.trim()).filter(Boolean);
+ const sport = parts[0] || 'Other';
+ let level = 'Varsity';
+ if (parts[1]) {
+ const lv = parts[1].toLowerCase();
+ if (lv.includes('freshman')) level = 'Freshman';
+ else if (lv.includes('junior')) level = 'JV';
+ }
+ return { sport, level, gender: parts[2] || '' };
+}
+
+// Accepts whatever date format the sheet's CSV export happens to use —
+// ISO (2026-08-17), US slash (8/17/2026), or anything JS's Date() natively
+// understands — and returns a clean local-time Date, or null if unusable.
+function parseAthleticsDate(raw) {
+ const s = (raw || '').toString().trim();
+ if (!s) return null;
+ let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+ if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+ m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+ if (m) return new Date(+m[3], +m[1] - 1, +m[2]);
+ const d = new Date(s);
+ return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// Normalizes whatever the Time column exports to ("9:00:00", "09:00", TBA,
+// etc.) into the same "9:00 AM" style already used across the site.
+function parseAthleticsTime(raw) {
+ const s = (raw || '').toString().trim();
+ if (!s) return '';
+ if (/^tba$/i.test(s)) return 'TBA';
+ let m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])$/);
+ if (m) return parseInt(m[1], 10) + ':' + m[2] + ' ' + m[3].toUpperCase();
+ m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+ if (m) {
+ const h = parseInt(m[1], 10);
+ const ap = h >= 12 ? 'PM' : 'AM';
+ let h12 = h % 12; if (h12 === 0) h12 = 12;
+ return h12 + ':' + m[2] + ' ' + ap;
+ }
+ return s;
+}
+
+function athleticsSportLabel(sport, gender) {
+ if (!gender || ATH_NO_GENDER_PREFIX.includes(sport)) return sport;
+ return gender + ' ' + sport;
+}
+
+// Turns one raw row from the AD's own sheet (Publish/Date/Time/Team/
+// Home-Away/Opponent/Site — his exact master-schedule headers) into the
+// shape the rest of the Athletics code uses. Returns null for cancelled
+// or unusable rows so callers can just .filter(Boolean).
+function parseAthleticsRow(r) {
+ const publish = (r.Publish || '').toString().trim().toUpperCase();
+ const homeAway = (r['Home/Away'] || '').toString().trim();
+ if (publish === 'CANCELLED' || homeAway.toUpperCase() === 'CANCELLED') return null;
+ const date = parseAthleticsDate(r.Date);
+ const opponent = (r.Opponent || '').toString().trim();
+ if (!date || !opponent) return null;
+ const { sport, level, gender } = parseAthleticsTeam(r.Team);
+ const vsAt = homeAway.toLowerCase() === 'home' ? 'vs' : '@';
+ let site = (r.Site || '').toString().trim();
+ if (site.includes('>>')) site = site.split('>>')[0].trim();
+ return {
+ _date: date,
+ MONTH: (Object.keys(MONTH_NUM).find(k => MONTH_NUM[k] === date.getMonth()) || ''),
+ DAY: String(date.getDate()),
+ TITLE: athleticsSportLabel(sport, gender) + ' ' + vsAt + ' ' + opponent,
+ TIME: parseAthleticsTime(r.Time),
+ LOCATION: site,
+ _sport: sport,
+ _level: level,
+ };
+}
+
 let athLoaded = false;
 async function loadAthletics() {
  if (athLoaded) return;
@@ -2626,20 +2711,9 @@ async function loadAthletics() {
  try {
  const rows = await fetchTab(GIDS.athletics);
  const today = new Date(); today.setHours(0,0,0,0);
- // Same fixed school-year anchor as renderEv — see the comment there for why.
- const athSchoolYearStartYear = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear() - 1;
- const clean = rows.filter(r =>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
- const rawDay = (r.DAY||'').toString().trim();
- const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
- let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
- const mo = MONTH_NUM[rawMonth.slice(0,3)];
- if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
- const yr = mo >= 7 ? athSchoolYearStartYear : athSchoolYearStartYear + 1;
- r._date = new Date(yr, mo, dy);
- r.MONTH = rawMonth.slice(0,3);
- r.DAY = String(dy);
- return r;
- }).filter(r =>r._date >= today && scheduleLevel(r) === 'Varsity').sort((a,b) =>a._date - b._date).slice(0,6);
+ const clean = rows.map(parseAthleticsRow).filter(Boolean)
+ .filter(r => r._date >= today && r._level === 'Varsity')
+ .sort((a,b) => a._date - b._date).slice(0,6);
 
  if (!clean.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted this week — check the full site for the season schedule.</p>';
@@ -3309,16 +3383,9 @@ function printEoyReport() {
 // FULL ATHLETICS SCHEDULE — every game, grouped by sport
 // ══════════════════════════════════════════════════════
 let scheduleLoaded = false;
-function scheduleSportName(title) {
- const m = (title || '').match(/^(.*?)\s+(?:vs|@)\s+/i);
- return m ? m[1].trim() : (title || 'Other').trim();
-}
-// A blank LEVEL cell means Varsity — lets the existing Varsity rows stay
-// untouched in the sheet while new JV/Freshman rows just add a LEVEL value.
-function scheduleLevel(row) {
- const lv = (row.LEVEL || '').toString().trim();
- return lv || 'Varsity';
-}
+// Sport, level, and gender now come straight from parseAthleticsRow()
+// (via the Team column), so this file no longer derives them by
+// regex-parsing the built TITLE string or reading a separate LEVEL cell.
 const SCHEDULE_LEVEL_ORDER = ['Varsity', 'JV', 'Freshman'];
 async function openSchedule() {
  document.getElementById('schedule-modal').style.display = 'block';
@@ -3332,22 +3399,7 @@ async function openSchedule() {
  try {
  const rows = await fetchTab(GIDS.athletics);
  const today = new Date(); today.setHours(0,0,0,0);
- // Same fixed school-year anchor as renderEv — see the comment there for why.
- const schedSchoolYearStartYear = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear() - 1;
- const clean = rows.filter(r =>r.TITLE && !r.TITLE.includes('ADD YOUR') && r.DAY && r.DAY !== '0').map(r => {
- const rawDay = (r.DAY||'').toString().trim();
- const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
- let rawMonth = (r.MONTH||'').toString().trim().toUpperCase();
- const mo = MONTH_NUM[rawMonth.slice(0,3)];
- if (mo === undefined) { r._date = new Date(9999,0,1); return r; }
- const yr = mo >= 7 ? schedSchoolYearStartYear : schedSchoolYearStartYear + 1;
- r._date = new Date(yr, mo, dy);
- r.MONTH = rawMonth.slice(0,3);
- r.DAY = String(dy);
- r._sport = scheduleSportName(r.TITLE);
- r._level = scheduleLevel(r);
- return r;
- }).sort((a,b) =>a._date - b._date);
+ const clean = rows.map(parseAthleticsRow).filter(Boolean).sort((a,b) =>a._date - b._date);
 
  if (!clean.length) {
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No games posted yet.</p>';
