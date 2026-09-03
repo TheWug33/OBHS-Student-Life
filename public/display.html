@@ -42,6 +42,11 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 .ev-row{display:flex;align-items:center;gap:26px;padding:19px 0;border-bottom:1px solid var(--line);}
 .ev-date{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
 .ev-date.range{width:136px;}
+/* Time badge for Today's Games — same size/shape as the date badge it
+   replaces, since every row shares today's date and repeating it is noise. */
+.ev-time{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
+.ev-time .t-hr{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1;}
+.ev-time .t-ap{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--silver);margin-top:2px;}
 .ev-date.cross{width:auto;min-width:180px;display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 16px;}
 .ev-date.cross .ev-half{display:flex;flex-direction:column;align-items:center;}
 .ev-date.cross .ev-mon{font-size:13px;}
@@ -176,6 +181,15 @@ const GIDS = {
 const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
+// Splits a sheet time like "5:30 PM" / "4:00PM" / "TBD" into two badge lines.
+// Falls back gracefully rather than showing a broken badge on odd input.
+function splitGameTime(raw){
+ const s=(raw||'').toString().trim();
+ if(!s) return {hr:'TBD', ap:''};
+ const m=s.match(/^(\d{1,2}(?::\d{2})?)\s*([APap]\.?[Mm]\.?)?$/);
+ if(!m) return {hr:s, ap:''};
+ return {hr:m[1], ap:(m[2]||'').replace(/\./g,'').toUpperCase()};
+}
 function buildEventTile(mon, day, endMonRaw, endDayRaw) {
  endMonRaw = (endMonRaw||'').toString().trim().toUpperCase().slice(0,3);
  endDayRaw = (endDayRaw||'').toString().trim();
@@ -333,10 +347,14 @@ async function loadData(){
  return r;
  // Today only — no cap, so every game on the day is listed.
  }).filter(r=>r._d>=today&&r._d<tomorrow).sort((a,b)=>a._d-b._d);
- document.getElementById('game-list').innerHTML=games.length?games.map(g=>
- '<div class="ev-row">'+buildEventTile(MONTH_ABBR[g._d.getMonth()],g._d.getDate(),'','')+
- '<div><div class="ev-t">'+g.TITLE+'</div><div class="ev-m">'+(g.TIME||'TBD')+(g.LOCATION?' · '+g.LOCATION:'')+'</div></div></div>'
- ).join(''):'<div class="empty">No games scheduled today.</div>';
+ document.getElementById('game-list').innerHTML=games.length?games.map(g=>{
+ const t=splitGameTime(g.TIME);
+ return '<div class="ev-row">'
+ + '<div class="ev-time"><div class="t-hr">'+t.hr+'</div>'+(t.ap?'<div class="t-ap">'+t.ap+'</div>':'')+'</div>'
+ + '<div><div class="ev-t">'+g.TITLE+'</div>'
+ + (g.LOCATION?'<div class="ev-m">'+g.LOCATION+'</div>':'')
+ + '</div></div>';
+ }).join(''):'<div class="empty">No games scheduled today.</div>';
  unifyTitleSizes('#game-list .ev-t', 84, 18, 34);
  })();
  // Footer ticker: continuous crawl of all announcements
