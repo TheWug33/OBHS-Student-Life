@@ -238,6 +238,7 @@ function parseAthleticsRow(r) {
  const opponent = (r.Opponent || '').toString().trim();
  if (!date || !opponent) return null;
  const { sport, level, gender } = parseAthleticsTeam(r.Team);
+ const sportLabel = athleticsSportLabel(sport, gender);
  const vsAt = homeAway.toLowerCase() === 'home' ? 'vs' : '@';
  let site = (r.Site || '').toString().trim();
  if (site.includes('>>')) site = site.split('>>')[0].trim();
@@ -245,10 +246,10 @@ function parseAthleticsRow(r) {
  _d: date,
  MONTH: MONTH_ABBR[date.getMonth()],
  DAY: String(date.getDate()),
- TITLE: athleticsSportLabel(sport, gender) + ' ' + vsAt + ' ' + opponent,
+ TITLE: sportLabel + ' ' + vsAt + ' ' + opponent,
  TIME: parseAthleticsTime(r.Time),
  LOCATION: site,
- _sport: sport,
+ _sport: sportLabel,
  _level: level,
  };
 }
