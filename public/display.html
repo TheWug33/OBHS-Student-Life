@@ -131,7 +131,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 
 <div class="stage">
  <div class="slide" id="slide-events"><div class="slide-tag">Upcoming Events</div><div id="ev-list"><div class="empty">Loading…</div></div></div>
- <div class="slide" id="slide-games"><div class="slide-tag">This Week's Games</div><div id="game-list"><div class="empty">Loading…</div></div></div>
+ <div class="slide" id="slide-games"><div class="slide-tag">Today's Games</div><div id="game-list"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-kotw"><div class="slide-tag">Knight of the Week</div><div id="kotw-wrap"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-cd"><div class="cd-wrap"><div class="cd-label" id="cd-label">Countdown</div><div class="cd-num" id="cd-num">—</div><div class="cd-days">Days</div><div class="lyric" id="lyric" style="display:none"></div></div></div>
 </div>
@@ -314,12 +314,12 @@ async function loadData(){
  ).join(''):'<div class="empty">No upcoming events posted.</div>';
  unifyTitleSizes('#ev-list .ev-t', 79, 18, 33);
 
- // This Week's Games — same athletics tab the website uses.
+ // Today's Games — same athletics tab the website uses.
  // Announcements are NOT rendered as a slide anymore; they still feed the
  // footer ticker below, so the same info isn't shown twice on screen.
  (function(){
  const today=new Date(); today.setHours(0,0,0,0);
- const weekEnd=new Date(today); weekEnd.setDate(weekEnd.getDate()+7);
+ const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
  // Anchor to the school year the same way the website does, so a past
  // one-time game never jumps forward a year and reappears.
  const syStart = today.getMonth() >= 7 ? today.getFullYear() : today.getFullYear()-1;
@@ -331,11 +331,12 @@ async function loadData(){
  const yr = mo>=7 ? syStart : syStart+1;
  r._d=new Date(yr,mo,dy);
  return r;
- }).filter(r=>r._d>=today&&r._d<weekEnd).sort((a,b)=>a._d-b._d).slice(0,5);
+ // Today only — no cap, so every game on the day is listed.
+ }).filter(r=>r._d>=today&&r._d<tomorrow).sort((a,b)=>a._d-b._d);
  document.getElementById('game-list').innerHTML=games.length?games.map(g=>
  '<div class="ev-row">'+buildEventTile(MONTH_ABBR[g._d.getMonth()],g._d.getDate(),'','')+
  '<div><div class="ev-t">'+g.TITLE+'</div><div class="ev-m">'+(g.TIME||'TBD')+(g.LOCATION?' · '+g.LOCATION:'')+'</div></div></div>'
- ).join(''):'<div class="empty">No games scheduled this week.</div>';
+ ).join(''):'<div class="empty">No games scheduled today.</div>';
  unifyTitleSizes('#game-list .ev-t', 84, 18, 34);
  })();
  // Footer ticker: continuous crawl of all announcements
