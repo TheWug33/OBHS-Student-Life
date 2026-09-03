@@ -3601,12 +3601,25 @@ function renderScheduleCalendar() {
  + '</div>';
  }
 
+ // Months that have already finished start collapsed, so the current
+ // month is the first thing you see. They stay reachable — the header
+ // is clickable to expand — rather than being hidden outright.
+ const isPast = m.year < today.getFullYear()
+ || (m.year === today.getFullYear() && m.month < today.getMonth());
+ const bodyId = 'schedmonth-' + m.key;
+
  return '<div style="margin-bottom:22px;">'
- + '<div class="blk-title sm" style="margin:0 0 10px;">' + MONTH_NAMES[m.month] + ' ' + m.year + '</div>'
+ + '<div onclick="toggleScheduleMonth(\'' + m.key + '\')" style="display:flex;align-items:center;gap:8px;margin:0 0 10px;cursor:pointer;">'
+ + '<span class="blk-title sm" style="margin:0;">' + MONTH_NAMES[m.month] + ' ' + m.year + '</span>'
+ + '<span id="schedchev-' + m.key + '" style="font-size:11px;color:var(--purple-glow);">' + (isPast ? '\u25b8' : '\u25be') + '</span>'
+ + (isPast ? '<span style="font-size:10px;color:var(--faint);">(past)</span>' : '')
+ + '</div>'
+ + '<div id="' + bodyId + '" style="' + (isPast ? 'display:none;' : '') + '">'
  + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px;">'
  + ['S','M','T','W','T','F','S'].map(d => '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--faint);">' + d + '</div>').join('')
  + '</div>'
  + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">' + cells + '</div>'
+ + '</div>'
  + '</div>';
  }).join('');
 }
@@ -3631,6 +3644,15 @@ function openScheduleDay(key) {
  + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
  + '</div>').join('');
  modal.style.display = 'flex';
+}
+
+function toggleScheduleMonth(key) {
+ const body = document.getElementById('schedmonth-' + key);
+ const chev = document.getElementById('schedchev-' + key);
+ if (!body) return;
+ const hidden = body.style.display === 'none';
+ body.style.display = hidden ? 'block' : 'none';
+ if (chev) chev.textContent = hidden ? '\u25be' : '\u25b8';
 }
 
 function setScheduleView(view) {
@@ -3663,7 +3685,7 @@ function toggleScheduleSport(i) {
 function closeSchedule() {
  document.getElementById('schedule-modal').style.display = 'none';
  document.body.style.overflow = '';
- setScheduleView('sport');
+ setScheduleView('calendar');
 }
 
 // ══════════════════════════════════════════════════════
@@ -4122,11 +4144,11 @@ observeReveal();
  <h2 class="cal-modal-ttl">Full Fall Schedule</h2>
  </div>
  <div style="display:flex;gap:8px;margin-bottom:16px;">
- <button id="sched-tab-sport" onclick="setScheduleView('sport')" style="flex:1;background:var(--purple-ui);color:#fff;border:1px solid var(--line-bright);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">By Sport</button>
- <button id="sched-tab-cal" onclick="setScheduleView('calendar')" style="flex:1;background:transparent;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Calendar</button>
+ <button id="sched-tab-cal" onclick="setScheduleView('calendar')" style="flex:1;background:var(--purple-ui);color:#fff;border:1px solid var(--line-bright);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Calendar</button>
+ <button id="sched-tab-sport" onclick="setScheduleView('sport')" style="flex:1;background:transparent;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">By Sport</button>
  </div>
- <div id="schedule-list"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
- <div id="schedule-cal" style="display:none"></div>
+ <div id="schedule-list" style="display:none"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
+ <div id="schedule-cal"><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px;margin-bottom:8px"></div><div class="skel" style="height:56px"></div></div>
  </div>
 </div>
 
