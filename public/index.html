@@ -2059,17 +2059,26 @@ async function load(){
 let chAllClubs = [], chActiveCategory = '', chLoaded = false;
 
 const CH_CATEGORY_RULES = [
- ['stem', 'STEM', 'cat-stem', ['bioinformatics','biomedical','engineering','robotics','math','science','chess','technology','computer','coding','physics','chemistry']],
+ ['stem', 'STEM', 'cat-stem', ['bioinformatics','biomedical','engineering','robotics','math','science','chess','technology','computer','coding','physics','chemistry','hosa','stem']],
  ['arts', 'Arts', 'cat-arts', ['art','drama','theater','theatre','music','dance','film','photography','creative','literary','writing','poetry','band','choir','orchestra','yearbook','newspaper','journalism','knightlife']],
  ['athletics','Athletics & Fitness','cat-athletics', ['athletic','sport','fitness','volleyball','basketball','soccer','baseball','softball','football','tennis','swim','track','cross country','cheer','lacrosse','wrestling','golf']],
  ['service', 'Community Service', 'cat-service', ['service','volunteer','community','charity','feed','environment','green','sustainability','social justice','advocacy','awareness','bring change','mind']],
- ['cultural', 'Cultural', 'cat-cultural', ['asian','black','african','hispanic','latino','chinese','korean','indian','caribbean','italian','french','spanish','international','culture','heritage']],
+ ['cultural', 'Cultural', 'cat-cultural', ['asian','black','african','hispanic','latino','chinese','korean','indian','caribbean','italian','french','spanish','international','culture','heritage','hindu','muslim','islamic','jewish','sikh','buddhist','filipino','vietnamese','arab','greek','polish','german','russian','ukrainian','native american','indigenous','south asian','middle eastern']],
  ['identity', 'Identity & Affinity','cat-identity', ['women','gender','lgbtq','pride','diversity','equity','inclusion','feminist','student union','affinity','minority']],
- ['academic', 'Academic', 'cat-academic', ['academic','honor','national','society','debate','model un','mock trial','law','history','language','book','reading','tutoring','scholar','gifted','business','finance','economics','investment','leadership','student government','class council','animal advisory']],
+ ['business', 'Business & Finance', 'cat-business', ['business','finance','economics','investment','entrepreneur','fbla','deca','marketing','stock market']],
+ ['academic', 'Academic', 'cat-academic', ['academic','honor','national','society','debate','model un','mock trial','law','history','language','book','reading','tutoring','scholar','gifted','leadership','student government','class council','animal advisory']],
 ];
 
-function chAssignCategory(name) {
- const lower = name.toLowerCase();
+// If the sheet has an explicit category for this club, use it as-is — no
+// guessing needed. Only falls back to keyword-matching the name when that
+// field is blank, which is true for every club submitted before this existed.
+function chAssignCategory(name, explicit) {
+ if (explicit) {
+ const key = String(explicit).trim().toLowerCase();
+ const match = CH_CATEGORY_RULES.find(r => r[0] === key);
+ if (match) return { key: match[0], label: match[1], cls: match[2] };
+ }
+ const lower = (name || '').toLowerCase();
  for (const [key, label, cls, kws] of CH_CATEGORY_RULES) {
  if (kws.some(k =>lower.includes(k))) return { key, label, cls };
  }
@@ -2104,6 +2113,7 @@ const CAT_BADGE_COLORS = {
  'cat-cultural': 'color:#D97706;background:#FFFBEB',
  'cat-identity': 'color:#DB2777;background:#FDF2F8',
  'cat-academic': 'color:#2563EB;background:#EFF6FF',
+ 'cat-business': 'color:#0D9488;background:#F0FDFA',
  'cat-other': 'color:#5F5E5A;background:#F3F3F1',
 };
 
@@ -2221,7 +2231,7 @@ async function chLoadClubs() {
  chLoadClubDetails()
  ]);
  if (!raw || !raw.length) throw new Error('no data');
- chAllClubs = raw.filter(c => c['CLUB']).map(c => ({ ...c, _cat: chAssignCategory(c['CLUB'] || '') }));
+ chAllClubs = raw.filter(c => c['CLUB']).map(c => ({ ...c, _cat: chAssignCategory(c['CLUB'] || '', c['CATEGORY']) }));
  chAllClubs.sort((a, b) =>a['CLUB'].localeCompare(b['CLUB']));
  chLoaded = true;
  const tot = document.getElementById('ch-total');
