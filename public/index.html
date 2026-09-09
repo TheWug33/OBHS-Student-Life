@@ -3386,7 +3386,7 @@ async function submitNewClubRequest() {
     'Advisor Email': document.getElementById('ncr-advisor-email')?.value || '',
     'Student Name': document.getElementById('ncr-student')?.value || '',
     'Student Email': document.getElementById('ncr-student-email')?.value || '',
-    'Why should this club be approved? Provide a short description of the club.': document.getElementById('ncr-why')?.value || '',
+    'Club Description': document.getElementById('ncr-why')?.value || '',
   }, btn, 'Request submitted! You\u2019ll hear back within 5 school days.');
   if (ok) {
     ['ncr-name','ncr-advisor','ncr-advisor-email','ncr-student','ncr-student-email','ncr-why'].forEach(id => {
@@ -4108,7 +4108,7 @@ observeReveal();
         <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="ncr-student" type="text" placeholder="Jane Doe" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
         <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="ncr-student-email" type="email" placeholder="you@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
       </div>
-      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Why should this club be approved?</label><textarea id="ncr-why" rows="3" placeholder="What will this club do? Who is it for?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Write a description of the club</label><textarea id="ncr-why" rows="3" placeholder="What will this club do? Who is it for?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
       <button id="ncr-submit-btn" onclick="submitNewClubRequest()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
       <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed within 5 school days.</p>
     </div>
