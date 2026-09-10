@@ -480,7 +480,7 @@ async function loadData(){
  const url=(r.IMAGE_URL||'').trim();
  const approved=!('APPROVED' in r)||/^y/i.test((r.APPROVED||'').trim());
  return url.startsWith('http')&&approved&&(r.TITLE||'')!==''&&!(r.TITLE||'').includes('ADD');
- }).slice(0,8);
+ });
  const stage=document.querySelector('.stage');
  for(let i=0;i<flyClean.length;i+=2){
  const pair=flyClean.slice(i,i+2);

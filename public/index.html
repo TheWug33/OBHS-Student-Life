@@ -216,8 +216,9 @@ img{max-width:100%;display:block;}
 .ql:hover .ql-arr{transform:translateX(3px);}
 
 /* Flyers */
-.fly-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,150px));gap:9px;}
-.fly{aspect-ratio:8.5/11;border-radius:9px;overflow:hidden;cursor:pointer;border:1px solid var(--line);position:relative;display:flex;align-items:flex-end;padding:8px;transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;background:linear-gradient(155deg,#392478,#130A28);}
+.fly-row{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;gap:9px;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none;}
+.fly-row::-webkit-scrollbar{display:none;}
+.fly{aspect-ratio:8.5/11;border-radius:9px;overflow:hidden;cursor:pointer;border:1px solid var(--line);position:relative;display:flex;align-items:flex-end;padding:8px;transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;background:linear-gradient(155deg,#392478,#130A28);flex:0 0 150px;scroll-snap-align:start;}
 @media (hover:hover){.fly:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
 .fly-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);position:relative;z-index:2;}
 
@@ -1702,8 +1703,8 @@ function renderQL(rows){
 }
 function renderFlyers(rows){
  const el=document.getElementById('fly-row');
- const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.IMAGE_URL&&r.IMAGE_URL.startsWith('http')&&/^y/i.test((r.APPROVED||'').trim())).slice(0,6);
- if(!clean.length){el.innerHTML='<div class="fly" style="grid-column:1/-1"><span class="fly-label">Flyers appear here once teachers submit them</span></div>';return;}
+ const clean=rows.filter(r=>r.TITLE&&!r.TITLE.includes('ADD')&&r.IMAGE_URL&&r.IMAGE_URL.startsWith('http')&&/^y/i.test((r.APPROVED||'').trim()));
+ if(!clean.length){el.innerHTML='<div class="fly" style="flex:1 1 auto"><span class="fly-label">Flyers appear here once teachers submit them</span></div>';return;}
  window._flyerData=clean;
  el.innerHTML=clean.map((r,i)=>`<div class="fly" onclick="openFlyer(${i})" style="padding:0;cursor:pointer"><img src="${r.IMAGE_URL}" alt="${r.TITLE}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=\\'fly-label\\' style=\\'padding:8px\\'>${r.TITLE}</span>'"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:7px;font-family:Barlow Condensed;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.75)">${r.TITLE}</div></div>`).join('');
 }
