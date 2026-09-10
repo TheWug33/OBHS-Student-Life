@@ -3380,6 +3380,7 @@ function openNewClub(audience) {
 async function submitNewClubRequest() {
   const name = document.getElementById('ncr-name')?.value.trim();
   if (!name) { showToast('Please enter a club name.'); return; }
+  if (!document.getElementById('ncr-confirm')?.checked) { showToast('Please confirm you\u2019ve already spoken with your proposed advisor.'); return; }
   const btn = document.getElementById('ncr-submit-btn');
   const ok = await submitToSheet('New Club Requests', {
     'Club Name': name,
@@ -3388,12 +3389,15 @@ async function submitNewClubRequest() {
     'Student Name': document.getElementById('ncr-student')?.value || '',
     'Student Email': document.getElementById('ncr-student-email')?.value || '',
     'Club Description': document.getElementById('ncr-why')?.value || '',
+    'Advisor Confirmed': 'Yes',
   }, btn, 'Request submitted! You\u2019ll hear back within 5 school days.');
   if (ok) {
     ['ncr-name','ncr-advisor','ncr-advisor-email','ncr-student','ncr-student-email','ncr-why'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    const cb = document.getElementById('ncr-confirm');
+    if (cb) cb.checked = false;
   }
 }
 function closeNewClub() {
@@ -4110,6 +4114,10 @@ observeReveal();
         <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="ncr-student-email" type="email" placeholder="you@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
       </div>
       <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Write a description of the club</label><textarea id="ncr-why" rows="3" placeholder="What will this club do? Who is it for?" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+      <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.25);border-radius:8px;padding:12px 14px;">
+      <input id="ncr-confirm" type="checkbox" style="margin-top:3px;width:16px;height:16px;accent-color:var(--purple-ui);flex-shrink:0;cursor:pointer;">
+      <label for="ncr-confirm" style="font-size:12.5px;color:var(--silver);line-height:1.5;cursor:pointer;">I have already talked to this teacher, and they've agreed to advise this club if it's approved.</label>
+      </div>
       <button id="ncr-submit-btn" onclick="submitNewClubRequest()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
       <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed within 5 school days.</p>
     </div>
