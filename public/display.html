@@ -72,9 +72,9 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 
 /* Countdown / lyric slide */
 .cd-wrap{text-align:center;}
-.cd-label{font-size:24px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
-.cd-num{font-size:150px;font-weight:800;line-height:1;background:linear-gradient(135deg,#F0F0F4,#C7C9D1 50%,#9A9CA8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-.cd-days{font-size:26px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-top:10px;}
+.cd-label{font-size:36px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:32px;}
+.cd-num{font-size:280px;font-weight:800;line-height:1;background:linear-gradient(135deg,#F0F0F4,#C7C9D1 50%,#9A9CA8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.cd-days{font-size:40px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-top:16px;}
 .lyric{margin-top:64px;font-size:27px;line-height:1.5;color:var(--silver);font-style:italic;max-width:960px;margin-left:auto;margin-right:auto;}
 .lyric em{color:var(--muted);font-style:normal;font-size:21px;display:block;margin-top:12px;}
 
@@ -366,7 +366,7 @@ function renderABDayBadge(){
  const pair=labels[type];
  if(!pair){el.style.display='none';return;}
  el.style.display='inline-block';
- el.style.cssText+='margin-top:8px;padding:6px 16px;border-radius:16px;font-family:\'Barlow Condensed\',sans-serif;font-size:15px;font-weight:700;letter-spacing:.1em;color:#fff;background:'+pair[1]+';box-shadow:0 6px 18px rgba(0,0,0,0.35);';
+ el.style.cssText+='margin-top:12px;padding:11px 28px;border-radius:22px;font-family:\'Barlow Condensed\',sans-serif;font-size:26px;font-weight:700;letter-spacing:.1em;color:#fff;background:'+pair[1]+';box-shadow:0 8px 22px rgba(0,0,0,0.35);';
  el.textContent=pair[0];
 }
 renderABDayBadge();
