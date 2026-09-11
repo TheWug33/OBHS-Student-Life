@@ -1,10 +1,9 @@
 // api/sheet.js — Vercel serverless function
 // Fetches Google Sheets CSV server-side (no CORS issues)
 // Usage: /api/sheet?gid=1447819289  OR  /api/sheet?url=https://...
-
 export default async function handler(req, res) {
-  const SHEET_ID = '2PACX-1vS7o0_FUyuW1Amalefxm-Yam4UHRbUbv619USaliAnL27vs22hCb5SDozsfq9CSDTMyDkLfKxlmAQkX';
-  
+  const SHEET_ID = '2PACX-1vTn1E6Nz4vVMyRkYoywXpVr65lR_1PGVEW-UWebjCKKhQFYbsaHiKrDf_4vyGSOLjV3t9euDz7lTbDw';
+
   let url;
   if (req.query.url) {
     url = req.query.url;
@@ -13,7 +12,6 @@ export default async function handler(req, res) {
   } else {
     return res.status(400).json({ error: 'Missing gid or url parameter' });
   }
-
   try {
     const response = await fetch(url);
     if (!response.ok) {
