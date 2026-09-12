@@ -138,6 +138,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
  <div class="slide" id="slide-flag"><video src="/flag.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></video></div>
  <div class="slide" id="slide-events"><div class="slide-tag">Upcoming Events</div><div id="ev-list"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-games"><div class="slide-tag">Today's Games</div><div id="game-list"><div class="empty">Loading…</div></div></div>
+ <div class="slide" id="slide-clubmeetings"><div class="slide-tag">Today's Club Meetings</div><div id="clubmeeting-list"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-kotw"><div class="slide-tag">Knight of the Week</div><div id="kotw-wrap"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-cd"><div class="cd-wrap"><div class="cd-label" id="cd-label">Countdown</div><div class="cd-num" id="cd-num">—</div><div class="cd-days">Days</div><div class="lyric" id="lyric" style="display:none"></div></div></div>
 </div>
@@ -178,6 +179,7 @@ const GIDS = {
  spotlight: '888519751',
  flyers: '523531820',
  athletics: '775220800',
+ clubmeetings: 'PASTE_CLUB_MEETINGS_GID', // ← replace once the Club Meetings tab exists
 };
 const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
 const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -376,9 +378,9 @@ renderABDayBadge();
 // Slide rotation
 let SLIDES=['slide-flag','slide-events','slide-games','slide-cd'];
 let sIdx=0;
-let hasKotw=false, hasGames=false, flyerIds=[];
+let hasKotw=false, hasGames=false, hasClubMeetings=false, flyerIds=[];
 function rebuildSlides(){
- SLIDES=['slide-flag','slide-events'].concat(hasGames?['slide-games']:[]).concat(hasKotw?['slide-kotw']:[]).concat(flyerIds).concat(['slide-cd']);
+ SLIDES=['slide-flag','slide-events'].concat(hasGames?['slide-games']:[]).concat(hasClubMeetings?['slide-clubmeetings']:[]).concat(hasKotw?['slide-kotw']:[]).concat(flyerIds).concat(['slide-cd']);
  if(sIdx>=SLIDES.length)sIdx=0;
 }
 function showSlide(i){
@@ -395,7 +397,8 @@ setInterval(()=>{sIdx=(sIdx+1)%SLIDES.length;showSlide(sIdx);},12000);
 // Data
 async function loadData(){
  const wantFlyers = GIDS.flyers && !GIDS.flyers.includes('_GID');
- const [ann,evt,cd,lyr,kotw,fly,ath]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.spotlight),wantFlyers?tab(GIDS.flyers):Promise.resolve([]),tab(GIDS.athletics)]);
+ const wantClubMeetings = GIDS.clubmeetings && !GIDS.clubmeetings.includes('_GID');
+ const [ann,evt,cd,lyr,kotw,fly,ath,clm]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.spotlight),wantFlyers?tab(GIDS.flyers):Promise.resolve([]),tab(GIDS.athletics),wantClubMeetings?tab(GIDS.clubmeetings):Promise.resolve([])]);
 
  // Events
  const today=new Date();today.setHours(0,0,0,0);
@@ -439,6 +442,46 @@ async function loadData(){
  + '</div></div>';
  }).join(''):'<div class="empty">No games scheduled today.</div>';
  unifyTitleSizes('#game-list .ev-t', 84, 18, 34);
+ })();
+
+ // Today's Club Meetings — separate tab from the general Events calendar,
+ // same APPROVED-gated pattern as Club Hub and Flyers.
+ (function(){
+ const today=new Date(); today.setHours(0,0,0,0);
+ const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+ const parseDate=raw=>{
+ const s=(raw||'').toString().trim(); if(!s) return null;
+ let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+ m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if(m){let yr=+m[3]; if(yr<100)yr+=2000; return new Date(yr,+m[1]-1,+m[2]);}
+ const d=new Date(s); return isNaN(d.getTime())?null:new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ };
+ const parseTime=raw=>{
+ const s=(raw||'').toString().trim(); if(!s) return '';
+ let m=s.match(/^(\d{1,2}):(\d{2})$/);
+ if(m){const h=parseInt(m[1],10);const ap=h>=12?'PM':'AM';let h12=h%12;if(h12===0)h12=12;return h12+':'+m[2]+' '+ap;}
+ m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])$/);
+ if(m) return parseInt(m[1],10)+':'+m[2]+' '+m[3].toUpperCase();
+ return s;
+ };
+ const meetings=(clm||[]).map(r=>{
+ const date=parseDate(r['Meeting Date']);
+ const club=(r['Club Name']||'').toString().trim();
+ if(!date||!club) return null;
+ if(!/^y/i.test((r['APPROVED']||'').toString().trim())) return null;
+ return {_d:date, TITLE:club, TIME:parseTime(r['Time']), LOCATION:(r['Location']||'').toString().trim()};
+ }).filter(Boolean)
+ .filter(r=>r._d>=today&&r._d<tomorrow)
+ .sort((a,b)=>athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME));
+ hasClubMeetings=meetings.length>0;
+ document.getElementById('clubmeeting-list').innerHTML=meetings.map(g=>{
+ const t=splitGameTime(g.TIME);
+ return '<div class="ev-row">'
+ + '<div class="ev-time"><div class="t-hr">'+t.hr+'</div>'+(t.ap?'<div class="t-ap">'+t.ap+'</div>':'')+'</div>'
+ + '<div><div class="ev-t">'+g.TITLE+'</div>'
+ + (g.LOCATION?'<div class="ev-m">'+g.LOCATION+'</div>':'')
+ + '</div></div>';
+ }).join('');
+ unifyTitleSizes('#clubmeeting-list .ev-t', 84, 18, 34);
  })();
  // Footer ticker: continuous crawl of all announcements
  const tickerAnn = ann.filter(a=>a.TITLE&&!a.TITLE.includes('ADD YOUR')).slice(0,8);

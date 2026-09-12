@@ -742,6 +742,7 @@ img{max-width:100%;display:block;}
  <!-- Club Hub sub-nav -->
  <div style="display:flex;gap:4px;margin-bottom:22px;background:rgba(0,0,0,0.25);padding:4px;border-radius:10px;width:fit-content;">
  <button class="ch-tab ch-tab-active" onclick="chShowSection('ch-directory',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--purple-ui);color:#fff;transition:background .2s,color .2s;">Club Directory</button>
+ <button class="ch-tab" onclick="chShowSection('ch-meetings',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Club Meetings</button>
  <button class="ch-tab" onclick="chShowSection('ch-submit',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Submit a Club</button>
  <button class="ch-tab" onclick="chShowSection('ch-flyer',this)" style="padding:8px 18px;border-radius:7px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:none;color:var(--muted);transition:background .2s,color .2s;">Flyer Generator</button>
  </div>
@@ -779,6 +780,18 @@ img{max-width:100%;display:block;}
  <div id="ch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;">
  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading clubs…</div>
  </div>
+ </div>
+
+ <!-- CLUB MEETINGS -->
+ <div id="ch-meetings" style="display:none">
+ <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+ <div>
+ <div class="blk-title" style="margin-bottom:6px">Club Meetings</div>
+ <div style="font-size:13px;color:var(--muted);line-height:1.6;max-width:480px;">When and where clubs are meeting this week — kept separate from the general Events calendar.</div>
+ </div>
+ <button onclick="openClubMeetingSubmit()" style="background:var(--purple-ui);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;">Submit a Meeting</button>
+ </div>
+ <div id="cm-list"><div style="text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading meetings…</div></div>
  </div>
 
  <!-- SUBMIT -->
@@ -1170,6 +1183,7 @@ const GIDS = {
  clubdetails: '1026862323',
   clubs: '1167760475',
   newclubs: '1905544186',
+  clubmeetings: 'PASTE_CLUB_MEETINGS_GID', // ← replace once the Club Meetings tab exists
  facultybulletin: '931535024', // Faculty Bulletin — Faculty Hub only, separate from student announcements
  serviceopps: '1260564879', // Community Service Opportunities
 };
@@ -2086,7 +2100,7 @@ function chAssignCategory(name, explicit) {
 }
 
 function chShowSection(id, btn) {
- ['ch-directory','ch-submit','ch-flyer'].forEach(s => {
+ ['ch-directory','ch-meetings','ch-submit','ch-flyer'].forEach(s => {
  const el = document.getElementById(s);
  if (el) el.style.display = s === id ? 'block' : 'none';
  });
@@ -2094,6 +2108,7 @@ function chShowSection(id, btn) {
  b.style.background = 'none'; b.style.color = 'var(--muted)';
  });
  if (btn) { btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff'; }
+ if (id === 'ch-meetings') loadClubMeetings();
 }
 
 function chSelectCat(cat, el) {
@@ -3399,6 +3414,145 @@ async function submitNewClubRequest() {
     if (cb) cb.checked = false;
   }
 }
+
+// ══════════════════════════════════════════════════════
+// CLUB MEETINGS — kept separate from the general Events calendar.
+// Submissions land in their own sheet tab, gated by the same
+// APPROVED-column pattern used for Club Hub and Flyers.
+// ══════════════════════════════════════════════════════
+function parseClubMeetingDate(raw) {
+  const s = (raw || '').toString().trim();
+  if (!s) return null;
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); // ISO — what <input type=date> sends
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); // fallback if typed/pasted differently
+  if (m) { let yr = +m[3]; if (yr < 100) yr += 2000; return new Date(yr, +m[1] - 1, +m[2]); }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function parseClubMeetingTime(raw) {
+  const s = (raw || '').toString().trim();
+  if (!s) return '';
+  let m = s.match(/^(\d{1,2}):(\d{2})$/); // 24hr — what <input type=time> sends
+  if (m) {
+    const h = parseInt(m[1], 10);
+    const ap = h >= 12 ? 'PM' : 'AM';
+    let h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ':' + m[2] + ' ' + ap;
+  }
+  m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])$/);
+  if (m) return parseInt(m[1], 10) + ':' + m[2] + ' ' + m[3].toUpperCase();
+  return s;
+}
+
+let cmLoaded = false;
+async function loadClubMeetings() {
+  const el = document.getElementById('cm-list');
+  if (!el) return;
+  if (!GIDS.clubmeetings || GIDS.clubmeetings.includes('_GID')) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Club Meetings isn\u2019t set up yet \u2014 check back soon.</p>';
+    return;
+  }
+  if (cmLoaded) return;
+  try {
+    const rows = await fetchTab(GIDS.clubmeetings);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const horizon = new Date(today); horizon.setDate(horizon.getDate() + 14);
+
+    const clean = rows.map(r => {
+      const date = parseClubMeetingDate(r['Meeting Date']);
+      const club = (r['Club Name'] || '').toString().trim();
+      if (!date || !club) return null;
+      if (!/^y/i.test((r['APPROVED'] || '').toString().trim())) return null;
+      return {
+        _date: date,
+        club,
+        time: parseClubMeetingTime(r['Time']),
+        location: (r['Location'] || '').toString().trim(),
+      };
+    }).filter(Boolean)
+      .filter(r => r._date >= today && r._date <= horizon)
+      .sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.time) - athleticsTimeMinutes(b.time));
+
+    if (!clean.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No club meetings scheduled in the next two weeks.</p>';
+      cmLoaded = true;
+      return;
+    }
+
+    const byDate = {}, order = [];
+    clean.forEach(r => {
+      const k = r._date.toDateString();
+      if (!byDate[k]) { byDate[k] = []; order.push(k); }
+      byDate[k].push(r);
+    });
+    const dayLabel = d => {
+      const diff = Math.round((d - today) / 86400000);
+      if (diff === 0) return 'Today';
+      if (diff === 1) return 'Tomorrow';
+      return d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+    };
+
+    el.innerHTML = order.map(k => {
+      const dayRows = byDate[k];
+      return `<div style="margin-bottom:18px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">${dayLabel(dayRows[0]._date)}</div>
+        ${dayRows.map(r => `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);">
+          <div style="width:64px;flex-shrink:0;font-size:12px;color:var(--muted);font-weight:600;">${r.time || 'TBD'}</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff;">${r.club}</div>${r.location ? `<div style="font-size:12px;color:var(--muted);margin-top:1px;">${r.location}</div>` : ''}</div>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+    cmLoaded = true;
+  } catch(e) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Couldn\u2019t load club meetings \u2014 try again in a moment.</p>';
+  }
+}
+
+let cmClubsPopulated = false;
+async function openClubMeetingSubmit() {
+  document.getElementById('club-meeting-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  if (!cmClubsPopulated) {
+    const sel = document.getElementById('cm-club');
+    try {
+      const rows = await fetchTab(GIDS.clubs);
+      const names = rows.map(r => (r['CLUB'] || '').toString().trim()).filter(Boolean).sort((a,b) => a.localeCompare(b));
+      if (sel) sel.innerHTML = '<option value="">Select your club\u2026</option>' + names.map(n => `<option value="${n.replace(/"/g,'&quot;')}">${n}</option>`).join('');
+      cmClubsPopulated = true;
+    } catch(e) {
+      if (sel) sel.innerHTML = '<option value="">Couldn\u2019t load clubs \u2014 try again</option>';
+    }
+  }
+}
+function closeClubMeetingSubmit() {
+  document.getElementById('club-meeting-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitClubMeeting() {
+  const club = document.getElementById('cm-club')?.value;
+  const date = document.getElementById('cm-date')?.value;
+  if (!club) { showToast('Please select a club.'); return; }
+  if (!date) { showToast('Please choose a meeting date.'); return; }
+  const btn = document.getElementById('cm-submit-btn');
+  const ok = await submitToSheet('Club Meetings', {
+    'Club Name': club,
+    'Meeting Date': date,
+    'Time': document.getElementById('cm-time')?.value || '',
+    'Location': document.getElementById('cm-location')?.value || '',
+    'Submitted By': document.getElementById('cm-name')?.value || '',
+  }, btn, 'Submitted! It\u2019ll show up once Student Life reviews it.');
+  if (ok) {
+    ['cm-date','cm-time','cm-location','cm-name'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const sel = document.getElementById('cm-club');
+    if (sel) sel.value = '';
+    cmLoaded = false;
+    closeClubMeetingSubmit();
+  }
+}
 function closeNewClub() {
  document.getElementById('new-club-modal').style.display = 'none';
  document.body.style.overflow = '';
@@ -4123,6 +4277,27 @@ observeReveal();
   </div>
 
  </div>
+</div>
+
+<div id="club-meeting-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+  <div class="cal-modal-head">
+  <button onclick="closeClubMeetingSubmit()" class="cal-modal-x" aria-label="Close">✕</button>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+  <h2 class="cal-modal-ttl">Submit a Club Meeting</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;">
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Club</label><select id="cm-club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"><option value="">Loading clubs…</option></select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Meeting Date</label><input id="cm-date" type="date" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Time</label><input id="cm-time" type="time" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      </div>
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Location</label><input id="cm-location" type="text" placeholder="Room 109" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="cm-name" type="text" placeholder="Jane Doe" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      <button id="cm-submit-btn" onclick="submitClubMeeting()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit &rarr;</button>
+      <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it appears on the site and displays.</p>
+    </div>
+  </div>
 </div>
 
 <div id="cal-choice-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;">
