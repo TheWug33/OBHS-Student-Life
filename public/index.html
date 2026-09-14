@@ -3539,17 +3539,37 @@ function closeClubMeetingSubmit() {
   document.getElementById('club-meeting-modal').style.display = 'none';
   document.body.style.overflow = '';
 }
+// Classrooms need no reservation; common spaces (cafeteria, library, gym,
+// auditorium, etc.) do — this just toggles which case is active and
+// shows/hides the reservation confirmation accordingly.
+function cmSetLocationType(type) {
+  document.getElementById('cm-loctype').value = type;
+  const classroomBtn = document.getElementById('cm-loc-classroom');
+  const commonBtn = document.getElementById('cm-loc-common');
+  const check = document.getElementById('cm-reservation-check');
+  [classroomBtn, commonBtn].forEach(b => { b.style.background = 'none'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--line)'; });
+  const active = type === 'classroom' ? classroomBtn : commonBtn;
+  active.style.background = 'var(--purple-ui)'; active.style.color = '#fff'; active.style.borderColor = 'var(--line-bright)';
+  if (check) check.style.display = type === 'common' ? 'flex' : 'none';
+}
 async function submitClubMeeting() {
   const club = document.getElementById('cm-club')?.value;
   const date = document.getElementById('cm-date')?.value;
+  const locType = document.getElementById('cm-loctype')?.value;
   if (!club) { showToast('Please select a club.'); return; }
   if (!date) { showToast('Please choose a meeting date.'); return; }
+  if (!locType) { showToast('Please choose whether this is a classroom or a common space.'); return; }
+  if (locType === 'common' && !document.getElementById('cm-reserved')?.checked) {
+    showToast('Please confirm the space is reserved in ML Schedules.'); return;
+  }
   const btn = document.getElementById('cm-submit-btn');
   const ok = await submitToSheet('Club Meetings', {
     'Club Name': club,
     'Meeting Date': date,
     'Time': document.getElementById('cm-time')?.value || '',
     'Location': document.getElementById('cm-location')?.value || '',
+    'Space Type': locType === 'common' ? 'Common Space' : 'Classroom',
+    'Reservation Confirmed': locType === 'common' ? 'Yes' : '',
     'Submitted By': document.getElementById('cm-name')?.value || '',
   }, btn, 'Submitted! It\u2019ll show up once Student Life reviews it.');
   if (ok) {
@@ -3559,6 +3579,12 @@ async function submitClubMeeting() {
     });
     const sel = document.getElementById('cm-club');
     if (sel) sel.value = '';
+    document.getElementById('cm-loctype').value = '';
+    document.getElementById('cm-reserved').checked = false;
+    document.getElementById('cm-reservation-check').style.display = 'none';
+    [document.getElementById('cm-loc-classroom'), document.getElementById('cm-loc-common')].forEach(b => {
+      b.style.background = 'none'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--line)';
+    });
     cmLoaded = false;
     closeClubMeetingSubmit();
   }
@@ -4371,6 +4397,18 @@ observeReveal();
         <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Time</label><input id="cm-time" type="time" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
       </div>
       <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Location</label><input id="cm-location" type="text" placeholder="Room 109" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+      <div>
+      <label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Where is this meeting?</label>
+      <input type="hidden" id="cm-loctype" value="">
+      <div style="display:flex;gap:8px;">
+      <button type="button" id="cm-loc-classroom" onclick="cmSetLocationType('classroom')" style="flex:1;background:none;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Classroom</button>
+      <button type="button" id="cm-loc-common" onclick="cmSetLocationType('common')" style="flex:1;background:none;color:var(--muted);border:1px solid var(--line);padding:10px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Common Space</button>
+      </div>
+      </div>
+      <div id="cm-reservation-check" style="display:none;align-items:flex-start;gap:10px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.25);border-radius:8px;padding:12px 14px;">
+      <input id="cm-reserved" type="checkbox" style="margin-top:3px;width:16px;height:16px;accent-color:var(--purple-ui);flex-shrink:0;cursor:pointer;">
+      <label for="cm-reserved" style="font-size:12.5px;color:var(--silver);line-height:1.5;cursor:pointer;">I have reserved this space in ML Schedules for this date and time.</label>
+      </div>
       <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="cm-name" type="text" placeholder="Jane Doe" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
       <button id="cm-submit-btn" onclick="submitClubMeeting()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit &rarr;</button>
       <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it appears on the site and displays.</p>
