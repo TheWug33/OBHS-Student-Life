@@ -3365,8 +3365,22 @@ async function submitToSheet(tab, fields, btn, successMsg) {
       method: 'POST',
       body: JSON.stringify({ _tab: tab, ...fields }),
     });
-    const data = await res.json();
-    if (data.status !== 'ok') throw new Error(data.message || 'Unknown error');
+    const rawText = await res.text();
+    console.log('[submitToSheet] raw response:', rawText);
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      // DIAGNOSTIC — TEMPORARY: surfaces exactly what came back instead of
+      // a generic error, so we can see whether it's valid JSON at all.
+      alert('DEBUG — response was not valid JSON:\n\n' + rawText.slice(0, 500));
+      throw new Error('Response was not valid JSON');
+    }
+    if (data.status !== 'ok') {
+      // DIAGNOSTIC — TEMPORARY
+      alert('DEBUG — server returned an error:\n\n' + JSON.stringify(data));
+      throw new Error(data.message || 'Unknown error');
+    }
     showToast(successMsg || 'Submitted successfully!');
     return true;
   } catch (e) {
