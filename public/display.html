@@ -445,26 +445,24 @@ async function loadData(){
 
  // College Visits — guidance-managed directly, no APPROVED gate. Shows
  // the next several upcoming visits, same "always in rotation" pattern
- // as Upcoming Events, since visits are sparse rather than daily.
+ // as Upcoming Events, since visits are sparse rather than daily. Uses
+ // a date badge (not a time badge) since entries span many different
+ // future days, unlike Today's Games/Club Meetings which are always today.
  (function(){
  const today=new Date(); today.setHours(0,0,0,0);
  const visits=(cv||[]).map(r=>{
  const date=parseGenericDate(r['DATE']);
  const college=(r['COLLEGE']||'').toString().trim();
  if(!date||!college) return null;
- return {_d:date, TITLE:college, TIME:parseGenericTime(r['TIME']), LOCATION:(r['REPRESENTATIVE']||'').toString().trim()};
+ return {_d:date, MONTH:MONTH_ABBR[date.getMonth()], DAY:String(date.getDate()), TITLE:college, TIME:parseGenericTime(r['TIME']), LOCATION:(r['REPRESENTATIVE']||'').toString().trim()};
  }).filter(Boolean)
  .filter(r=>r._d>=today)
  .sort((a,b)=>a._d-b._d||athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME))
  .slice(0,6);
- document.getElementById('cv-list').innerHTML=visits.length?visits.map(r=>{
- const t=splitGameTime(r.TIME);
- return '<div class="ev-row">'
- + '<div class="ev-time"><div class="t-hr">'+t.hr+'</div>'+(t.ap?'<div class="t-ap">'+t.ap+'</div>':'')+'</div>'
- + '<div><div class="ev-t">'+r.TITLE+'</div>'
- + (r.LOCATION?'<div class="ev-m">'+r.LOCATION+'</div>':'')
- + '</div></div>';
- }).join(''):'<div class="empty">No upcoming college visits scheduled.</div>';
+ document.getElementById('cv-list').innerHTML=visits.length?visits.map(r=>
+ '<div class="ev-row">'+buildEventTile(r.MONTH,r.DAY)+
+ '<div><div class="ev-t">'+r.TITLE+'</div><div class="ev-m">'+(r.TIME||'TBD')+(r.LOCATION?' \u00b7 '+r.LOCATION:'')+'</div></div></div>'
+ ).join(''):'<div class="empty">No upcoming college visits scheduled.</div>';
  unifyTitleSizes('#cv-list .ev-t', 84, 18, 34);
  })();
 
