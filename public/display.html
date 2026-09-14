@@ -449,10 +449,10 @@ async function loadData(){
  (function(){
  const today=new Date(); today.setHours(0,0,0,0);
  const visits=(cv||[]).map(r=>{
- const date=parseGenericDate(r['Date']);
- const college=(r['College']||'').toString().trim();
+ const date=parseGenericDate(r['DATE']);
+ const college=(r['COLLEGE']||'').toString().trim();
  if(!date||!college) return null;
- return {_d:date, TITLE:college, TIME:parseGenericTime(r['Time']), LOCATION:(r['Representative']||'').toString().trim()};
+ return {_d:date, TITLE:college, TIME:parseGenericTime(r['TIME']), LOCATION:(r['REPRESENTATIVE']||'').toString().trim()};
  }).filter(Boolean)
  .filter(r=>r._d>=today)
  .sort((a,b)=>a._d-b._d||athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME))
@@ -498,11 +498,11 @@ async function loadData(){
  const today=new Date(); today.setHours(0,0,0,0);
  const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
  const meetings=(clm||[]).map(r=>{
- const date=parseGenericDate(r['Meeting Date']);
- const club=(r['Club Name']||'').toString().trim();
+ const date=parseGenericDate(r['MEETING DATE']);
+ const club=(r['CLUB NAME']||'').toString().trim();
  if(!date||!club) return null;
  if(!/^y/i.test((r['APPROVED']||'').toString().trim())) return null;
- return {_d:date, TITLE:club, TIME:parseGenericTime(r['Time']), LOCATION:(r['Location']||'').toString().trim()};
+ return {_d:date, TITLE:club, TIME:parseGenericTime(r['TIME']), LOCATION:(r['LOCATION']||'').toString().trim()};
  }).filter(Boolean)
  .filter(r=>r._d>=today&&r._d<tomorrow)
  .sort((a,b)=>athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME));
