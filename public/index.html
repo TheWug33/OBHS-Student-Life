@@ -681,6 +681,7 @@ img{max-width:100%;display:block;}
  <button class="sn" onclick="ssub(this,'s-botc')">Battle of the Classes</button>
  <button class="sn" onclick="ssub(this,'s-spirit')">Spirit Wear</button>
  <button class="sn" onclick="ssub(this,'s-committees')">Committees</button>
+ <button class="sn" onclick="ssub(this,'s-collegevisits')">College Visits</button>
  </div>
 
  <div id="s-overview" class="subbody">
@@ -722,6 +723,7 @@ img{max-width:100%;display:block;}
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(6)'),'s-botc')"><div class="fc-ttl">Battle of the Classes</div><div class="fc-dsc">Sign-ups reopen in spring 2027 — see how last year's event went and get ready to represent your class.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Sign-ups open spring 2027</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(7)'),'s-spirit')" id="ov-spirit-card" style="display:none"><div class="fc-ttl">Spirit Wear</div><div class="fc-dsc">Online purchases coming soon — check back for OBHS Knights gear.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
  <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(8)'),'s-committees')" id="ov-committees-card" style="display:none"><div class="fc-ttl">Student Committees</div><div class="fc-dsc">Committee sign-ups are coming soon — check back for details.</div><span class="fc-tag" style="background:rgba(199,201,209,0.15);color:var(--muted)">Coming soon</span></div>
+ <div class="fc" onclick="ssub(document.querySelector('#s-subnav .sn:nth-child(9)'),'s-collegevisits')"><div class="fc-ttl">College Visits</div><div class="fc-dsc">Reps from colleges and universities visit the Guidance Office throughout the fall — see who's coming and when.</div></div>
 <div class="fc" onclick="openFlyerSubmit()"><div class="fc-ttl">Submit a Flyer</div><div class="fc-dsc">Have your flyer featured on the homepage and TV displays.</div></div>
 <div class="fc" onclick="openBellSchedule()"><div class="fc-ttl">Bell Schedules</div><div class="fc-dsc">Full day, delayed opening, and half day — new for 2026&ndash;27.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">New this year</span></div>
  </div>
@@ -1043,6 +1045,12 @@ img{max-width:100%;display:block;}
  </div>
  </div>
 
+ <div id="s-collegevisits" class="subbody" style="display:none">
+ <div class="blk-title" style="margin-bottom:6px">College Visits</div>
+ <div style="font-size:13px;color:var(--muted);line-height:1.7;max-width:560px;margin-bottom:20px;">Open to all college-bound juniors and seniors. Sign up in Naviance — don't miss the chance to meet one-on-one with a rep from a college you're interested in. Questions? See Ms. Patella in Guidance.</div>
+ <div id="cv-list"><div style="text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading visits…</div></div>
+ </div>
+
  <div id="s-botc" class="subbody" style="display:none">
  <div class="botc-strip">
  <img src="/sl-photo-6.jpg" alt="Juniors cheering in the bleachers at Battle of the Classes" loading="lazy">
@@ -1184,6 +1192,7 @@ const GIDS = {
   clubs: '1167760475',
   newclubs: '1905544186',
   clubmeetings: '1448029261',
+  collegevisits: 'PASTE_COLLEGE_VISITS_GID', // ← replace once the College Visits tab exists
  facultybulletin: '931535024', // Faculty Bulletin — Faculty Hub only, separate from student announcements
  serviceopps: '1260564879', // Community Service Opportunities
 };
@@ -2265,7 +2274,7 @@ async function chLoadClubs() {
 
 
 // Updated ssub/fsub that trigger chLoadClubs when clubs tab is selected
-const sPages = ['s-overview','s-clubs','s-classes','s-events','s-service','s-botc','s-spirit','s-committees'];
+const sPages = ['s-overview','s-clubs','s-classes','s-events','s-service','s-botc','s-spirit','s-committees','s-collegevisits'];
 const fPages = ['f-overview','f-forms','f-departure','f-clubs','f-events','f-helpdesk','f-docs'];
 
 function ssub(btn, id) {
@@ -2275,6 +2284,7 @@ function ssub(btn, id) {
  window.scrollTo({top:0,behavior:'instant'});
  if (id === 's-clubs') chLoadClubs();
  if (id === 's-classes') clsLoadPosts('2027');
+ if (id === 's-collegevisits') loadCollegeVisits();
  try { history.replaceState(null, '', '#student:' + id); } catch(e) {}
 }
 
@@ -3553,6 +3563,74 @@ async function submitClubMeeting() {
     closeClubMeetingSubmit();
   }
 }
+
+// ══════════════════════════════════════════════════════
+// COLLEGE VISITS — guidance-managed directly in the sheet, no public
+// submission form, so no APPROVED gate needed here.
+// ══════════════════════════════════════════════════════
+let cvLoaded = false;
+async function loadCollegeVisits() {
+  const el = document.getElementById('cv-list');
+  if (!el) return;
+  if (!GIDS.collegevisits || GIDS.collegevisits.includes('_GID')) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">College Visits isn\u2019t set up yet \u2014 check back soon.</p>';
+    return;
+  }
+  if (cvLoaded) return;
+  try {
+    const rows = await fetchTab(GIDS.collegevisits);
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    const clean = rows.map(r => {
+      const date = parseClubMeetingDate(r['Date']);
+      const college = (r['College'] || '').toString().trim();
+      if (!date || !college) return null;
+      return {
+        _date: date,
+        college,
+        rep: (r['Representative'] || '').toString().trim(),
+        time: parseClubMeetingTime(r['Time']),
+        location: (r['Location'] || '').toString().trim(),
+      };
+    }).filter(Boolean)
+      .filter(r => r._date >= today)
+      .sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.time) - athleticsTimeMinutes(b.time));
+
+    if (!clean.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No upcoming college visits scheduled.</p>';
+      cvLoaded = true;
+      return;
+    }
+
+    const byDate = {}, order = [];
+    clean.forEach(r => {
+      const k = r._date.toDateString();
+      if (!byDate[k]) { byDate[k] = []; order.push(k); }
+      byDate[k].push(r);
+    });
+    const dayLabel = d => {
+      const diff = Math.round((d - today) / 86400000);
+      if (diff === 0) return 'Today';
+      if (diff === 1) return 'Tomorrow';
+      return d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+    };
+
+    el.innerHTML = order.map(k => {
+      const dayRows = byDate[k];
+      return `<div style="margin-bottom:18px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:8px;">${dayLabel(dayRows[0]._date)}</div>
+        ${dayRows.map(r => `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);">
+          <div style="width:64px;flex-shrink:0;font-size:12px;color:var(--muted);font-weight:600;">${r.time || 'TBD'}</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff;">${r.college}</div><div style="font-size:12px;color:var(--muted);margin-top:1px;">${r.rep ? r.rep + (r.location ? ' · ' : '') : ''}${r.location || ''}</div></div>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+    cvLoaded = true;
+  } catch(e) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Couldn\u2019t load college visits \u2014 try again in a moment.</p>';
+  }
+}
+
 function closeNewClub() {
  document.getElementById('new-club-modal').style.display = 'none';
  document.body.style.overflow = '';
