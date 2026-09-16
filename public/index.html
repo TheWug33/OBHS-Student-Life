@@ -3248,6 +3248,20 @@ function printInPlace(htmlContent) {
  }, 350);
 }
 
+// Prints just the flyer image, scaled to one page — a clean, isolated print
+// job via the same hidden-iframe approach as the other print features, so
+// it can never hijack printing for anything else on the site (unlike the
+// waiver's old global-CSS approach, which is exactly what caused that bug).
+function printFlyer() {
+ const img = document.getElementById('flyer-modal-img');
+ const title = document.getElementById('flyer-modal-title')?.textContent || 'Flyer';
+ if (!img || !img.src) return;
+ const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${title}</title>
+ <style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;}body{display:flex;align-items:center;justify-content:center;}img{max-width:100%;max-height:100vh;width:auto;height:auto;}@page{margin:0.4in;}</style></head>
+ <body><img src="${img.src}" alt="${title}"></body></html>`;
+ printInPlace(html);
+}
+
 function showToast(msg) {
  let t = document.getElementById('site-toast');
  if (!t) {
@@ -4277,6 +4291,10 @@ observeReveal();
 <div id="flyer-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(19,10,40,0.96);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:20px;">
  <button onclick="closeFlyer()" aria-label="Close" style="position:absolute;top:18px;right:18px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid var(--line-bright);color:#fff;font-size:22px;cursor:pointer;z-index:2;">✕</button>
  <div id="flyer-modal-inner" style="max-width:min(94vw,820px);max-height:92vh;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0;transform:scale(0.92);transition:opacity .28s ease,transform .28s cubic-bezier(.2,.9,.3,1.1);">
+ <button onclick="printFlyer()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid var(--line-bright);padding:9px 20px;border-radius:100px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+ Print
+ </button>
  <img id="flyer-modal-img" src="" alt="" style="max-width:100%;max-height:80vh;width:auto;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.65);">
  <div id="flyer-modal-title" style="font-size:14px;color:var(--muted);text-align:center;"></div>
  <div style="font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;">Tap outside or ✕ to close</div>
