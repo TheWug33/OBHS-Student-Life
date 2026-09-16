@@ -500,8 +500,8 @@ img{max-width:100%;display:block;}
 }
 
 @media print{
-  body>*{display:none!important;}
-  #print-only-waiver{display:block!important;}
+  body.printing-waiver>*{display:none!important;}
+  body.printing-waiver #print-only-waiver{display:block!important;}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -4051,8 +4051,15 @@ function printWaiver() {
   // Prints the on-screen image directly via the browser's normal print flow —
   // deliberately avoids opening the PDF itself, since iOS hijacks that into a
   // full-screen native preview (QuickLook) with no reliable way back in standalone mode.
+  // The printing-waiver class scopes the @media print override to just this
+  // action, so printing anything else on the site (a flyer, any other page)
+  // isn't hijacked into printing the waiver instead.
+  document.body.classList.add('printing-waiver');
   window.print();
 }
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('printing-waiver');
+});
 
 // ══════════════════════════════════════════════════════
 // CLUB DETAILS SUBMISSION — native form, posts straight to the Club Hub tab
