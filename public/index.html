@@ -3248,18 +3248,43 @@ function printInPlace(htmlContent) {
  }, 350);
 }
 
-// Prints just the flyer image, scaled to one page — a clean, isolated print
-// job via the same hidden-iframe approach as the other print features, so
-// it can never hijack printing for anything else on the site (unlike the
-// waiver's old global-CSS approach, which is exactly what caused that bug).
+// Prints just the flyer image, scaled to one page. Unlike the other print
+// jobs (which are pure text/HTML and always ready instantly), this one
+// loads an external image from Drive — so instead of printInPlace's fixed
+// timeout, it actually waits for the image's load event before printing,
+// with a safety-net timeout in case that event never fires.
 function printFlyer() {
  const img = document.getElementById('flyer-modal-img');
  const title = document.getElementById('flyer-modal-title')?.textContent || 'Flyer';
  if (!img || !img.src) return;
- const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${title}</title>
+ let iframe = document.getElementById('print-frame');
+ if (!iframe) {
+ iframe = document.createElement('iframe');
+ iframe.id = 'print-frame';
+ iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+ document.body.appendChild(iframe);
+ }
+ const doc = iframe.contentWindow.document;
+ doc.open();
+ doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${title}</title>
  <style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;}body{display:flex;align-items:center;justify-content:center;}img{max-width:100%;max-height:100vh;width:auto;height:auto;}@page{margin:0.4in;}</style></head>
- <body><img src="${img.src}" alt="${title}"></body></html>`;
- printInPlace(html);
+ <body><img id="print-flyer-img" src="${img.src}" alt="${title}"></body></html>`);
+ doc.close();
+ const printImg = doc.getElementById('print-flyer-img');
+ let printed = false;
+ const doPrint = () => {
+ if (printed) return;
+ printed = true;
+ iframe.contentWindow.focus();
+ iframe.contentWindow.print();
+ };
+ if (printImg.complete && printImg.naturalWidth > 0) {
+ setTimeout(doPrint, 150);
+ } else {
+ printImg.addEventListener('load', () => setTimeout(doPrint, 150));
+ printImg.addEventListener('error', doPrint);
+ setTimeout(doPrint, 4000); // safety net if neither event ever fires
+ }
 }
 
 function showToast(msg) {
