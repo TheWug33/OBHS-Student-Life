@@ -41,7 +41,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 /* Events slide */
 .ev-row{display:flex;align-items:center;gap:26px;padding:19px 0;border-bottom:1px solid var(--line);}
 .ev-date{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
-.ev-date.range{width:136px;}
+.ev-date.range{width:190px;}
 /* Time badge for Today's Games — same size/shape as the date badge it
    replaces, since every row shares today's date and repeating it is noise. */
 .ev-time{width:104px;flex-shrink:0;text-align:center;background:linear-gradient(150deg,var(--purple-ui),var(--purple-mid));border-radius:16px;padding:12px 0;border:1px solid var(--line-bright);}
@@ -313,7 +313,7 @@ function buildEventTile(mon, day, endMonRaw, endDayRaw) {
  const sameDay = String(endDay) === String(day);
  if (!sameDay) {
  if (sameMonth) {
- return '<div class="ev-date range"><div class="ev-mon">'+mon+'</div><div class="ev-day" style="font-size:0.62em;letter-spacing:-0.02em;">'+day+'\u2013'+endDay+'</div></div>';
+ return '<div class="ev-date range"><div class="ev-mon">'+mon+'</div><div class="ev-day" style="font-size:32px;letter-spacing:-0.02em;">'+day+'\u2013'+endDay+'</div></div>';
  }
  return '<div class="ev-date cross">'
  +'<div class="ev-half"><div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div></div>'
