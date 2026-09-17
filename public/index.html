@@ -2127,6 +2127,7 @@ function chShowSection(id, btn) {
  });
  if (btn) { btn.style.background = 'var(--purple-ui)'; btn.style.color = '#fff'; }
  if (id === 'ch-meetings') loadClubMeetings();
+ trackEvent('Club Hub Section', id);
 }
 
 function chSelectCat(cat, el) {
@@ -2294,6 +2295,7 @@ function ssub(btn, id) {
  if (id === 's-clubs') chLoadClubs();
  if (id === 's-classes') clsLoadPosts('2027');
  if (id === 's-collegevisits') loadCollegeVisits();
+ trackEvent('Student Hub Section', id);
  try { history.replaceState(null, '', '#student:' + id); } catch(e) {}
 }
 
@@ -3266,6 +3268,7 @@ function printFlyer() {
  const img = document.getElementById('flyer-modal-img');
  const title = document.getElementById('flyer-modal-title')?.textContent || 'Flyer';
  if (!img || !img.src) return;
+ trackEvent('Print Flyer', title);
  const printWin = window.open('', '_blank');
  if (!printWin) { showToast('Please allow pop-ups to print.'); return; }
  printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${title}</title>
@@ -3427,6 +3430,20 @@ async function submitToSheet(tab, fields, btn, successMsg) {
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = original; }
   }
+}
+
+// Silent, fire-and-forget usage logging — deliberately NOT submitToSheet,
+// since that's built for user-facing forms (toasts, disabled buttons while
+// submitting). This should never be visible and should never be able to
+// break the feature it's attached to, hence the try/catch swallowing
+// everything and the .catch(()=>{}) on the fetch itself.
+function trackEvent(name, detail) {
+  try {
+    fetch(FORM_RECEIVER_URL, {
+      method: 'POST',
+      body: JSON.stringify({ _tab: 'Analytics', Timestamp: new Date().toISOString(), Event: name, Detail: detail || '' }),
+    }).catch(() => {});
+  } catch (e) {}
 }
 
 function openNewClub(audience) {
@@ -3773,6 +3790,7 @@ const SCHEDULE_LEVEL_ORDER = ['Varsity', 'JV', 'Freshman'];
 async function openSchedule() {
  document.getElementById('schedule-modal').style.display = 'block';
  document.body.style.overflow = 'hidden';
+ trackEvent('Athletics Full Schedule Opened');
  if (scheduleLoaded) return;
  const el = document.getElementById('schedule-list');
  if (!GIDS.athletics || GIDS.athletics.includes('_GID')) {
@@ -4051,6 +4069,7 @@ function printAthleticsSchedule() {
  const sport = sportSel.value;
  const level = levelSel.value;
  const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level).sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME));
+ trackEvent('Print Athletics Schedule', sport + ' - ' + level);
  printInPlace(athleticsSchedulePrintHTML(sport, level, games));
 }
 
@@ -4095,6 +4114,7 @@ function printWaiver() {
   // The printing-waiver class scopes the @media print override to just this
   // action, so printing anything else on the site (a flyer, any other page)
   // isn't hijacked into printing the waiver instead.
+  trackEvent('Print Transportation Waiver');
   document.body.classList.add('printing-waiver');
   window.print();
 }
