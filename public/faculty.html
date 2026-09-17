@@ -1199,6 +1199,17 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Site Insights</div>
  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Which parts of the Student Life site actually get used \u2014 not page views, but real feature usage: which Student Hub and Club Hub sections get opened, and how often people print a schedule, flyer, or the transportation waiver.</p>
+
+ <div id="an-locked" style="max-width:320px;">
+ <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">This section is restricted. Enter the password to view.</p>
+ <div style="display:flex;gap:8px;">
+ <input id="an-password" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')unlockAnalytics()" style="flex:1;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+ <button onclick="unlockAnalytics()" style="background:var(--purple-ui);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;">Unlock</button>
+ </div>
+ <p id="an-password-error" style="display:none;font-size:12px;color:#F87171;margin-top:8px;">Incorrect password.</p>
+ </div>
+
+ <div id="an-unlocked" style="display:none;">
  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
  <select id="an-range" onchange="renderAnalytics()" style="padding:9px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
  <option value="1">Today</option>
@@ -1208,6 +1219,8 @@ img{max-width:100%;display:block;}
  </select>
  </div>
  <div id="an-results"><div style="text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading insights\u2026</div></div>
+ </div>
+
  </div>
  </div>
 
@@ -2396,7 +2409,7 @@ function fsub(btn, id) {
  fPages.forEach(p => { const el = document.getElementById(p); if (el) el.style.display = p === id ? 'block' : 'none'; });
  window.scrollTo({top:0,behavior:'instant'});
  if (id === 'f-departure') loadFieldTrips();
- if (id === 'f-analytics') loadAnalytics();
+ if (id === 'f-analytics') openAnalyticsSection();
  try { history.replaceState(null, '', '#faculty:' + id); } catch(e) {}
 }
 
@@ -3143,7 +3156,41 @@ function closeCoaches() {
 // calls sprinkled through the main site. Not page views (Vercel already
 // covers that) — this is specifically which in-app sections and print
 // actions people actually use, aggregated and filterable by date range.
+//
+// Gated by a second password, separate from the main Faculty Hub one —
+// CHANGE THIS to something only you know. Worth knowing honestly: since
+// everyone who already has the Faculty Hub password receives this page's
+// full code, this stops casual clicking-in but isn't a hard security
+// boundary against someone who goes looking in dev tools. The data
+// itself is aggregate and anonymous (counts, not names), so that
+// tradeoff fits what's actually at stake here.
 // ══════════════════════════════════════════════════════
+const ANALYTICS_PASSWORD = 'CHANGE_ME';
+function openAnalyticsSection() {
+ if (sessionStorage.getItem('analyticsUnlocked') === '1') {
+ const locked = document.getElementById('an-locked');
+ const unlocked = document.getElementById('an-unlocked');
+ if (locked) locked.style.display = 'none';
+ if (unlocked) unlocked.style.display = 'block';
+ }
+ loadAnalytics();
+}
+function unlockAnalytics() {
+ const input = document.getElementById('an-password');
+ const err = document.getElementById('an-password-error');
+ if (!input) return;
+ if (input.value === ANALYTICS_PASSWORD) {
+ sessionStorage.setItem('analyticsUnlocked', '1');
+ const locked = document.getElementById('an-locked');
+ const unlocked = document.getElementById('an-unlocked');
+ if (locked) locked.style.display = 'none';
+ if (unlocked) unlocked.style.display = 'block';
+ if (err) err.style.display = 'none';
+ input.value = '';
+ } else {
+ if (err) err.style.display = 'block';
+ }
+}
 let analyticsRows = [];
 let analyticsLoaded = false;
 async function loadAnalytics() {
