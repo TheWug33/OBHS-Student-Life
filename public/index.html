@@ -1055,29 +1055,32 @@ img{max-width:100%;display:block;}
  </div>
 
  <div id="s-collegecareer" class="subbody" style="display:none">
- <div class="blk-title" style="margin-bottom:6px">College &amp; Career Corner</div>
- <div style="font-size:13px;color:var(--muted);line-height:1.7;max-width:560px;margin-bottom:24px;">Everything to help you plan what's next — college applications, testing, scholarships, trade and military pathways, and more. Questions? See your counselor in Guidance.</div>
 
- <div style="margin-bottom:30px;">
- <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:#fff;margin-bottom:6px;">Upcoming College Visits</div>
- <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Open to all college-bound juniors and seniors. Sign up in Naviance — don't miss the chance to meet one-on-one with a rep from a college you're interested in.</div>
- <div id="cv-list"><div style="text-align:center;padding:40px;color:var(--faint);font-size:13px;">Loading visits…</div></div>
+ <div class="cs" style="margin-bottom:18px;">
+ <div class="cs-ttl">College &amp; Career Corner</div>
+ <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px;">Everything to help you plan what's next — college applications, testing, scholarships, trade and military pathways, and more. Questions? See your counselor in Guidance.</p>
+ <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin:6px 0 8px;">Upcoming College Visits</div>
+ <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px;">Open to all college-bound juniors and seniors. Sign up in Naviance — don't miss the chance to meet one-on-one with a rep from a college you're interested in.</div>
+ <div id="cv-preview" style="font-size:13px;color:#fff;margin-bottom:10px;">Loading visits…</div>
+ <button id="cv-toggle" onclick="toggleCollegeVisits()" style="display:none;background:none;border:none;color:var(--purple-glow);font-size:12.5px;font-weight:600;cursor:pointer;padding:0;align-items:center;gap:5px;">View full schedule <span id="cv-toggle-arrow">↓</span></button>
+ <div id="cv-list" style="display:none;margin-top:14px;"></div>
  </div>
 
- <div style="margin-bottom:30px;">
- <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:#fff;margin-bottom:14px;">College Pathway</div>
+ <div class="cs" style="margin-bottom:18px;">
+ <div class="cs-ttl">College Pathway</div>
  <div id="ccc-college-list"><div style="text-align:center;padding:24px;color:var(--faint);font-size:13px;">Loading…</div></div>
  </div>
 
- <div style="margin-bottom:30px;">
- <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:#fff;margin-bottom:14px;">Career &amp; Trade Pathway</div>
+ <div class="cs" style="margin-bottom:18px;">
+ <div class="cs-ttl">Career &amp; Trade Pathway</div>
  <div id="ccc-career-list"><div style="text-align:center;padding:24px;color:var(--faint);font-size:13px;">Loading…</div></div>
  </div>
 
- <div>
- <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:#fff;margin-bottom:14px;">Military Pathway</div>
+ <div class="cs">
+ <div class="cs-ttl">Military Pathway</div>
  <div id="ccc-military-list"><div style="text-align:center;padding:24px;color:var(--faint);font-size:13px;">Loading…</div></div>
  </div>
+
  </div>
 
  <div id="s-botc" class="subbody" style="display:none">
@@ -3695,11 +3698,14 @@ async function submitClubMeeting() {
 // submission form, so no APPROVED gate needed here.
 // ══════════════════════════════════════════════════════
 let cvLoaded = false;
+let cvExpanded = false;
 async function loadCollegeVisits() {
   const el = document.getElementById('cv-list');
-  if (!el) return;
+  const preview = document.getElementById('cv-preview');
+  const toggle = document.getElementById('cv-toggle');
+  if (!el || !preview) return;
   if (!GIDS.collegevisits || GIDS.collegevisits.includes('_GID')) {
-    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">College Visits isn\u2019t set up yet \u2014 check back soon.</p>';
+    preview.textContent = 'College Visits isn\u2019t set up yet \u2014 check back soon.';
     return;
   }
   if (cvLoaded) return;
@@ -3723,7 +3729,7 @@ async function loadCollegeVisits() {
       .sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.time) - athleticsTimeMinutes(b.time));
 
     if (!clean.length) {
-      el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">No upcoming college visits scheduled.</p>';
+      preview.textContent = 'No upcoming college visits scheduled.';
       cvLoaded = true;
       return;
     }
@@ -3741,6 +3747,11 @@ async function loadCollegeVisits() {
       return d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
     };
 
+    const next = clean[0];
+    const lastLabel = clean[clean.length-1]._date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    preview.innerHTML = `<strong>${clean.length}</strong> visit${clean.length===1?'':'s'} scheduled through ${lastLabel}. Next up: <strong>${next.college}</strong> — ${dayLabel(next._date)}${next.time ? ' at ' + next.time : ''}.`;
+    if (toggle) toggle.style.display = 'flex';
+
     el.innerHTML = order.map(k => {
       const dayRows = byDate[k];
       return `<div style="margin-bottom:18px;">
@@ -3753,8 +3764,17 @@ async function loadCollegeVisits() {
     }).join('');
     cvLoaded = true;
   } catch(e) {
-    el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Couldn\u2019t load college visits \u2014 try again in a moment.</p>';
+    preview.textContent = 'Couldn\u2019t load college visits \u2014 try again in a moment.';
   }
+}
+function toggleCollegeVisits() {
+  cvExpanded = !cvExpanded;
+  const el = document.getElementById('cv-list');
+  const arrow = document.getElementById('cv-toggle-arrow');
+  const btn = document.getElementById('cv-toggle');
+  if (el) el.style.display = cvExpanded ? 'block' : 'none';
+  if (arrow) arrow.textContent = cvExpanded ? '\u2191' : '\u2193';
+  if (btn) btn.childNodes[0].textContent = cvExpanded ? 'Hide full schedule ' : 'View full schedule ';
 }
 
 // College Pathway / Career & Trade Pathway resource lists. Guidance-managed
