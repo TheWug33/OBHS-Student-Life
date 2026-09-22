@@ -579,6 +579,15 @@ async function loadData(){
  stage.appendChild(d);
  flyerIds.push(d.id);
  }
+ // A flyer's URL can pass the "looks like a link" check above but still
+ // fail to actually load (Drive permissions changed, file deleted, etc.).
+ // Without this, that shows as a silent blank slide -- with it, at least
+ // the failure is visible and points at which flyer needs a re-check.
+ document.querySelectorAll('.poster-wrap img').forEach(img=>{
+ img.addEventListener('error',function(){
+ this.closest('.poster-wrap').innerHTML='<div style="color:rgba(255,255,255,0.6);font-size:18px;text-align:center;padding:20px;">Flyer image unavailable</div>';
+ },{once:true});
+ });
 
  rebuildSlides();
 
