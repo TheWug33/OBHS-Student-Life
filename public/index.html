@@ -1530,6 +1530,16 @@ function renderAnn(rows){
 // completely separate from the public student-facing announcements.
 // Community Service opportunities — a simple browsable list, sourced from its own
 // sheet tab (GIDS.serviceopps). Expected columns: TITLE, ORG, DATE, DESCRIPTION, LINK.
+// Sheet-entered links often come in without a scheme (e.g. "www.site.org"
+// instead of "https://www.site.org") since that's how people naturally type
+// them. Without this, window.open() treats a schemeless link as a path on
+// THIS site rather than an external address, which is exactly what caused
+// the SAT/ACT link to 404 -- it tried to open obhs-student-life-ob.vercel.app/www.collegeboard.org.
+function normalizeUrl(u) {
+  const s = (u || '').toString().trim();
+  if (!s) return '';
+  return /^[a-z][a-z0-9+.-]*:/i.test(s) ? s : 'https://' + s;
+}
 function renderServiceOpps(rows){
  const el = document.getElementById('service-opps-list');
  if(!el) return;
@@ -1550,7 +1560,7 @@ function renderServiceOpps(rows){
  + (desc ? '<div class="flr-d" style="margin-top:2px;">' + desc + '</div>' : '')
  + '</div>';
  return link
- ? '<div class="flr" onclick="window.open(\'' + link + '\',\'_blank\')">' + body + '<div class="flr-arr">→</div></div>'
+ ? '<div class="flr" onclick="window.open(\'' + normalizeUrl(link) + '\',\'_blank\')">' + body + '<div class="flr-arr">→</div></div>'
  : '<div class="flr" style="cursor:default">' + body + '</div>';
  }).join('');
 }
@@ -3791,7 +3801,7 @@ function cccRenderList(el, rows) {
       + (r.desc ? '<div class="flr-d">' + r.desc + '</div>' : '')
       + '</div>';
     return r.link
-      ? '<div class="flr" onclick="window.open(\'' + r.link + '\',\'_blank\')">' + body + '<div class="flr-arr">\u2192</div></div>'
+      ? '<div class="flr" onclick="window.open(\'' + normalizeUrl(r.link) + '\',\'_blank\')">' + body + '<div class="flr-arr">\u2192</div></div>'
       : '<div class="flr" style="cursor:default">' + body + '</div>';
   }).join('');
 }
