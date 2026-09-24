@@ -1389,6 +1389,7 @@ function go(id, btn) {
  try{renderAnn(window._lastAnn||[]);}catch(e){}
  try{renderEv(window._lastEvt||[]);}catch(e){}
  try{renderWeekStrip();}catch(e){}
+ try{loadWeekStripGames();}catch(e){}
  try{renderQL(window._lastQL||[]);}catch(e){}
  }
  if(id==='athletics'){
@@ -1692,7 +1693,7 @@ function renderEv(rows){
  );
 
  // Parse each row into a sortable date and filter out past events
- const upcoming=clean.map(r=>{
+ const parsed=clean.map(r=>{
  // DAY might be a full date string like "6/19/2026" — extract just the day number
  const rawDay = (r.DAY||'').toString().trim();
  const dy = rawDay.includes('/') ? parseInt(rawDay.split('/')[1]) : parseInt(rawDay) || 1;
@@ -1728,7 +1729,11 @@ function renderEv(rows){
  }
  console.log('[Events] row:', r.TITLE, '| MONTH:', r.MONTH, '| DAY:', r.DAY, '| date:', r._date, '| past:', r._date< today);
  return r;
- }).filter(r =>r._date >= today)
+ });
+ // Unfiltered (includes past events) — specifically for the week strip,
+ // which should show what already happened this week, not just what's ahead.
+ window._allEventsFull = parsed.slice().sort((a,b) =>a._date - b._date);
+ const upcoming = parsed.filter(r =>r._date >= today)
  .sort((a,b) =>a._date - b._date);
  // Store all upcoming for the Full Calendar modal
  window._allEvents = upcoming;
@@ -1810,17 +1815,22 @@ function renderWeekStrip() {
  const monday = new Date(today);
  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
  const names = ['MON','TUE','WED','THU','FRI'];
- const evs = window._allEvents || [];
+ // Unfiltered on purpose — a day that already happened this week should
+ // still show what was on it, not go blank just because it's in the past.
+ const evs = window._allEventsFull || window._allEvents || [];
+ const games = window._weekGames || [];
  let html = '';
  for (let i = 0; i< 5; i++) {
  const d = new Date(monday); d.setDate(monday.getDate() + i);
  const isToday = d.getTime() === today.getTime();
  const isPast = d< today;
  const dayEvs = evs.filter(r =>r._date && d.getTime() >= r._date.getTime() && d.getTime() <= (r._endDate||r._date).getTime());
+ const dayGames = games.filter(g =>g._date && g._date.getTime() === d.getTime());
+ const items = dayEvs.map(r =>r.TITLE||'').concat(dayGames.map(g =>g.TITLE||''));
  let inner = '';
- if (dayEvs.length) {
- inner = dayEvs.slice(0,3).map(r => '<div class="wk-ev">' + (r.TITLE||'') + '</div>').join('');
- if (dayEvs.length >3) inner += '<div class="wk-none">+' + (dayEvs.length-3) + ' more</div>';
+ if (items.length) {
+ inner = items.slice(0,3).map(t => '<div class="wk-ev">' + t + '</div>').join('');
+ if (items.length >3) inner += '<div class="wk-none">+' + (items.length-3) + ' more</div>';
  } else {
  inner = '<div class="wk-none">' + (isPast ? '—' : 'Nothing yet') + '</div>';
  }
@@ -1832,6 +1842,24 @@ function renderWeekStrip() {
  + '<div class="wk-evs">' + inner + '</div></div>';
  }
  el.innerHTML = html;
+}
+
+let weekGamesLoaded = false;
+// Lightweight, separate from the Full Schedule fetch (which is lazy and
+// only loads if someone opens that modal) -- this pulls just enough to
+// fill in the week strip's empty days with this week's Varsity games.
+async function loadWeekStripGames() {
+ if (weekGamesLoaded) return;
+ weekGamesLoaded = true;
+ if (!GIDS.athletics || GIDS.athletics.includes('_GID')) return;
+ try {
+ const rows = await fetchTab(GIDS.athletics);
+ window._weekGames = rows.map(parseAthleticsRow).filter(Boolean)
+ .filter(r =>r._level === 'Varsity' && !r._cancelled);
+ renderWeekStrip();
+ } catch(e) {
+ console.warn('[WeekStrip] athletics load failed', e);
+ }
 }
 
 // ══════════════════════════════════════════════════════
@@ -2104,6 +2132,7 @@ async function load(){
  try{renderAnn(ann);}catch(e){console.warn('[render] ann',e);}
  try{renderEv(evt);}catch(e){console.warn('[render] ev',e);}
  try{renderWeekStrip();}catch(e){console.warn('[render] week',e);}
+ try{loadWeekStripGames();}catch(e){console.warn('[render] week-games',e);}
  try{loadClassCup();}catch(e){console.warn('[render] cup',e);}
  try{loadSpotlight();}catch(e){console.warn('[render] spotlight',e);}
  try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
