@@ -38,17 +38,19 @@ export default async function handler(req, res) {
       const rawDesc = getTag(block, 'description');
       const excerpt = decodeEntities(stripTags(rawDesc)).slice(0, 160).trim();
 
-      // WordPress/Jetpack feeds usually carry the featured image as
-      // <media:content>; fall back to the first <img> in the full post
-      // body if that tag isn't present for some reason.
+      // The real, per-story photo lives in the post body itself. Try that
+      // first; media:content is a fallback for the rare case a post has no
+      // inline image at all -- in practice it turned out to carry a
+      // generic Jetpack-generated placeholder graphic rather than the
+      // actual featured photo, which is why this order matters.
       let image = '';
-      const mediaMatch = block.match(/<media:content[^>]*url=["']([^"']+)["']/i);
-      if (mediaMatch) {
-        image = mediaMatch[1];
+      const content = getTag(block, 'content:encoded') || rawDesc;
+      const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["']/i);
+      if (imgMatch) {
+        image = imgMatch[1];
       } else {
-        const content = getTag(block, 'content:encoded') || rawDesc;
-        const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["']/i);
-        if (imgMatch) image = imgMatch[1];
+        const mediaMatch = block.match(/<media:content[^>]*url=["']([^"']+)["']/i);
+        if (mediaMatch) image = mediaMatch[1];
       }
 
       return { title, link, excerpt, image };
