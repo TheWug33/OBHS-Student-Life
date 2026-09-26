@@ -28,6 +28,7 @@ export default async function handler(req, res) {
       .replace(/&#8221;/g, '\u201d')
       .replace(/&#8211;/g, '\u2013')
       .replace(/&#8212;/g, '\u2014');
+    const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';
     // Extract the byline (e.g. "By Jane Doe, Social Media Director") instead
     // of discarding it as before -- this is now the only thing shown besides
     // the headline, since the description field turned out to be photo
@@ -36,12 +37,36 @@ export default async function handler(req, res) {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
       if (!lines.length || !/^by\s/i.test(lines[0])) return '';
       let byline = lines[0];
+      // Some posts run the byline and the article's opening sentence
+      // together with no paragraph break at all -- but every article seen
+      // so far opens its body with "On <Month> ...", so that's used as a
+      // reliable cutoff even when the newline-based split above doesn't catch it.
+      const monthCut = byline.match(new RegExp(`\\bOn (${MONTHS})\\b`, 'i'));
+      if (monthCut) byline = byline.slice(0, monthCut.index);
+      // Some posts (often staff-written pieces) open straight into the
+      // story with no "On <Month>" pattern at all -- e.g. "BY KNIGHT LIFE
+      // STAFF The girls soccer team...". Most bylines end in a recognizable
+      // role word, so that's tried next if the month-cutoff above found nothing.
+      if (!monthCut) {
+        const roleCut = byline.match(/\b(Staff|Editor|Director|Reporter|Writer)\b/i);
+        if (roleCut) byline = byline.slice(0, roleCut.index + roleCut[0].length);
+      }
       // If "By Name, Role" format is used, keep just the name portion.
-      // If there's no comma (some posts run name and role together with no
-      // separator at all), the full line is kept as-is rather than guessed at.
       const commaIdx = byline.indexOf(',');
       if (commaIdx > -1) byline = byline.slice(0, commaIdx);
+      // Last-resort safety net: real bylines are short, so anything still
+      // this long after the cuts above is almost certainly still leaking
+      // into article text with no pattern this code recognizes.
+      if (byline.length > 60) byline = byline.slice(0, 60).trim();
+      // Strip the leading "By"/"BY" from the source text itself -- the
+      // frontend adds its own "By " prefix, so leaving this in doubled it.
+      byline = byline.replace(/^by\s+/i, '');
       return decodeEntities(byline).trim();
+    };
+    const formatDate = (pubDate) => {
+      const d = new Date(pubDate);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
     const getTag = (block, tag) => {
       const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
@@ -58,7 +83,8 @@ export default async function handler(req, res) {
         const rawContent = getTag(block, 'content:encoded');
         byline = extractByline(htmlToText(rawContent));
       }
-      return { title, link, byline };
+      const date = formatDate(getTag(block, 'pubDate'));
+      return { title, link, byline, date };
     }).filter(item => item.title && item.link);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
