@@ -621,11 +621,7 @@ img{max-width:100%;display:block;}
  </div>
  <div class="reveal" id="knightlife-block" style="margin-top:36px">
  <div class="blk-head"><span class="blk-title">From Knight Life</span><button class="blk-link" onclick="window.open('https://knightlifeob.com/','_blank')">Visit Knight Life →</button></div>
- <div class="kl-row" id="kl-row">
- <div class="kl-card"><div class="kl-card-title">Test headline one</div><div class="kl-card-excerpt">This is placeholder text standing in for a real story excerpt, just to test the shape of the card.</div><span class="kl-card-cta">Read the full story →</span></div>
- <div class="kl-card"><div class="kl-card-title">Test headline two</div><div class="kl-card-excerpt">A second placeholder card, same size, to confirm the row scrolls correctly with more than one card in it.</div><span class="kl-card-cta">Read the full story →</span></div>
- <div class="kl-card"><div class="kl-card-title">Test headline three</div><div class="kl-card-excerpt">A third placeholder card, to make sure nothing changes once there are enough cards to require scrolling.</div><span class="kl-card-cta">Read the full story →</span></div>
- </div>
+ <div class="kl-row" id="kl-row"><div class="kl-card"><span class="fly-label">Loading…</span></div></div>
  </div>
  <div class="reveal" id="flyers-block" style="margin-top:36px">
  <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openFlyerSubmit()">Submit →</button></div>
@@ -1790,6 +1786,30 @@ function renderFlyers(rows){
  window._flyerData=clean;
  el.innerHTML=clean.map((r,i)=>`<div class="fly" onclick="openFlyer(${i})" style="padding:0;cursor:pointer"><img src="${r.IMAGE_URL}" alt="${r.TITLE}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=\\'fly-label\\' style=\\'padding:8px\\'>${r.TITLE}</span>'"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:7px;font-family:Barlow Condensed;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.75)">${r.TITLE}</div></div>`).join('');
 }
+let knightLifeLoaded = false;
+async function loadKnightLife() {
+ if (knightLifeLoaded) return;
+ const el = document.getElementById('kl-row');
+ if (!el) return;
+ try {
+ const res = await fetch('/api/knightlife');
+ const data = await res.json();
+ const items = (data.items || []).filter(it => it.title && it.link).slice(0, 6);
+ if (!items.length) {
+ el.innerHTML = '<div class="kl-card"><span class="fly-label">Check back soon</span></div>';
+ return;
+ }
+ el.innerHTML = items.map(it => `<div class="kl-card" onclick="window.open('${it.link}','_blank')">
+ <div class="kl-card-title">${it.title}</div>
+ ${it.excerpt ? `<div class="kl-card-excerpt">${it.excerpt}</div>` : ''}
+ <span class="kl-card-cta">Read the full story →</span>
+ </div>`).join('');
+ knightLifeLoaded = true;
+ } catch(e) {
+ el.innerHTML = '<div class="kl-card"><span class="fly-label">Couldn\u2019t load right now</span></div>';
+ console.warn('[KnightLife] load failed', e);
+ }
+}
 async function fetchCountdown(gid){
  try{
  const url=SHEET.replace('gid=1447819289','gid='+gid);
@@ -2152,6 +2172,7 @@ async function load(){
  try{loadSpotlight();}catch(e){console.warn('[render] spotlight',e);}
  try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
  try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers',e);}
+ try{loadKnightLife();}catch(e){console.warn('[render] knightlife',e);}
  try{await fetchCountdown(GIDS.countdown);}catch(e){setupCD('Days until Graduation','2026-06-23');}
  break;
  }
