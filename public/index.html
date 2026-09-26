@@ -1800,7 +1800,7 @@ async function loadKnightLife() {
  }
  el.innerHTML = items.map(it => `<div class="kl-card" onclick="window.open('${it.link}','_blank')">
  <div class="kl-card-title">${it.title}</div>
- ${it.byline ? `<div class="kl-card-excerpt">By ${it.byline}</div>` : ''}
+ ${(it.byline || it.date) ? `<div class="kl-card-excerpt">${it.byline ? `By ${it.byline}` : ''}${it.byline && it.date ? ' · ' : ''}${it.date || ''}</div>` : ''}
  </div>`).join('');
  knightLifeLoaded = true;
  } catch(e) {
