@@ -29,39 +29,53 @@ export default async function handler(req, res) {
       .replace(/&#8211;/g, '\u2013')
       .replace(/&#8212;/g, '\u2014');
     const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';
-    // Extract the byline (e.g. "By Jane Doe, Social Media Director") instead
-    // of discarding it as before -- this is now the only thing shown besides
-    // the headline, since the description field turned out to be photo
-    // caption text, not a real summary, and reads as nonsense out of context.
+    const toTitleCase = (s) => s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    // Returns {author, role} -- author always has a value (falls back to
+    // "Knight Life Staff" if nothing usable is found or if what's found is a
+    // generic staff byline rather than a real name), role may be empty.
+    const FALLBACK = { author: 'Knight Life Staff', role: '' };
     const extractByline = (text) => {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-      if (!lines.length || !/^by\s/i.test(lines[0])) return '';
-      let byline = lines[0];
+      if (!lines.length || !/^by\s/i.test(lines[0])) return FALLBACK;
+      let raw = lines[0].replace(/^by\s+/i, '').trim();
+
       // Some posts run the byline and the article's opening sentence
-      // together with no paragraph break at all -- but every article seen
-      // so far opens its body with "On <Month> ...", so that's used as a
-      // reliable cutoff even when the newline-based split above doesn't catch it.
-      const monthCut = byline.match(new RegExp(`\\bOn (${MONTHS})\\b`, 'i'));
-      if (monthCut) byline = byline.slice(0, monthCut.index);
-      // Some posts (often staff-written pieces) open straight into the
-      // story with no "On <Month>" pattern at all -- e.g. "BY KNIGHT LIFE
-      // STAFF The girls soccer team...". Most bylines end in a recognizable
-      // role word, so that's tried next if the month-cutoff above found nothing.
-      if (!monthCut) {
-        const roleCut = byline.match(/\b(Staff|Editor|Director|Reporter|Writer)\b/i);
-        if (roleCut) byline = byline.slice(0, roleCut.index + roleCut[0].length);
+      // together with no paragraph break at all. Every article seen opens
+      // its body with "On <Month> ...", so that's tried first as a cutoff;
+      // failing that, most bylines end in a recognizable role word.
+      const monthCut = raw.match(new RegExp(`\\bOn (${MONTHS})\\b`, 'i'));
+      if (monthCut) {
+        raw = raw.slice(0, monthCut.index).trim();
+      } else {
+        const roleCut = raw.match(/\b(Staff|Editor|Director|Reporter|Writer)\b/i);
+        if (roleCut) raw = raw.slice(0, roleCut.index + roleCut[0].length).trim();
       }
-      // If "By Name, Role" format is used, keep just the name portion.
-      const commaIdx = byline.indexOf(',');
-      if (commaIdx > -1) byline = byline.slice(0, commaIdx);
       // Last-resort safety net: real bylines are short, so anything still
       // this long after the cuts above is almost certainly still leaking
       // into article text with no pattern this code recognizes.
-      if (byline.length > 60) byline = byline.slice(0, 60).trim();
-      // Strip the leading "By"/"BY" from the source text itself -- the
-      // frontend adds its own "By " prefix, so leaving this in doubled it.
-      byline = byline.replace(/^by\s+/i, '');
-      return decodeEntities(byline).trim();
+      if (raw.length > 60) raw = raw.slice(0, 60).trim();
+
+      // Split into name + role. Prefer a comma if present ("Name, Role");
+      // otherwise this publication writes bylines as a leading ALL-CAPS
+      // name followed by a Title-Case role ("DAYAMI VILORIA Social Media
+      // Director"), so each word is checked individually for being fully
+      // uppercase -- a regex-based version of this was tried first and
+      // failed, since a Title-Case word's lone leading capital ("Social")
+      // was wrongly matched as its own one-letter all-caps word.
+      let namePart, rolePart;
+      const commaIdx = raw.indexOf(',');
+      if (commaIdx > -1) {
+        namePart = raw.slice(0, commaIdx).trim();
+        rolePart = raw.slice(commaIdx + 1).trim();
+      } else {
+        const words = raw.split(/\s+/).filter(Boolean);
+        let splitIdx = 0;
+        while (splitIdx < words.length && /^[A-Z']+$/.test(words[splitIdx])) splitIdx++;
+        namePart = words.slice(0, splitIdx).join(' ');
+        rolePart = words.slice(splitIdx).join(' ');
+      }
+      if (!namePart || /\bstaff\b/i.test(namePart)) return FALLBACK;
+      return { author: toTitleCase(decodeEntities(namePart)), role: decodeEntities(rolePart) };
     };
     const formatDate = (pubDate) => {
       const d = new Date(pubDate);
@@ -78,13 +92,14 @@ export default async function handler(req, res) {
       const title = decodeEntities(htmlToText(getTag(block, 'title'))).slice(0, 90).trim();
       const link = getTag(block, 'link').trim();
       const rawDesc = getTag(block, 'description');
-      let byline = extractByline(htmlToText(rawDesc));
-      if (!byline) {
+      let { author, role } = extractByline(htmlToText(rawDesc));
+      if (author === FALLBACK.author) {
         const rawContent = getTag(block, 'content:encoded');
-        byline = extractByline(htmlToText(rawContent));
+        const retry = extractByline(htmlToText(rawContent));
+        if (retry.author !== FALLBACK.author) ({ author, role } = retry);
       }
       const date = formatDate(getTag(block, 'pubDate'));
-      return { title, link, byline, date };
+      return { title, link, author, role, date };
     }).filter(item => item.title && item.link);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
