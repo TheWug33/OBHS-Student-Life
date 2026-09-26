@@ -53,7 +53,15 @@ export default async function handler(req, res) {
       const title = decodeEntities(htmlToText(getTag(block, 'title')));
       const link = getTag(block, 'link').trim();
       const rawDesc = getTag(block, 'description');
-      const excerpt = decodeEntities(stripByline(htmlToText(rawDesc))).slice(0, 130).trim();
+      let excerpt = decodeEntities(stripByline(htmlToText(rawDesc))).trim();
+      // Some posts' <description> field is *only* the byline -- after
+      // stripping it, nothing's left. Fall back to the full post body
+      // in that case rather than showing a blank excerpt.
+      if (excerpt.length < 20) {
+        const rawContent = getTag(block, 'content:encoded');
+        excerpt = decodeEntities(stripByline(htmlToText(rawContent))).trim();
+      }
+      excerpt = excerpt.slice(0, 130).trim();
 
       return { title, link, excerpt };
     }).filter(item => item.title && item.link);
