@@ -1798,12 +1798,36 @@ async function loadKnightLife() {
  el.innerHTML = '<div class="kl-card"><span class="fly-label">Check back soon</span></div>';
  return;
  }
- el.innerHTML = items.map(it => `<div class="kl-card" onclick="window.open('${it.link}','_blank')">
- <div class="kl-card-title">${it.title}</div>
- <div class="kl-card-meta">By ${it.author}</div>
- ${it.role ? `<div class="kl-card-meta">${it.role}</div>` : ''}
- ${it.date ? `<div class="kl-card-meta">${it.date}</div>` : ''}
- </div>`).join('');
+ el.innerHTML = '';
+ items.forEach(it => {
+ const card = document.createElement('div');
+ card.className = 'kl-card';
+ card.addEventListener('click', () => window.open(it.link, '_blank'));
+
+ const title = document.createElement('div');
+ title.className = 'kl-card-title';
+ title.textContent = it.title;
+ card.appendChild(title);
+
+ const author = document.createElement('div');
+ author.className = 'kl-card-meta';
+ author.textContent = `By ${it.author}`;
+ card.appendChild(author);
+
+ if (it.role) {
+ const role = document.createElement('div');
+ role.className = 'kl-card-meta';
+ role.textContent = it.role;
+ card.appendChild(role);
+ }
+ if (it.date) {
+ const date = document.createElement('div');
+ date.className = 'kl-card-meta';
+ date.textContent = it.date;
+ card.appendChild(date);
+ }
+ el.appendChild(card);
+ });
  knightLifeLoaded = true;
  } catch(e) {
  el.innerHTML = '<div class="kl-card"><span class="fly-label">Couldn\u2019t load right now</span></div>';
