@@ -11,7 +11,16 @@ export default async function handler(req, res) {
     const xml = await response.text();
 
     const stripCdata = (s) => (s || '').replace(/^<!\[CDATA\[/, '').replace(/\]\]>$/, '').trim();
-    const stripTags = (s) => (s || '').replace(/<[^>]*>/g, '').trim();
+    // Preserve paragraph/line breaks as newlines before stripping tags --
+    // without this, a separate byline paragraph ("By Jane Doe, Editor")
+    // runs directly into the next paragraph's first word with no space
+    // ("...Editor On September 14..."), which is exactly what happened
+    // before this fix.
+    const htmlToText = (s) => (s || '')
+      .replace(/<\/(p|div|h[1-6]|li)>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]*>/g, '')
+      .trim();
     const decodeEntities = (s) => (s || '')
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
@@ -24,6 +33,14 @@ export default async function handler(req, res) {
       .replace(/&#8221;/g, '\u201d')
       .replace(/&#8211;/g, '\u2013')
       .replace(/&#8212;/g, '\u2014');
+    // Bylines ("By Jane Doe, Social Media Director") are their own leading
+    // paragraph in the feed -- drop that line so the excerpt starts with
+    // the actual story instead of an author credit eating the character budget.
+    const stripByline = (text) => {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length && /^by\s/i.test(lines[0])) lines.shift();
+      return lines.join(' ');
+    };
 
     // Grab a tag's raw inner content, whether or not it's CDATA-wrapped.
     const getTag = (block, tag) => {
@@ -33,27 +50,12 @@ export default async function handler(req, res) {
 
     const itemBlocks = xml.match(/<item\b[\s\S]*?<\/item>/g) || [];
     const items = itemBlocks.slice(0, 6).map(block => {
-      const title = decodeEntities(stripTags(getTag(block, 'title')));
+      const title = decodeEntities(htmlToText(getTag(block, 'title')));
       const link = getTag(block, 'link').trim();
       const rawDesc = getTag(block, 'description');
-      const excerpt = decodeEntities(stripTags(rawDesc)).slice(0, 160).trim();
+      const excerpt = decodeEntities(stripByline(htmlToText(rawDesc))).slice(0, 130).trim();
 
-      // The real, per-story photo lives in the post body itself. Try that
-      // first; media:content is a fallback for the rare case a post has no
-      // inline image at all -- in practice it turned out to carry a
-      // generic Jetpack-generated placeholder graphic rather than the
-      // actual featured photo, which is why this order matters.
-      let image = '';
-      const content = getTag(block, 'content:encoded') || rawDesc;
-      const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["']/i);
-      if (imgMatch) {
-        image = imgMatch[1];
-      } else {
-        const mediaMatch = block.match(/<media:content[^>]*url=["']([^"']+)["']/i);
-        if (mediaMatch) image = mediaMatch[1];
-      }
-
-      return { title, link, excerpt, image };
+      return { title, link, excerpt };
     }).filter(item => item.title && item.link);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
