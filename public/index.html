@@ -227,7 +227,7 @@ img{max-width:100%;display:block;}
 .kl-card{flex:0 0 220px;height:150px;scroll-snap-align:start;background:linear-gradient(155deg,#392478,#130A28);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;display:flex;flex-direction:column;overflow:hidden;}
 @media (hover:hover){.kl-card:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
 .kl-card-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.35;text-transform:uppercase;letter-spacing:.02em;}
-.kl-card-excerpt{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;flex:1;overflow:hidden;}
+.kl-card-meta{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:3px;}
 /* ═══════════════════════════════════════════
  SUB-PAGES
 ═══════════════════════════════════════════ */
@@ -1800,7 +1800,9 @@ async function loadKnightLife() {
  }
  el.innerHTML = items.map(it => `<div class="kl-card" onclick="window.open('${it.link}','_blank')">
  <div class="kl-card-title">${it.title}</div>
- ${(it.byline || it.date) ? `<div class="kl-card-excerpt">${it.byline ? `By ${it.byline}` : ''}${it.byline && it.date ? ' · ' : ''}${it.date || ''}</div>` : ''}
+ <div class="kl-card-meta">By ${it.author}</div>
+ ${it.role ? `<div class="kl-card-meta">${it.role}</div>` : ''}
+ ${it.date ? `<div class="kl-card-meta">${it.date}</div>` : ''}
  </div>`).join('');
  knightLifeLoaded = true;
  } catch(e) {
