@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
     const itemBlocks = xml.match(/<item\b[\s\S]*?<\/item>/g) || [];
     const items = itemBlocks.slice(0, 6).map(block => {
-      const title = decodeEntities(htmlToText(getTag(block, 'title')));
+      const title = decodeEntities(htmlToText(getTag(block, 'title'))).slice(0, 90).trim();
       const link = getTag(block, 'link').trim();
       const rawDesc = getTag(block, 'description');
       let excerpt = decodeEntities(stripByline(htmlToText(rawDesc))).trim();
