@@ -401,12 +401,21 @@ img{max-width:100%;display:block;}
 .wk-day.today .wk-dow{color:var(--purple-glow);}
 .wk-ev{font-size:11px;color:var(--silver);line-height:1.35;padding:4px 7px;background:rgba(91,63,192,0.18);border-radius:6px;margin-bottom:4px;max-height:30px;overflow:hidden;}
 .wk-ev:last-child{margin-bottom:0;}
+/* School events: light chip so they stand apart from sports */
+.wk-ev.school{background:var(--silver-bright);color:#1a1230;font-weight:600;}
+.wk-extra[hidden]{display:none;}
+.wk-extra{margin-top:4px;}
+.wk-extra .wk-ev:last-child{margin-bottom:4px;}
+.wk-toggle{background:none;border:0;padding:4px 0 0;font:inherit;font-size:11px;color:var(--purple-glow);cursor:pointer;text-align:left;}
+.wk-toggle:hover{text-decoration:underline;}
 .wk-none{font-size:11px;color:var(--faint);}
 @media (max-width:767px){
  .wk-strip{flex-direction:column;gap:7px;}
  .wk-day{display:flex;align-items:flex-start;gap:14px;min-height:0;padding:10px 14px;}
  .wk-date{margin-bottom:0;width:52px;flex-shrink:0;}
  .wk-evs{flex:1;min-width:0;padding-top:1px;}
+ .wk-ev{max-height:none;font-size:13px;}
+ .wk-toggle{font-size:13px;padding:6px 0 2px;}
 }
 
 /* ── Class Cup ── */
@@ -1865,6 +1874,20 @@ function setupCD(label,dateStr){
 // ══════════════════════════════════════════════════════
 // THIS WEEK AT OBHS — Mon–Fri strip on Student Hub
 // ══════════════════════════════════════════════════════
+function wkEsc(str) {
+ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// One delegated listener (survives re-renders): expands/collapses a day's extra items
+document.addEventListener('click', e => {
+ const btn = e.target.closest && e.target.closest('.wk-toggle');
+ if (!btn) return;
+ const extra = btn.previousElementSibling;
+ if (!extra) return;
+ const open = extra.hasAttribute('hidden');
+ if (open) extra.removeAttribute('hidden'); else extra.setAttribute('hidden','');
+ btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+ btn.textContent = open ? 'Show less' : '+' + btn.dataset.more + ' more';
+});
 function renderWeekStrip() {
  const el = document.getElementById('wk-strip');
  if (!el) return;
@@ -1885,11 +1908,20 @@ function renderWeekStrip() {
  const isPast = d< today;
  const dayEvs = evs.filter(r =>r._date && d.getTime() >= r._date.getTime() && d.getTime() <= (r._endDate||r._date).getTime());
  const dayGames = games.filter(g =>g._date && g._date.getTime() === d.getTime());
- const items = dayEvs.map(r =>r.TITLE||'').concat(dayGames.map(g =>g.TITLE||''));
+ // School events always lead; sports follow. Each item carries its kind
+ // so school events can be styled differently (light chip vs purple chip).
+ const items = dayEvs.map(r => ({t: r.TITLE||'', school: true}))
+ .concat(dayGames.map(g => ({t: g.TITLE||'', school: false})));
+ const LIMIT = 3;
+ const pill = it => '<div class="wk-ev' + (it.school ? ' school' : '') + '">' + wkEsc(it.t) + '</div>';
  let inner = '';
  if (items.length) {
- inner = items.slice(0,3).map(t => '<div class="wk-ev">' + t + '</div>').join('');
- if (items.length >3) inner += '<div class="wk-none">+' + (items.length-3) + ' more</div>';
+ inner = items.slice(0, LIMIT).map(pill).join('');
+ if (items.length > LIMIT) {
+ const extra = items.length - LIMIT;
+ inner += '<div class="wk-extra" hidden>' + items.slice(LIMIT).map(pill).join('') + '</div>'
+ + '<button type="button" class="wk-toggle" data-more="' + extra + '" aria-expanded="false">+' + extra + ' more</button>';
+ }
  } else {
  inner = '<div class="wk-none">' + (isPast ? '—' : 'Nothing yet') + '</div>';
  }
