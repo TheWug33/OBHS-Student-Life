@@ -3486,13 +3486,19 @@ async function submitToSheet(tab, fields, btn, successMsg) {
       method: 'POST',
       body: JSON.stringify({ _tab: tab, ...fields }),
     });
-    const data = await res.json();
-    if (data.status !== 'ok') throw new Error(data.message || 'Unknown error');
+    let data;
+    try { data = await res.json(); }
+    catch (parseErr) { const err = new Error('bad-response'); err.kind = 'response'; throw err; }
+    if (data.status !== 'ok') { const err = new Error(data.message || 'Unknown error'); err.kind = 'server'; throw err; }
     showToast(successMsg || 'Submitted successfully!');
     return true;
   } catch (e) {
     console.warn('[submitToSheet] failed', e);
-    showToast('Something went wrong \u2014 please try again.');
+    // Tell people (and whoever they screenshot it to) roughly WHERE it failed.
+    const msg = e.kind === 'server' ? 'The form server rejected that submission \u2014 please try again or contact Student Life.'
+      : e.kind === 'response' ? 'The form server sent back an unexpected response \u2014 please try a smaller image or contact Student Life.'
+      : 'Couldn\u2019t reach the form server \u2014 check your connection or try a different network/browser.';
+    showToast(msg);
     return false;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = original; }
@@ -4059,6 +4065,36 @@ function fsFileToBase64(file) {
   });
 }
 
+// Shrinks big phone/AI-generated flyer images before upload. Large PNGs (several MB)
+// become ~10MB+ of base64 in the POST body, which is the most likely reason an
+// Apps Script upload fails. Resizes to max 1600px on the long side and re-encodes
+// as JPEG; falls back to the original file if anything about that fails.
+async function fsCompressImage(file) {
+  try {
+    if (!file.type || !file.type.startsWith('image/') || file.type === 'image/gif') return file;
+    const url = URL.createObjectURL(file);
+    const img = await new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url;
+    });
+    URL.revokeObjectURL(url);
+    const MAX = 1600;
+    const scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); // flatten transparency for JPEG
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+    if (!blob || blob.size >= file.size) return file; // already small — keep original
+    const name = (file.name || 'flyer').replace(/\.[^.]+$/, '') + '.jpg';
+    return new File([blob], name, { type: 'image/jpeg' });
+  } catch (e) {
+    console.warn('[flyer] compression skipped', e);
+    return file;
+  }
+}
+
 async function submitFlyer() {
   const title = document.getElementById('fs-title')?.value.trim();
   const file = document.getElementById('fs-image-file')?.files?.[0];
@@ -4075,15 +4111,16 @@ async function submitFlyer() {
   btn.disabled = true; btn.textContent = 'Uploading\u2026';
 
   try {
-    const base64 = await fsFileToBase64(file);
+    const upload = await fsCompressImage(file);
+    const base64 = await fsFileToBase64(upload);
     const ok = await submitToSheet('Flyers', {
       'TITLE': title,
       'SUBMITTED_BY': name,
       'SUBMITTED_EMAIL': email,
       '_image_base64': base64,
       '_image_field': 'IMAGE_URL',
-      '_image_mime': file.type || 'image/jpeg',
-      '_image_filename': file.name || 'flyer.jpg',
+      '_image_mime': upload.type || 'image/jpeg',
+      '_image_filename': upload.name || 'flyer.jpg',
     }, null, 'Submitted! It\u2019ll appear once Student Life reviews it.');
     if (ok) {
       document.getElementById('fs-title').value = '';
