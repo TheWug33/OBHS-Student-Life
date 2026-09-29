@@ -2985,7 +2985,7 @@ function parseAthleticsRow(r) {
 // and a struck-through title instead of a different function per caller.
 function athleticsGameTileHTML(r) {
  const titleStyle = r._cancelled ? ' style="text-decoration:line-through;opacity:.55;"' : '';
- const badge = r._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '';
+ const badge = r._cancelled ? ' <span style="display:inline-block;font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '';
  return `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t"${titleStyle}>${r.TITLE}${badge}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`;
 }
 
@@ -4198,8 +4198,8 @@ function openScheduleDay(key) {
  + games.map(g =>
  '<div style="border-top:1px solid var(--line);padding:10px 0;">'
  + '<div style="font-size:14px;font-weight:600;color:#fff;' + (g._cancelled ? 'text-decoration:line-through;opacity:.55;' : '') + '">' + (g.TITLE || '')
- + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">(' + g._level + ')</span>' : '')
- + (g._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '')
+ + (g._level !== 'Varsity' ? ' <span style="display:inline-block;font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">(' + g._level + ')</span>' : '')
+ + (g._cancelled ? ' <span style="display:inline-block;font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '')
  + '</div>'
  + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
  + '</div>').join('');
