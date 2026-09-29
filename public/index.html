@@ -2985,7 +2985,7 @@ function parseAthleticsRow(r) {
 // and a struck-through title instead of a different function per caller.
 function athleticsGameTileHTML(r) {
  const titleStyle = r._cancelled ? ' style="text-decoration:line-through;opacity:.55;"' : '';
- const badge = r._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;">Cancelled</span>' : '';
+ const badge = r._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '';
  return `<div class="ev">${buildEventTile(r)}<div style="flex:1"><div class="ev-t"${titleStyle}>${r.TITLE}${badge}</div><div class="ev-s">${r.TIME||'TBD'}${r.LOCATION?' \u00b7 '+r.LOCATION:''}</div></div></div>`;
 }
 
@@ -4198,8 +4198,8 @@ function openScheduleDay(key) {
  + games.map(g =>
  '<div style="border-top:1px solid var(--line);padding:10px 0;">'
  + '<div style="font-size:14px;font-weight:600;color:#fff;' + (g._cancelled ? 'text-decoration:line-through;opacity:.55;' : '') + '">' + (g.TITLE || '')
- + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;">(' + g._level + ')</span>' : '')
- + (g._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;">Cancelled</span>' : '')
+ + (g._level !== 'Varsity' ? ' <span style="font-size:10px;font-weight:700;color:var(--purple-glow);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">(' + g._level + ')</span>' : '')
+ + (g._cancelled ? ' <span style="font-size:10px;font-weight:700;color:#E05252;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Cancelled</span>' : '')
  + '</div>'
  + '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + (g.TIME || 'TBD') + (g.LOCATION ? ' \u00b7 ' + g.LOCATION : '') + '</div>'
  + '</div>').join('');
@@ -4807,7 +4807,7 @@ observeReveal();
  <div class="cal-modal-head">
  <button onclick="closeSchedule()" class="cal-modal-x" aria-label="Close">✕</button>
  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
- <h2 class="cal-modal-ttl">Full Fall Schedule</h2>
+ <h2 class="cal-modal-ttl">Full Sports Schedule</h2>
  </div>
  <div style="display:flex;gap:8px;margin-bottom:16px;">
  <button id="sched-tab-cal" onclick="setScheduleView('calendar')" style="flex:1;background:var(--purple-ui);color:#fff;border:1px solid var(--line-bright);padding:10px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Calendar</button>
