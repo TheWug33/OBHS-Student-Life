@@ -454,6 +454,20 @@ img{max-width:100%;display:block;}
 /* ── Search ── */
 .nav-search-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:8px;margin-left:2px;border-radius:8px;transition:color .2s,background .2s;flex-shrink:0;display:flex;align-items:center;}
 .nav-search-btn:hover{color:#fff;background:rgba(255,255,255,0.08);}
+.nav-toggle{display:none;background:none;border:none;color:var(--muted);cursor:pointer;padding:8px;margin-left:4px;border-radius:8px;flex-shrink:0;align-items:center;justify-content:center;}
+.nav-toggle:hover{color:#fff;background:rgba(255,255,255,0.08);}
+.nav-toggle-close{display:none;}
+.nav-toggle.open .nav-toggle-hamburger{display:none;}
+.nav-toggle.open .nav-toggle-close{display:block;}
+.nav-dropdown{display:none;flex-direction:column;background:rgba(19,10,40,0.97);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid var(--line);}
+.nav-dropdown.open{display:flex;}
+.nav-dropdown .nav-btn{width:100%;text-align:left;padding:15px 20px;border-bottom:1px solid var(--line);}
+.nav-dropdown .nav-btn::after{display:none;}
+.nav-dropdown .nav-btn.active{color:#fff;background:rgba(115,88,214,0.14);}
+@media (max-width:767px){
+ .nav>.nav-btn{display:none;}
+ .nav-toggle{display:inline-flex;}
+}
 .sr-group{margin-bottom:22px;}
 .sr-group-ttl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:10px;}
 .sr-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s;}
@@ -559,7 +573,18 @@ img{max-width:100%;display:block;}
  <button class="nav-btn" onclick="window.open('https://knightlifeob.com','_blank')">Knight Life</button>
  <button class="nav-btn" data-page="athletics" onclick="go('athletics',this)">Athletics</button>
  <button class="nav-search-btn" onclick="openSearch()" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+ <button class="nav-toggle" id="navToggle" onclick="toggleNavMenu()" aria-label="Menu" aria-expanded="false" aria-controls="navDropdown">
+ <svg class="nav-toggle-hamburger" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+ <svg class="nav-toggle-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+ </button>
 </nav>
+<div class="nav-dropdown" id="navDropdown">
+ <button class="nav-btn" data-page="home" onclick="go('home',this)">Home</button>
+ <button class="nav-btn" data-page="student" onclick="go('student',this)">Student Hub</button>
+ <button class="nav-btn" data-page="faculty" onclick="window.location.href='/faculty'">Faculty Hub</button>
+ <button class="nav-btn" onclick="window.open('https://knightlifeob.com','_blank')">Knight Life</button>
+ <button class="nav-btn" data-page="athletics" onclick="go('athletics',this)">Athletics</button>
+</div>
 
 
 <!-- ══════════════ HOME ══════════════ -->
@@ -1393,13 +1418,44 @@ window.addEventListener('scroll', () => {
  else nav.classList.remove('scrolled');
 }, {passive:true});
 
+// ── Mobile nav menu (hamburger dropdown) ──
+function toggleNavMenu() {
+ const dd = document.getElementById('navDropdown');
+ const btn = document.getElementById('navToggle');
+ if (!dd || !btn) return;
+ const open = dd.classList.toggle('open');
+ btn.classList.toggle('open', open);
+ btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeNavMenu() {
+ const dd = document.getElementById('navDropdown');
+ const btn = document.getElementById('navToggle');
+ if (!dd || !dd.classList.contains('open')) return;
+ dd.classList.remove('open');
+ if (btn) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+ const dd = document.getElementById('navDropdown');
+ if (dd) dd.addEventListener('click', e => { if (e.target.closest('button')) closeNavMenu(); });
+});
+document.addEventListener('click', e => {
+ const dd = document.getElementById('navDropdown');
+ const toggle = document.getElementById('navToggle');
+ if (!dd || !dd.classList.contains('open')) return;
+ if (dd.contains(e.target) || (toggle && toggle.contains(e.target))) return;
+ closeNavMenu();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNavMenu(); });
+window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeNavMenu(); });
+
 // ── Page nav ──
 function go(id, btn) {
  document.querySelectorAll('.page').forEach(p =>p.classList.remove('active'));
  document.getElementById('page-'+id).classList.add('active');
  document.querySelectorAll('.nav-btn').forEach(b =>b.classList.remove('active'));
- if (btn) btn.classList.add('active');
- else document.querySelector('[data-page='+id+']').classList.add('active');
+ // Highlight every button for this page — the bar copy AND the mobile dropdown copy share data-page
+ document.querySelectorAll('[data-page="'+id+'"]').forEach(b =>b.classList.add('active'));
+ closeNavMenu();
  window.scrollTo({top:0,behavior:'instant'});
  setTimeout(observeReveal, 50);
  try { history.replaceState(null, '', id === 'home' ? location.pathname : '#' + id); } catch(e) {}
