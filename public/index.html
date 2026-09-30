@@ -4154,6 +4154,7 @@ async function openSchedule() {
  scheduleLoaded = true;
  renderScheduleCalendar();
  populatePrintPicker();
+ populateCalendarPrintPicker();
  } catch(e) {
  console.warn('[Schedule] load failed', e);
  el.innerHTML = '<p style="font-size:13px;color:var(--faint);padding:12px 0">Could not load the schedule \u2014 visit the full Knights Athletics site.</p>';
@@ -4188,6 +4189,7 @@ function renderScheduleCalendar() {
  }
  });
  months.sort((a, b) => a.year - b.year || a.month - b.month);
+ window._scheduleMonths = months;
 
  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
  const today = new Date(); today.setHours(0,0,0,0);
@@ -4284,7 +4286,7 @@ function setScheduleView(view) {
  tab.style.color = on ? '#fff' : 'var(--muted)';
  tab.style.borderColor = on ? 'var(--line-bright)' : 'var(--line)';
  });
- if (view === 'print') populatePrintPicker();
+ if (view === 'print') { populatePrintPicker(); populateCalendarPrintPicker(); }
 }
 
 function toggleScheduleSport(i) {
@@ -4375,6 +4377,78 @@ function printAthleticsSchedule() {
  const games = (window._scheduleGames || []).filter(g => g._sport === sport && g._level === level).sort((a,b) => a._date - b._date || athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME));
  trackEvent('Print Athletics Schedule', sport + ' - ' + level);
  printInPlace(athleticsSchedulePrintHTML(sport, level, games));
+}
+
+// ══════════════════════════════════════════════════════
+// PRINT A MONTHLY CALENDAR — a full month grid with every sport already
+// filled in on its date, for trainers/coaches who were hand-copying games
+// onto a blank calendar. Reuses window._scheduleByDay / _scheduleMonths,
+// both populated by renderScheduleCalendar() whenever the schedule loads.
+// ══════════════════════════════════════════════════════
+function populateCalendarPrintPicker() {
+ const sel = document.getElementById('print-month-select');
+ if (!sel || sel.options.length) return; // already populated
+ const months = window._scheduleMonths;
+ if (!months || !months.length) return; // calendar hasn't rendered yet — try again next time the tab opens
+ const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+ sel.innerHTML = months.map(m => `<option value="${m.key}">${MONTH_NAMES[m.month]} ${m.year}</option>`).join('');
+ // Default to the current month when it's on the list, since that's almost always what someone printing wants
+ const today = new Date();
+ const curKey = today.getFullYear() + '-' + today.getMonth();
+ if (months.some(m => m.key === curKey)) sel.value = curKey;
+}
+function athleticsMonthCalendarPrintHTML(year, month, dayGamesMap) {
+ const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+ const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ const first = new Date(year, month, 1);
+ const daysInMonth = new Date(year, month + 1, 0).getDate();
+ const startDow = first.getDay();
+
+ const cellsFlat = [];
+ for (let i = 0; i < startDow; i++) cellsFlat.push('<td class="amc-empty"></td>');
+ for (let d = 1; d <= daysInMonth; d++) {
+ const k = year + '-' + month + '-' + d;
+ const games = (dayGamesMap[k] || []).slice().sort((a,b) => athleticsTimeMinutes(a.TIME) - athleticsTimeMinutes(b.TIME));
+ const entries = games.map(g => '<div class="amc-ev' + (g._cancelled ? ' amc-cancelled' : '') + '"><strong>' + (g._sport || g.TITLE || '') + '</strong>'
+ + (g._level && g._level !== 'Varsity' ? ' (' + g._level + ')' : '')
+ + (g._cancelled ? ' \u2014 CANCELLED' : (g.TIME ? ' \u00b7 ' + g.TIME : ''))
+ + '</div>').join('');
+ cellsFlat.push('<td><div class="amc-date">' + d + '</div>' + entries + '</td>');
+ }
+ while (cellsFlat.length % 7 !== 0) cellsFlat.push('<td class="amc-empty"></td>');
+ const rows = [];
+ for (let i = 0; i < cellsFlat.length; i += 7) rows.push('<tr>' + cellsFlat.slice(i, i + 7).join('') + '</tr>');
+
+ return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>${MONTH_NAMES[month]} ${year} \u2014 Athletics Calendar</title>
+ <style>
+ @page{size:landscape;margin:10mm;}
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{font-family:Georgia,serif;color:#222;}
+ .amc-header{background:#26215C;color:#EEEDFE;padding:14px 22px;text-align:center;border-radius:8px 8px 0 0;}
+ .amc-school{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:4px;font-family:sans-serif;}
+ .amc-title{font-size:22px;font-weight:700;}
+ table{width:100%;border-collapse:collapse;table-layout:fixed;}
+ th{background:#EEEDFE;color:#3C3489;font-family:sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:6px;border:1px solid #ddd;}
+ td{border:1px solid #ddd;vertical-align:top;padding:4px 5px;height:85px;width:14.28%;font-family:sans-serif;overflow:hidden;}
+ td.amc-empty{background:#fafafa;}
+ .amc-date{font-weight:700;font-size:11px;margin-bottom:3px;}
+ .amc-ev{font-size:8.5px;line-height:1.3;margin-bottom:2px;}
+ .amc-cancelled{text-decoration:line-through;opacity:.55;}
+ .amc-footer{background:#3C3489;color:#AFA9EC;padding:8px 22px;font-size:9px;text-align:center;font-family:sans-serif;border-radius:0 0 8px 8px;margin-top:8px;}
+ tr{page-break-inside:avoid;}
+ @media print{body{margin:0;padding:0;max-width:100%}}
+ </style></head><body>
+ <div class="amc-header"><div class="amc-school">Old Bridge High School &nbsp;\u00b7&nbsp; Knights Athletics</div><div class="amc-title">${MONTH_NAMES[month]} ${year} Schedule</div></div>
+ <table><thead><tr>${DOW.map(d => '<th>' + d + '</th>').join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>
+ <div class="amc-footer">Old Bridge High School \u2014 Knights Athletics \u00b7 Schedule subject to change</div>
+ </body></html>`;
+}
+function printAthleticsMonthCalendar() {
+ const sel = document.getElementById('print-month-select');
+ if (!sel || !sel.value) { showToast('Schedule is still loading \u2014 try again in a moment.'); return; }
+ const [year, month] = sel.value.split('-').map(Number);
+ trackEvent('Print Athletics Month Calendar', sel.value);
+ printInPlace(athleticsMonthCalendarPrintHTML(year, month, window._scheduleByDay || {}));
 }
 
 // ══════════════════════════════════════════════════════
@@ -4883,6 +4957,14 @@ observeReveal();
  <select id="print-level-select" style="width:100%;background:rgba(255,255,255,0.06);color:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:13px;"></select>
  </div>
  <button onclick="printAthleticsSchedule()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Print / Save as PDF</button>
+ <div style="margin:22px 0 18px;border-top:1px solid var(--line);"></div>
+ <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-glow);margin-bottom:14px;">Print a Monthly Calendar</div>
+ <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">A blank grid for the whole month, with every sport already filled in on its date &mdash; nothing to write in by hand.</div>
+ <div style="margin-bottom:18px;">
+ <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:6px;">Month</label>
+ <select id="print-month-select" style="width:100%;background:rgba(255,255,255,0.06);color:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:13px;"></select>
+ </div>
+ <button onclick="printAthleticsMonthCalendar()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:12px;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Print / Save as PDF</button>
  </div>
  </div>
 </div>
