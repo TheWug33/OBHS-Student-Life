@@ -1115,7 +1115,7 @@ img{max-width:100%;display:block;}
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(3)'),'f-departure')"><div class="fc-ttl">See who's leaving today</div><div class="fc-dsc">Check the Field Trip &amp; Departure Log for groups out of the building right now, or look back on any past date.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Departure Log</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(4)'),'f-clubs')"><div class="fc-ttl">Run my club</div><div class="fc-dsc">Handbook, budget requests, meeting logs, new club approval, and end-of-year reporting.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Club Advisor Resources</span></div>
  <div class="fc" onclick="openFlyerSubmit()"><div class="fc-ttl">Submit a flyer</div><div class="fc-dsc">Get your club or event flyer featured on the homepage and TV displays.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Homepage &amp; TV Displays</span></div>
- <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-events')"><div class="fc-ttl">Get my event on the calendar</div><div class="fc-dsc">In-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Microsoft Form</span></div>
+ <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(5)'),'f-events')"><div class="fc-ttl">Get my event on the calendar</div><div class="fc-dsc">In-school events or meetings where students will miss class time.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Reviewed by Student Life</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(6)'),'f-helpdesk')"><div class="fc-ttl">Get help — IT, a room, or a real person</div><div class="fc-dsc">Tech support, reserving spaces like the auditorium or cafeteria, or reach Student Life directly.</div><span class="fc-tag" style="background:rgba(255,255,255,0.08);color:#C7C9D1">Help Desk</span></div>
  <div class="fc" onclick="fsub(document.querySelector('#f-subnav .sn:nth-child(7)'),'f-docs')"><div class="fc-ttl">Find a form or document</div><div class="fc-dsc">Permission slips, policy docs, and standard forms — all in one place.</div><span class="fc-tag" style="background:rgba(91,63,192,0.25);color:#C7C9D1">Document Library</span></div>
  </div>
@@ -1133,7 +1133,7 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Early Dismissal</div>
  <div class="info"><div class="info-t">Use the link below to submit your final roster for all early dismissals and field trips</div><div class="info-d">Early dismissals for student activities must be submitted and approved before communicating to students or parents.</div></div>
- <div class="flr" onclick="window.open(DISMISSAL_URL,'_blank')"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Microsoft Form · attach your student roster file · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openDismissalSubmit()"><div><div class="flr-t">Submit early dismissal request</div><div class="flr-d">Goes straight to Student Life for review \u2014 you'll get an on-screen confirmation once it's submitted</div></div><div class="flr-arr">\u2192</div></div>
  <div class="flr" style="opacity:0.75;cursor:default"><div><div class="flr-t">Early dismissal policy</div><div class="flr-d">Requests must be submitted at least 24 hours in advance and approved before communicating to students or parents.</div></div></div>
  </div>
  </div>
@@ -1186,7 +1186,7 @@ img{max-width:100%;display:block;}
  <div class="cs">
  <div class="cs-ttl">Submit an Event / Meeting</div>
  <div class="info"><div class="info-t">For school meetings, assemblies, and events — during the school day or after</div><div class="info-d">Use this form for assemblies, meetings, or activities happening during the school day or after school hours. Not for field trips (students leaving the building) — use the Field Trip Request for those.</div></div>
- <div class="flr" onclick="window.open(EVT_URL,'_blank')"><div><div class="flr-t">Submit an event / meeting</div><div class="flr-d">During school or after — assemblies, meetings, activities · you'll see an on-screen confirmation once it's submitted</div></div><div class="flr-arr">→</div></div>
+ <div class="flr" onclick="openEventSubmit()"><div><div class="flr-t">Submit an event / meeting</div><div class="flr-d">Goes straight to Student Life for review \u2014 you'll get an on-screen confirmation once it's submitted</div></div><div class="flr-arr">\u2192</div></div>
  
  <div class="flr" onclick="window.open(FACILITIES_URL,'_blank')"><div><div class="flr-t">Reserve a space</div><div class="flr-d">Auditorium, cafeteria, and other facilities</div></div><div class="flr-arr">→</div></div>
  </div>
@@ -4190,6 +4190,122 @@ async function submitFlyer() {
 }
 
 // ══════════════════════════════════════════════════════
+// EARLY DISMISSAL REQUEST — native form, posts straight to the Field
+// Trips tab (the same one the Departure Log reads), replacing the old
+// Microsoft Form + Power Automate relay.
+// ══════════════════════════════════════════════════════
+function openDismissalSubmit() {
+  document.getElementById('dismissal-submit-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeDismissalSubmit() {
+  document.getElementById('dismissal-submit-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitDismissal() {
+  const group = document.getElementById('ds-group')?.value.trim();
+  const date = document.getElementById('ds-date')?.value;
+  const dismissal = document.getElementById('ds-dismissal')?.value.trim();
+  const ret = document.getElementById('ds-return')?.value.trim();
+  const destination = document.getElementById('ds-destination')?.value.trim();
+  const email = document.getElementById('ds-email')?.value.trim();
+  const notes = document.getElementById('ds-notes')?.value.trim();
+  const file = document.getElementById('ds-roster-file')?.files?.[0];
+  if (!group) { showToast('Please enter the group, team, or activity.'); return; }
+  if (!date) { showToast('Please choose a date.'); return; }
+  if (!dismissal) { showToast('Please enter a dismissal time.'); return; }
+  if (!ret) { showToast('Please enter a return time.'); return; }
+  if (!destination) { showToast('Please enter a destination.'); return; }
+  if (!email) { showToast('Please enter your email.'); return; }
+  if (file && file.size > 8 * 1024 * 1024) { showToast('That roster file is a bit large \u2014 try one under 8MB.'); return; }
+
+  const btn = document.getElementById('ds-submit-btn');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Submitting\u2026';
+
+  try {
+    const fields = {
+      'GROUP': group,
+      'DATE': date,
+      'DISMISSAL_TIME': dismissal,
+      'RETURN_TIME': ret,
+      'DESTINATION': destination,
+      'TEACHER': email,
+      'DESCRIPTION': notes,
+    };
+    if (file) {
+      fields['_image_base64'] = await fsFileToBase64(file);
+      fields['_image_field'] = 'ROSTER_URL';
+      fields['_image_mime'] = file.type || 'application/octet-stream';
+      fields['_image_filename'] = file.name || 'roster';
+    }
+    const ok = await submitToSheet('Field Trips', fields, null, 'Submitted! Student Life will review and approve it.');
+    if (ok) {
+      ['ds-group','ds-dismissal','ds-return','ds-destination','ds-email','ds-notes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.getElementById('ds-date').value = '';
+      document.getElementById('ds-roster-file').value = '';
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// EVENT / MEETING SUBMISSION — native form, posts straight to the
+// Events tab (same APPROVED-gated tab that already feeds the homepage
+// calendar), replacing the old Microsoft Form + Power Automate relay.
+// ══════════════════════════════════════════════════════
+function openEventSubmit() {
+  document.getElementById('event-submit-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeEventSubmit() {
+  document.getElementById('event-submit-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+async function submitEvent() {
+  const title = document.getElementById('ev-title')?.value.trim();
+  const dateVal = document.getElementById('ev-date')?.value;
+  const time = document.getElementById('ev-time')?.value.trim();
+  const location = document.getElementById('ev-location')?.value.trim();
+  const name = document.getElementById('ev-name')?.value.trim();
+  const email = document.getElementById('ev-email')?.value.trim();
+  const notes = document.getElementById('ev-notes')?.value.trim();
+  if (!title) { showToast('Please enter an event or meeting title.'); return; }
+  if (!dateVal) { showToast('Please choose a date.'); return; }
+  if (!name) { showToast('Please enter your name.'); return; }
+  if (!email) { showToast('Please enter your email.'); return; }
+
+  const btn = document.getElementById('ev-submit-btn');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Submitting\u2026';
+
+  try {
+    // Parse the date input (YYYY-MM-DD) locally rather than with `new Date(string)`,
+    // which reads a bare YYYY-MM-DD as UTC midnight and can shift a day off in
+    // any timezone behind UTC.
+    const [y, m, d] = dateVal.split('-').map(Number);
+    const month = Object.keys(MONTH_NUM).find(k => MONTH_NUM[k] === (m - 1)) || '';
+    const ok = await submitToSheet('Events', {
+      'TITLE': title,
+      'MONTH': month,
+      'DAY': String(d),
+      'TIME': time,
+      'LOCATION': location,
+      'SUBMITTED_BY': name,
+      'SUBMITTED_EMAIL': email,
+      'DESCRIPTION': notes,
+    }, null, 'Submitted! It\u2019ll appear on the calendar once Student Life reviews it.');
+    if (ok) {
+      ['ev-title','ev-time','ev-location','ev-name','ev-email','ev-notes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.getElementById('ev-date').value = '';
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
+}
+
+// ══════════════════════════════════════════════════════
 // FIELD TRIP SUBMISSION INSTRUCTIONS
 // ══════════════════════════════════════════════════════
 function openFtInstructions() {
@@ -4647,6 +4763,69 @@ observeReveal();
         </div>
         <button id="fs-submit-btn" onclick="submitFlyer()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
         <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it appears on the site.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="dismissal-submit-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeDismissalSubmit()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Early Dismissal Request</h2>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">Submit at least 24 hours in advance. This goes to Student Life for review before it's approved — don't communicate details to students or parents until you hear back.</p>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Group / Team / Activity</label><input id="ds-group" type="text" placeholder="e.g. Girls Tennis \u2014 States" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Date</label><input id="ds-date" type="date" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Dismissal Time</label><input id="ds-dismissal" type="text" placeholder="12:00 PM" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Return Time</label><input id="ds-return" type="text" placeholder="4:00 PM" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Destination</label><input id="ds-destination" type="text" placeholder="e.g. Jersey 34 Tennis Club" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="ds-email" type="email" placeholder="you@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Additional Notes</label><textarea id="ds-notes" rows="2" placeholder="Anything Student Life should know" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Student Roster (optional)</label>
+          <input id="ds-roster-file" type="file" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;">
+        </div>
+        <button id="ds-submit-btn" onclick="submitDismissal()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+        <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it's approved.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="event-submit-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(19,10,40,0.92);backdrop-filter:blur(12px);overflow-y:auto;padding:32px 20px;">
+  <div style="max-width:560px;margin:0 auto;">
+    <div class="cal-modal-head">
+      <button onclick="closeEventSubmit()" class="cal-modal-x" aria-label="Close">✕</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--silver);opacity:.5;margin-bottom:6px">OBHS Student Life</div>
+      <h2 class="cal-modal-ttl">Submit an Event / Meeting</h2>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">For assemblies, meetings, or activities during or after school. Not for field trips (students leaving the building) — use the Early Dismissal / Field Trip request for those. Reviewed by Student Life before it appears on the calendar.</p>
+
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Event / Meeting Title</label><input id="ev-title" type="text" placeholder="e.g. Student Council Meeting" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Date</label><input id="ev-date" type="date" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Time</label><input id="ev-time" type="text" placeholder="3:00-4:00 PM" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Location</label><input id="ev-location" type="text" placeholder="e.g. Room 112" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Name</label><input id="ev-name" type="text" placeholder="Jane Doe" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+          <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Your Email</label><input id="ev-email" type="email" placeholder="you@obps.org" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"></div>
+        </div>
+        <div><label style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Notes (optional)</label><textarea id="ev-notes" rows="2" placeholder="Anything Student Life should know" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:vertical;"></textarea></div>
+        <button id="ev-submit-btn" onclick="submitEvent()" style="width:100%;background:var(--purple-ui);color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Submit for Review &rarr;</button>
+        <p style="font-size:11px;color:var(--faint);text-align:center;margin:0;">Reviewed by Student Life before it appears on the calendar.</p>
       </div>
     </div>
 
