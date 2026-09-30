@@ -3333,7 +3333,9 @@ async function loadFieldTrips() {
  // "Leaving Today" has to reflect submissions made minutes ago, so a stale
  // read here is worse than a slightly slower load.
  const rows = await fetchTab(GIDS.fieldtrips, true);
- ftData = rows.filter(r => (r.GROUP||'').trim() && (r.DATE||'').trim()).map(r => {
+ // Same APPROVED-column pattern as Flyers/Events/Club Hub: a submission sits
+ // invisible here until Student Life marks its APPROVED cell with a Y.
+ ftData = rows.filter(r => (r.GROUP||'').trim() && (r.DATE||'').trim() && /^y/i.test((r.APPROVED||'').trim())).map(r => {
  const d = new Date((r.DATE||'').trim() + 'T00:00:00');
  r._date = isNaN(d.getTime()) ? null : d;
  return r;
