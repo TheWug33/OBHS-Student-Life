@@ -228,6 +228,16 @@ img{max-width:100%;display:block;}
 @media (hover:hover){.kl-card:hover{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
 .kl-card-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.35;text-transform:uppercase;letter-spacing:.02em;}
 .kl-card-meta{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:3px;}
+.obtv-row{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;gap:12px;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none;}
+.obtv-row::-webkit-scrollbar{display:none;}
+.obtv-card{flex:0 0 220px;scroll-snap-align:start;cursor:pointer;}
+.obtv-thumb{width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;position:relative;background:linear-gradient(155deg,#392478,#130A28);border:1px solid var(--line);transition:transform 0.3s cubic-bezier(.2,.8,.2,1),border-color 0.3s;}
+.obtv-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.obtv-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.obtv-play svg{filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));}
+@media (hover:hover){.obtv-card:hover .obtv-thumb{transform:translateY(-3px) scale(1.02);border-color:var(--line-bright);}}
+.obtv-card-title{font-size:13px;font-weight:600;color:#fff;margin:8px 0 3px;line-height:1.35;}
+.obtv-card-meta{font-size:12px;color:var(--muted);}
 /* ═══════════════════════════════════════════
  SUB-PAGES
 ═══════════════════════════════════════════ */
@@ -655,6 +665,10 @@ img{max-width:100%;display:block;}
  <div class="reveal" id="knightlife-block" style="margin-top:36px">
  <div class="blk-head"><span class="blk-title">Knight Life</span><button class="blk-link" onclick="window.open('https://knightlifeob.com/','_blank')">Visit Knight Life →</button></div>
  <div class="kl-row" id="kl-row"><div class="kl-card"><span class="fly-label">Loading…</span></div></div>
+ </div>
+ <div class="reveal" id="obtv-block" style="margin-top:36px">
+ <div class="blk-head"><span class="blk-title">OBTV</span><button class="blk-link" onclick="window.open('https://www.youtube.com/@oldbridgehighschool','_blank')">Visit Channel →</button></div>
+ <div class="obtv-row" id="obtv-row"><div class="obtv-card"><div class="obtv-thumb"></div><span class="fly-label">Loading…</span></div></div>
  </div>
  <div class="reveal" id="flyers-block" style="margin-top:36px">
  <div class="blk-head"><span class="blk-title">Recent Flyers</span><button class="blk-link" onclick="openFlyerSubmit()">Submit →</button></div>
@@ -1897,6 +1911,57 @@ async function loadKnightLife() {
  console.warn('[KnightLife] load failed', e);
  }
 }
+let obtvLoaded = false;
+async function loadOBTV() {
+ if (obtvLoaded) return;
+ const el = document.getElementById('obtv-row');
+ if (!el) return;
+ try {
+ const res = await fetch('/api/obtv');
+ const data = await res.json();
+ const items = (data.items || []).filter(it => it.title && it.link).slice(0, 8);
+ if (!items.length) {
+ el.innerHTML = '<div class="obtv-card"><span class="fly-label">Check back soon</span></div>';
+ return;
+ }
+ el.innerHTML = '';
+ items.forEach(it => {
+ const card = document.createElement('div');
+ card.className = 'obtv-card';
+ card.addEventListener('click', () => window.open(it.link, '_blank'));
+
+ const thumb = document.createElement('div');
+ thumb.className = 'obtv-thumb';
+ const img = document.createElement('img');
+ img.src = it.thumbnail;
+ img.alt = it.title;
+ img.loading = 'lazy';
+ thumb.appendChild(img);
+ const play = document.createElement('div');
+ play.className = 'obtv-play';
+ play.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="rgba(255,255,255,0.92)"><circle cx="12" cy="12" r="11" fill="rgba(19,10,40,0.55)"/><path d="M9.5 7.5v9l8-4.5z"/></svg>';
+ thumb.appendChild(play);
+ card.appendChild(thumb);
+
+ const title = document.createElement('div');
+ title.className = 'obtv-card-title';
+ title.textContent = it.title;
+ card.appendChild(title);
+
+ if (it.date) {
+ const date = document.createElement('div');
+ date.className = 'obtv-card-meta';
+ date.textContent = it.date;
+ card.appendChild(date);
+ }
+ el.appendChild(card);
+ });
+ obtvLoaded = true;
+ } catch(e) {
+ el.innerHTML = '<div class="obtv-card"><span class="fly-label">Couldn\u2019t load right now</span></div>';
+ console.warn('[OBTV] load failed', e);
+ }
+}
 async function fetchCountdown(gid){
  try{
  const url=SHEET.replace('gid=1447819289','gid='+gid);
@@ -2283,6 +2348,7 @@ async function load(){
  try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
  try{renderFlyers(flyers);}catch(e){console.warn('[render] flyers',e);}
  try{loadKnightLife();}catch(e){console.warn('[render] knightlife',e);}
+ try{loadOBTV();}catch(e){console.warn('[render] obtv',e);}
  try{await fetchCountdown(GIDS.countdown);}catch(e){setupCD('Days until Graduation','2026-06-23');}
  break;
  }
