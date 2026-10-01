@@ -11,9 +11,14 @@ export default async function handler(req, res) {
   const SERIES_MATCH = 'old bridge knightly wrap up';
 
   try {
-    const response = await fetch(FEED_URL);
+    const response = await fetch(FEED_URL, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'application/atom+xml, application/xml, text/xml, */*',
+      },
+    });
     if (!response.ok) {
-      return res.status(502).json({ error: `Feed returned ${response.status}` });
+      return res.status(502).json({ error: `Feed returned ${response.status}`, statusText: response.statusText });
     }
     const xml = await response.text();
 
