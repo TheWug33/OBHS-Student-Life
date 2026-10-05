@@ -371,8 +371,20 @@ function parseCSV(text){
  const hdrs=splitLine(lines[hi]).map(h=>h.replace(/^"|"$/g,'').trim());
  return lines.slice(hi+1).map(l=>{const v=splitLine(l).map(x=>x.replace(/^"|"$/g,'').trim());const o={};hdrs.forEach((h,i)=>o[h.toUpperCase()]=v[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
 }
-async function tab(gid){
- try{const r=await fetch('/api/sheet?gid='+gid,{cache:'no-store'});if(!r.ok)return[];const t=await r.text();if(!t||t.includes('<!DOCTYPE'))return[];return parseCSV(t);}catch(e){return[];}
+// Fetches every tab this page needs in ONE request instead of one request
+// per tab — with 11+ TVs polling independently, that was multiplying CDN
+// request volume by the tab count on every single poll.
+async function fetchBatch(gids){
+ try{
+ const r=await fetch('/api/display-data?gids='+gids.join(','));
+ if(!r.ok)return{};
+ return await r.json();
+ }catch(e){return{};}
+}
+function parseTab(batch,gid){
+ const t=batch[gid];
+ if(!t||t.includes('<!DOCTYPE'))return[];
+ return parseCSV(t);
 }
 
 // Clock
@@ -436,7 +448,12 @@ async function loadData(){
  const wantFlyers = GIDS.flyers && !GIDS.flyers.includes('_GID');
  const wantClubMeetings = GIDS.clubmeetings && !GIDS.clubmeetings.includes('_GID');
  const wantCollegeVisits = GIDS.collegevisits && !GIDS.collegevisits.includes('_GID');
- const [ann,evt,cd,lyr,kotw,fly,ath,clm,cv]=await Promise.all([tab(GIDS.announcements),tab(GIDS.events),tab(GIDS.countdown),tab(GIDS.lyric),tab(GIDS.spotlight),wantFlyers?tab(GIDS.flyers):Promise.resolve([]),tab(GIDS.athletics),wantClubMeetings?tab(GIDS.clubmeetings):Promise.resolve([]),wantCollegeVisits?tab(GIDS.collegevisits):Promise.resolve([])]);
+ const gidList=[GIDS.announcements,GIDS.events,GIDS.countdown,GIDS.lyric,GIDS.spotlight,GIDS.athletics]
+ .concat(wantFlyers?[GIDS.flyers]:[])
+ .concat(wantClubMeetings?[GIDS.clubmeetings]:[])
+ .concat(wantCollegeVisits?[GIDS.collegevisits]:[]);
+ const batch=await fetchBatch(gidList);
+ const ann=parseTab(batch,GIDS.announcements),evt=parseTab(batch,GIDS.events),cd=parseTab(batch,GIDS.countdown),lyr=parseTab(batch,GIDS.lyric),kotw=parseTab(batch,GIDS.spotlight),fly=wantFlyers?parseTab(batch,GIDS.flyers):[],ath=parseTab(batch,GIDS.athletics),clm=wantClubMeetings?parseTab(batch,GIDS.clubmeetings):[],cv=wantCollegeVisits?parseTab(batch,GIDS.collegevisits):[];
 
  // Events
  const today=new Date();today.setHours(0,0,0,0);
@@ -615,8 +632,8 @@ async function loadData(){
  }
 }
 loadData();
-setInterval(loadData,5*60*1000); // refresh data every 5 minutes
-setTimeout(()=>location.reload(),30*60*1000); // full reload every 30 min (picks up code updates)
+setInterval(loadData,15*60*1000); // refresh data every 15 minutes
+setTimeout(()=>location.reload(),2*60*60*1000); // full reload every 2 hours (picks up code updates)
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>function qrInit() {
