@@ -28,7 +28,6 @@ export default async function handler(req, res) {
       .replace(/&#8221;/g, '\u201d')
       .replace(/&#8211;/g, '\u2013')
       .replace(/&#8212;/g, '\u2014');
-    const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';
     const toTitleCase = (s) => s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
     // Returns {author, role} -- author always has a value (falls back to
     // "Knight Life Staff" if nothing usable is found or if what's found is a
@@ -37,42 +36,51 @@ export default async function handler(req, res) {
     const extractByline = (text) => {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
       if (!lines.length || !/^by\s/i.test(lines[0])) return FALLBACK;
-      let raw = lines[0].replace(/^by\s+/i, '').trim();
+      const raw = lines[0].replace(/^by\s+/i, '').trim();
+      const ROLE_RE = /\b(Staff|Editor|Director|Reporter|Writer)\b/i;
 
-      // Some posts run the byline and the article's opening sentence
-      // together with no paragraph break at all. Every article seen opens
-      // its body with "On <Month> ...", so that's tried first as a cutoff;
-      // failing that, most bylines end in a recognizable role word.
-      const monthCut = raw.match(new RegExp(`\\bOn (${MONTHS})\\b`, 'i'));
-      if (monthCut) {
-        raw = raw.slice(0, monthCut.index).trim();
-      } else {
-        const roleCut = raw.match(/\b(Staff|Editor|Director|Reporter|Writer)\b/i);
-        if (roleCut) raw = raw.slice(0, roleCut.index + roleCut[0].length).trim();
-      }
-      // Last-resort safety net: real bylines are short, so anything still
-      // this long after the cuts above is almost certainly still leaking
-      // into article text with no pattern this code recognizes.
-      if (raw.length > 60) raw = raw.slice(0, 60).trim();
-
-      // Split into name + role. Prefer a comma if present ("Name, Role");
-      // otherwise this publication writes bylines as a leading ALL-CAPS
-      // name followed by a Title-Case role ("DAYAMI VILORIA Social Media
-      // Director"), so each word is checked individually for being fully
-      // uppercase -- a regex-based version of this was tried first and
-      // failed, since a Title-Case word's lone leading capital ("Social")
-      // was wrongly matched as its own one-letter all-caps word.
+      // Many posts run the byline and the article's opening sentence
+      // together with no paragraph break at all, and where that boundary
+      // falls varies per article (some open "On <Month> ...", some don't,
+      // some have no stated role at all) -- too inconsistent to locate
+      // reliably. Rather than guess where body text starts and risk
+      // pulling article text into the author or role field, this only
+      // ever trusts two specific, narrow patterns and leaves role blank
+      // otherwise.
       let namePart, rolePart;
       const commaIdx = raw.indexOf(',');
-      if (commaIdx > -1) {
+      // "Name, Role" -- but only committed to if a real role keyword
+      // follows the comma. An ordinary run-on sentence can easily contain
+      // an early comma too (e.g. "...This past summer, students..."), so
+      // the comma alone isn't enough signal; without a role keyword
+      // confirming it, this falls through to the all-caps check instead
+      // of keeping a namePart that's actually just sentence fragment.
+      let commaRoleMatch = null;
+      if (commaIdx > -1 && commaIdx < 60) {
+        const afterComma = raw.slice(commaIdx + 1, commaIdx + 61).trim();
+        commaRoleMatch = afterComma.match(new RegExp(`^(.*?${ROLE_RE.source})`, 'i'));
+      }
+      if (commaRoleMatch) {
         namePart = raw.slice(0, commaIdx).trim();
-        rolePart = raw.slice(commaIdx + 1).trim();
+        rolePart = commaRoleMatch[1].trim();
       } else {
+        // This publication's other convention: a leading ALL-CAPS name,
+        // optionally followed by a Title-Case role ("DAYAMI VILORIA
+        // Social Media Director"). The run of fully-uppercase words is
+        // the one part of a run-on byline+body line that's safe to trust
+        // -- once a non-all-caps word shows up, that's either the role or
+        // the article's body, so the words right after the name are only
+        // kept as a role if a recognized keyword actually appears there.
+        // (A regex-based version of the all-caps scan was tried first and
+        // failed, since a Title-Case word's lone leading capital, like
+        // "Social", wrongly matched as its own one-letter all-caps word.)
         const words = raw.split(/\s+/).filter(Boolean);
         let splitIdx = 0;
         while (splitIdx < words.length && /^[A-Z']+$/.test(words[splitIdx])) splitIdx++;
         namePart = words.slice(0, splitIdx).join(' ');
-        rolePart = words.slice(splitIdx).join(' ');
+        const afterName = words.slice(splitIdx, splitIdx + 6).join(' ');
+        const roleMatch = afterName.match(new RegExp(`^(.*?${ROLE_RE.source})`, 'i'));
+        rolePart = roleMatch ? roleMatch[1].trim() : '';
       }
       if (!namePart || /\bstaff\b/i.test(namePart)) return FALLBACK;
       return { author: toTitleCase(decodeEntities(namePart)), role: decodeEntities(rolePart) };
