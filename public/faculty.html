@@ -1903,11 +1903,17 @@ function renderFlyers(rows){
  el.innerHTML=clean.map((r,i)=>`<div class="fly" onclick="openFlyer(${i})" style="padding:0;cursor:pointer"><img src="${r.IMAGE_URL}" alt="${r.TITLE}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=\\'fly-label\\' style=\\'padding:8px\\'>${r.TITLE}</span>'"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:7px;font-family:Barlow Condensed;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.75)">${r.TITLE}</div></div>`).join('');
 }
 async function fetchCountdown(gid){
+ // Was fetching the published CSV straight from Google with no cache
+ // control at all, unlike every other tab -- that left it at the mercy of
+ // whatever caching Google's edge applies, which can stick for days. This
+ // now goes through fetchTab()/api/sheet like everything else: a real
+ // no-store fetch, short server-side cache, and proper column parsing
+ // instead of a raw-line regex scan (which only worked because LABEL
+ // happens to be the sheet's first column).
  try{
- const url=SHEET.replace('gid=1447819289','gid='+gid);
- const text=await(await fetch(url)).text();
- const lines=text.trim().split('\n').map(l=>l.replace(/"/g,'').trim());
- for(const line of lines){const m=line.match(/(\d{4}-\d{2}-\d{2})/);if(m){const parts=line.split(',').map(p=>p.trim());setupCD(parts[0]||'Countdown',m[1]);return;}}
+ const rows=await fetchTab(gid);
+ const row=rows.find(r=>r.TARGET_DATE);
+ if(row){setupCD(row.LABEL||'Countdown',row.TARGET_DATE);return;}
  setupCD('Days until Graduation','2026-06-23');
  }catch(e){setupCD('Days until Graduation','2026-06-23');}
 }
