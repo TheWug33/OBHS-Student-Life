@@ -3728,7 +3728,10 @@ async function submitToSheet(tab, fields, btn, successMsg) {
   } catch (e) {
     console.warn('[submitToSheet] failed', e);
     // Tell people (and whoever they screenshot it to) roughly WHERE it failed.
-    const msg = e.kind === 'server' ? 'The form server rejected that submission \u2014 please try again or contact Student Life.'
+    // The server's own reason was being thrown away before; show it so a failed
+    // submission can be diagnosed from a screenshot of the message.
+    const detail = (e.kind === 'server' && e.message && e.message !== 'Unknown error') ? ' (' + String(e.message).slice(0, 140) + ')' : '';
+    const msg = e.kind === 'server' ? 'The form server rejected that submission' + detail + ' \u2014 please try again or contact Student Life.'
       : e.kind === 'response' ? 'The form server sent back an unexpected response \u2014 please try a smaller image or contact Student Life.'
       : 'Couldn\u2019t reach the form server \u2014 check your connection or try a different network/browser.';
     showToast(msg);
