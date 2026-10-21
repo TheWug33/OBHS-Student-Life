@@ -143,7 +143,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
  <div class="slide" id="slide-collegevisits"><div class="slide-tag">College Visits</div><div id="cv-list"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-games"><div class="slide-tag">Today's Games</div><div id="game-list"><div class="empty">Loading…</div></div></div>
  <div class="slide full-art" id="slide-right"><div class="landscape-poster-wrap"><img src="/right-thing-poster.png" alt="Do The R.I.G.H.T Thing — Old Bridge High School's five core values: Responsibility, Inclusivity, Generosity, Hardworking, Trustworthy"></div></div>
- <div class="slide" id="slide-clubmeetings"><div class="slide-tag">Today's Club Meetings</div><div id="clubmeeting-list"><div class="empty">Loading…</div></div></div>
+ <div class="slide" id="slide-clubmeetings"><div class="slide-tag">Upcoming Club Meetings</div><div id="clubmeeting-list"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-kotw"><div class="slide-tag">Knight of the Week</div><div id="kotw-wrap"><div class="empty">Loading…</div></div></div>
  <div class="slide" id="slide-cd"><div class="cd-wrap"><div class="cd-label" id="cd-label">Countdown</div><div class="cd-num" id="cd-num">—</div><div class="cd-days">Days</div><div class="lyric" id="lyric" style="display:none"></div></div></div>
 </div>
@@ -522,29 +522,28 @@ async function loadData(){
  unifyTitleSizes('#game-list .ev-t', 84, 18, 34);
  })();
 
- // Today's Club Meetings — separate tab from the general Events calendar,
- // same APPROVED-gated pattern as Club Hub and Flyers.
+ // Upcoming Club Meetings — separate tab from the general Events calendar,
+ // same APPROVED-gated pattern as Club Hub and Flyers. Shows upcoming
+ // meetings (not just today's), same "always in rotation" pattern as
+ // College Visits, since only a few clubs use this so far and showing
+ // the fuller upcoming list is meant to nudge more clubs/students to it.
  (function(){
  const today=new Date(); today.setHours(0,0,0,0);
- const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
  const meetings=(clm||[]).map(r=>{
- const date=parseGenericDate(r['MEETING DATE']);
- const club=(r['CLUB NAME']||'').toString().trim();
+ const date=parseGenericDate(r['Meeting Date']);
+ const club=(r['Club Name']||'').toString().trim();
  if(!date||!club) return null;
  if(!/^y/i.test((r['APPROVED']||'').toString().trim())) return null;
- return {_d:date, TITLE:club, TIME:parseGenericTime(r['TIME']), LOCATION:(r['LOCATION']||'').toString().trim()};
+ return {_d:date, MONTH:MONTH_ABBR[date.getMonth()], DAY:String(date.getDate()), TITLE:club, TIME:parseGenericTime(r['Time']), LOCATION:(r['Location']||'').toString().trim()};
  }).filter(Boolean)
- .filter(r=>r._d>=today&&r._d<tomorrow)
- .sort((a,b)=>athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME));
+ .filter(r=>r._d>=today)
+ .sort((a,b)=>a._d-b._d||athleticsTimeMinutes(a.TIME)-athleticsTimeMinutes(b.TIME))
+ .slice(0,6);
  hasClubMeetings=meetings.length>0;
- document.getElementById('clubmeeting-list').innerHTML=meetings.map(g=>{
- const t=splitGameTime(g.TIME);
- return '<div class="ev-row">'
- + '<div class="ev-time"><div class="t-hr">'+t.hr+'</div>'+(t.ap?'<div class="t-ap">'+t.ap+'</div>':'')+'</div>'
- + '<div><div class="ev-t">'+g.TITLE+'</div>'
- + (g.LOCATION?'<div class="ev-m">'+g.LOCATION+'</div>':'')
- + '</div></div>';
- }).join('');
+ document.getElementById('clubmeeting-list').innerHTML=meetings.length?meetings.map(r=>
+ '<div class="ev-row">'+buildEventTile(r.MONTH,r.DAY)+
+ '<div><div class="ev-t">'+r.TITLE+'</div><div class="ev-m">'+(r.TIME||'TBD')+(r.LOCATION?' · '+r.LOCATION:'')+'</div></div></div>'
+ ).join(''):'<div class="empty">No upcoming club meetings scheduled.</div>';
  unifyTitleSizes('#clubmeeting-list .ev-t', 84, 18, 34);
  })();
  // Footer ticker: continuous crawl of all announcements
