@@ -121,6 +121,7 @@ body{background:var(--void);color:#fff;font-family:'DM Sans','Segoe UI',system-u
 .landscape-poster-wrap{height:100%;width:100%;display:flex;align-items:center;justify-content:center;}
 .landscape-poster-wrap img{max-width:100%;max-height:100%;object-fit:contain;border-radius:16px;box-shadow:0 22px 70px rgba(0,0,0,0.6);}
 </style>
+<script src="/notices.js"></script>
 </head>
 <body>
 
@@ -418,9 +419,9 @@ renderABDayBadge();
 // Slide rotation
 let SLIDES=['slide-events','slide-collegevisits','slide-games','slide-cd'];
 let sIdx=0;
-let hasKotw=false, hasGames=false, hasClubMeetings=false, flyerIds=[];
+let hasKotw=false, hasGames=false, hasClubMeetings=false, flyerIds=[], noticeIds=[];
 function rebuildSlides(){
- SLIDES=['slide-events','slide-collegevisits'].concat(hasGames?['slide-games']:[]).concat(['slide-right','slide-hoodie']).concat(hasClubMeetings?['slide-clubmeetings']:[]).concat(hasKotw?['slide-kotw']:[]).concat(flyerIds).concat(['slide-cd']);
+ SLIDES=['slide-events','slide-collegevisits'].concat(hasGames?['slide-games']:[]).concat(['slide-right','slide-hoodie']).concat(noticeIds).concat(hasClubMeetings?['slide-clubmeetings']:[]).concat(hasKotw?['slide-kotw']:[]).concat(flyerIds).concat(['slide-cd']);
  if(sIdx>=SLIDES.length)sIdx=0;
 }
 function showSlide(i){
@@ -453,6 +454,8 @@ async function loadData(){
  .concat(wantFlyers?[GIDS.flyers]:[])
  .concat(wantClubMeetings?[GIDS.clubmeetings]:[])
  .concat(wantCollegeVisits?[GIDS.collegevisits]:[]);
+ const wantNotices = typeof NOTICES_GID!=='undefined' && !!NOTICES_GID;
+ if(wantNotices) gidList.push(NOTICES_GID);
  const batch=await fetchBatch(gidList);
  const ann=parseTab(batch,GIDS.announcements),evt=parseTab(batch,GIDS.events),cd=parseTab(batch,GIDS.countdown),lyr=parseTab(batch,GIDS.lyric),kotw=parseTab(batch,GIDS.spotlight),fly=wantFlyers?parseTab(batch,GIDS.flyers):[],ath=parseTab(batch,GIDS.athletics),clm=wantClubMeetings?parseTab(batch,GIDS.clubmeetings):[],cv=wantCollegeVisits?parseTab(batch,GIDS.collegevisits):[];
 
@@ -579,6 +582,34 @@ async function loadData(){
  hasKotw=true;
  } else {
  hasKotw=false;
+ }
+
+ // Notices (from the "Notices" sheet tab — see /notices.js). Rows marked
+ // for TV whose dates cover today become their own slides: an image
+ // notice gets the full-screen poster treatment (same as the hoodie
+ // slide); a text-only notice gets a large announcement slide.
+ document.querySelectorAll('.notice-slide').forEach(el=>el.remove());
+ noticeIds=[];
+ if(wantNotices){
+ const tvNotices=noticesActive(noticesParse(batch[NOTICES_GID]||''),'tv');
+ const nStage=document.querySelector('.stage');
+ tvNotices.forEach((n,i)=>{
+ const d=document.createElement('div');
+ d.id='slide-notice-'+i;
+ if(n.image){
+ d.className='slide full-art notice-slide';
+ d.innerHTML='<div class="landscape-poster-wrap"><img src="'+noticesEscape(n.image)+'" alt="'+noticesEscape(n.title)+'"></div>';
+ const img=d.querySelector('img');
+ img.addEventListener('error',()=>{d.remove();noticeIds=noticeIds.filter(x=>x!==d.id);rebuildSlides();},{once:true});
+ } else {
+ d.className='slide notice-slide';
+ d.innerHTML='<div class="slide-tag">Announcement</div>'
+ +'<div style="font-family:\'Arial Narrow\',sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#fff;text-transform:uppercase;letter-spacing:.01em;margin-bottom:28px;">'+noticesEscape(n.title)+'</div>'
+ +(n.message?'<div style="font-size:'+(n.message.length>420?24:n.message.length>250?28:34)+'px;line-height:1.45;color:rgba(255,255,255,0.85);">'+noticesMessageHtml(n.message)+'</div>':'');
+ }
+ nStage.appendChild(d);
+ noticeIds.push(d.id);
+ });
  }
 
  // Club flyers — pair them up two per slide, side by side. A trailing odd
