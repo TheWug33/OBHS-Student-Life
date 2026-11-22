@@ -424,10 +424,18 @@ img{max-width:100%;display:block;}
 .wk-dow{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
 .wk-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;line-height:1.1;}
 .wk-day.today .wk-dow{color:var(--purple-glow);}
-.wk-ev{font-size:11px;color:var(--silver);line-height:1.35;padding:4px 7px;background:rgba(91,63,192,0.18);border-radius:6px;margin-bottom:4px;max-height:30px;overflow:hidden;}
+.wk-ev{font-size:11px;line-height:1.3;padding:5px 7px 5px 8px;background:rgba(255,255,255,0.045);border-left:3px solid var(--wk-c,var(--purple-glow));border-radius:6px;margin-bottom:5px;}
 .wk-ev:last-child{margin-bottom:0;}
-/* School events: light chip so they stand apart from sports */
-.wk-ev.school{background:var(--silver-bright);color:#1a1230;font-weight:600;}
+.wk-ev.school{--wk-c:#E8E9EF;}
+.wk-ev.club{--wk-c:#9B7FE0;}
+.wk-ev.game{--wk-c:#F5C842;}
+.wk-t{color:#fff;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wk-m{color:var(--muted);font-size:10.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wk-closed{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#E0A030;margin-bottom:5px;}
+.wk-day.closed{opacity:.7;}
+.wk-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:-4px 0 12px;}
+.wk-legend span{display:inline-flex;align-items:center;gap:6px;}
+.wk-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;}
 .wk-extra[hidden]{display:none;}
 .wk-extra{margin-top:4px;}
 .wk-extra .wk-ev:last-child{margin-bottom:4px;}
@@ -439,7 +447,8 @@ img{max-width:100%;display:block;}
  .wk-day{display:flex;align-items:flex-start;gap:14px;min-height:0;padding:10px 14px;}
  .wk-date{margin-bottom:0;width:52px;flex-shrink:0;}
  .wk-evs{flex:1;min-width:0;padding-top:1px;}
- .wk-ev{max-height:none;font-size:13px;}
+ .wk-ev{font-size:13px;}
+ .wk-m{font-size:12px;}
  .wk-toggle{font-size:13px;padding:6px 0 2px;}
 }
 
@@ -772,7 +781,8 @@ img{max-width:100%;display:block;}
 
  <!-- THIS WEEK AT OBHS -->
  <div class="wk-wrap">
- <div class="blk-head" style="margin-bottom:12px"><span class="blk-title sm">This Week at OBHS</span><button class="blk-link" onclick="openCal()">Full calendar →</button></div>
+ <div class="blk-head" style="margin-bottom:12px"><span class="blk-title sm" id="wk-title">This Week at OBHS</span><button class="blk-link" onclick="openCal()">Full calendar →</button></div>
+ <div class="wk-legend"><span><i style="background:#E8E9EF"></i>School</span><span><i style="background:#9B7FE0"></i>Clubs</span><span><i style="background:#F5C842"></i>Athletics</span></div>
  <div class="wk-strip" id="wk-strip">
  <div class="skel" style="height:110px;flex:1"></div>
  <div class="skel" style="height:110px;flex:1"></div>
@@ -1606,6 +1616,7 @@ function go(id, btn) {
  try{renderEv(window._lastEvt||[]);}catch(e){}
  try{renderWeekStrip();}catch(e){}
  try{loadWeekStripGames();}catch(e){}
+ try{loadWeekStripClubMeetings();}catch(e){}
  try{renderQL(window._lastQL||[]);}catch(e){}
  }
  if(id==='athletics'){
@@ -2142,51 +2153,104 @@ document.addEventListener('click', e => {
  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
  btn.textContent = open ? 'Show less' : '+' + btn.dataset.more + ' more';
 });
+// Rolling "Daily Look": today + the next school days (weekdays only). On
+// a weekend it starts Monday, so Saturday shows the coming week instead
+// of five days that already happened. Each day merges school events, club
+// meetings and Varsity games, sorted by time, with an A/B-day chip and a
+// "No School" marker for closed days (from AB_DAY_DATA).
+function wkStartMinutes(t) {
+ const m = (t || '').toString().match(/(\d{1,2})(?::(\d{2}))?\s*([AaPp])\.?\s*[Mm]/);
+ if (!m) return null;
+ let h = parseInt(m[1], 10) % 12;
+ if (m[3].toUpperCase() === 'P') h += 12;
+ return h * 60 + (parseInt(m[2] || '0', 10));
+}
 function renderWeekStrip() {
  const el = document.getElementById('wk-strip');
  if (!el) return;
  const today = new Date(); today.setHours(0,0,0,0);
- // Find Monday of the current week (Sun=0)
- const dow = today.getDay();
- const monday = new Date(today);
- monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
- const names = ['MON','TUE','WED','THU','FRI'];
- // Unfiltered on purpose — a day that already happened this week should
- // still show what was on it, not go blank just because it's in the past.
+ const start = new Date(today);
+ while (start.getDay() === 0 || start.getDay() === 6) start.setDate(start.getDate() + 1);
+ const days = [];
+ for (const d = new Date(start); days.length < 5; d.setDate(d.getDate() + 1)) {
+ if (d.getDay() !== 0 && d.getDay() !== 6) days.push(new Date(d));
+ }
+ const titleEl = document.getElementById('wk-title');
+ if (titleEl) titleEl.textContent = start.getTime() === today.getTime() ? 'This Week at OBHS' : 'Next Week at OBHS';
+
+ const names = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
  const evs = window._allEventsFull || window._allEvents || [];
  const games = window._weekGames || [];
+ const clubs = window._weekClubMeetings || [];
+ const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
  let html = '';
- for (let i = 0; i< 5; i++) {
- const d = new Date(monday); d.setDate(monday.getDate() + i);
- const isToday = d.getTime() === today.getTime();
- const isPast = d< today;
- const dayEvs = evs.filter(r =>r._date && d.getTime() >= r._date.getTime() && d.getTime() <= (r._endDate||r._date).getTime());
- const dayGames = games.filter(g =>g._date && g._date.getTime() === d.getTime());
- // School events always lead; sports follow. Each item carries its kind
- // so school events can be styled differently (light chip vs purple chip).
- const items = dayEvs.map(r => ({t: r.TITLE||'', school: true}))
- .concat(dayGames.map(g => ({t: g.TITLE||'', school: false})));
- const LIMIT = 3;
- const pill = it => '<div class="wk-ev' + (it.school ? ' school' : '') + '">' + wkEsc(it.t) + '</div>';
- let inner = '';
+ days.forEach(d => {
+ const t = d.getTime();
+ const isToday = t === today.getTime();
+ const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+ const closed = typeof AB_DAY_DATA !== 'undefined' && AB_DAY_DATA[key] === 'Closed';
+ const items = []
+ .concat(evs.filter(r => r._date && t >= r._date.getTime() && t <= (r._endDate || r._date).getTime())
+ .map(r => ({ kind: 'school', t: r.TITLE || '', time: r.TIME || '', where: r.LOCATION || '' })))
+ .concat(clubs.filter(c => c._date.getTime() === t)
+ .map(c => ({ kind: 'club', t: c.club, time: c.time || '', where: c.location || '' })))
+ .concat(games.filter(g => g._date && g._date.getTime() === t)
+ .map(g => ({ kind: 'game', t: g.TITLE || '', time: g.TIME || '', where: g.LOCATION || '' })));
+ // Untimed school events (all-day things) lead; then everything by start time.
+ items.forEach(it => {
+ const m = wkStartMinutes(it.time);
+ it._k = m !== null ? m : (it.kind === 'school' ? -1 : 9999);
+ });
+ items.sort((a, b) => a._k - b._k);
+
+ const LIMIT = 4;
+ const row = it => {
+ const meta = [it.time, it.where].filter(Boolean).join(' · ');
+ return '<div class="wk-ev ' + it.kind + '"><div class="wk-t">' + wkEsc(it.t) + '</div>'
+ + (meta ? '<div class="wk-m">' + wkEsc(meta) + '</div>' : '') + '</div>';
+ };
+ let inner = closed ? '<div class="wk-closed">No School</div>' : '';
  if (items.length) {
- inner = items.slice(0, LIMIT).map(pill).join('');
+ inner += items.slice(0, LIMIT).map(row).join('');
  if (items.length > LIMIT) {
  const extra = items.length - LIMIT;
- inner += '<div class="wk-extra" hidden>' + items.slice(LIMIT).map(pill).join('') + '</div>'
+ inner += '<div class="wk-extra" hidden>' + items.slice(LIMIT).map(row).join('') + '</div>'
  + '<button type="button" class="wk-toggle" data-more="' + extra + '" aria-expanded="false">+' + extra + ' more</button>';
  }
- } else {
- inner = '<div class="wk-none">' + (isPast ? '—' : 'Nothing yet') + '</div>';
+ } else if (!closed) {
+ inner = '<div class="wk-none">Nothing scheduled yet</div>';
  }
- const ab = getABLabel(d);
+ const ab = closed ? '' : getABLabel(d);
  const abChip = ab ? `<span class="ab-chip ${ab.toLowerCase()}">${ab}</span>` : '';
- html += '<div class="wk-day' + (isToday ? ' today' : '') + (isPast ? ' past' : '') + '">'
- + '<div class="wk-date"><div class="wk-dow">' + names[i] + (isToday ? ' · TODAY' : '') + '</div>'
+ const tag = isToday ? ' · TODAY' : (t === tomorrow.getTime() ? ' · TMRW' : '');
+ html += '<div class="wk-day' + (isToday ? ' today' : '') + (closed ? ' closed' : '') + '">'
+ + '<div class="wk-date"><div class="wk-dow">' + names[d.getDay()] + tag + '</div>'
  + '<div class="wk-num">' + d.getDate() + abChip + '</div></div>'
  + '<div class="wk-evs">' + inner + '</div></div>';
- }
+ });
  el.innerHTML = html;
+}
+
+// Pulls approved club meetings for the Daily Look (separate from the Club
+// Hub's own Club Meetings tab, which only loads when that tab is opened).
+let weekClubMeetingsLoaded = false;
+async function loadWeekStripClubMeetings() {
+ if (weekClubMeetingsLoaded) return;
+ weekClubMeetingsLoaded = true;
+ if (!GIDS.clubmeetings || GIDS.clubmeetings.includes('_GID')) return;
+ try {
+ const rows = await fetchTab(GIDS.clubmeetings);
+ window._weekClubMeetings = rows.map(r => {
+ const date = parseClubMeetingDate(r['Meeting Date']);
+ const club = (r['Club Name'] || '').toString().trim();
+ if (!date || !club || !/^y/i.test((r['APPROVED'] || '').toString().trim())) return null;
+ date.setHours(0,0,0,0);
+ return { _date: date, club, time: parseClubMeetingTime(r['Time']), location: (r['Location'] || '').toString().trim() };
+ }).filter(Boolean);
+ renderWeekStrip();
+ } catch(e) {
+ console.warn('[WeekStrip] club meetings load failed', e);
+ }
 }
 
 let weekGamesLoaded = false;
@@ -2478,6 +2542,7 @@ async function load(){
  try{renderEv(evt);}catch(e){console.warn('[render] ev',e);}
  try{renderWeekStrip();}catch(e){console.warn('[render] week',e);}
  try{loadWeekStripGames();}catch(e){console.warn('[render] week-games',e);}
+ try{loadWeekStripClubMeetings();}catch(e){console.warn('[render] week-clubs',e);}
  try{loadClassCup();}catch(e){console.warn('[render] cup',e);}
  try{loadSpotlight();}catch(e){console.warn('[render] spotlight',e);}
  try{renderQL(ql);}catch(e){console.warn('[render] ql',e);}
@@ -2576,10 +2641,16 @@ function chRenderClubs(clubs) {
  const badge = CAT_BADGE_COLORS[cat.cls] || CAT_BADGE_COLORS['cat-other'];
  const detail = chDetails[name.trim().toLowerCase()];
  const clickable = !!detail;
+ // Meeting info right on the card (not just inside "View details"), for
+ // clubs that have submitted their details.
+ const meets = detail ? [detail['Meeting Day'], detail['Meeting Time']].filter(Boolean).join(' \u00b7 ') : '';
+ const room = detail ? (detail['Room #'] || '').toString().trim() : '';
+ const meetLine = (meets || room) ? '<div style="font-size:12px;color:var(--silver);margin-top:6px;display:flex;gap:6px;align-items:baseline;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-glow);">Meets</span><span>' + wkEsc([meets, room ? 'Room ' + room.replace(/^room\s*/i,'') : ''].filter(Boolean).join(' \u00b7 ')) + '</span></div>' : '';
  return '<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:border-color .2s;' + (clickable ? 'cursor:pointer;' : '') + '" onmouseover="this.style.borderColor=\'var(--line-bright)\'" onmouseout="this.style.borderColor=\'var(--line)\'"' + (clickable ? ' onclick="chOpenClub(' + i + ')"' : '') + '>'
  + '<span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:inline-block;padding:2px 9px;border-radius:20px;margin-bottom:8px;' + badge + '">' + cat.label + '</span>'
  + '<div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:6px;">' + name + '</div>'
  + (advisor ? '<div style="font-size:12px;color:var(--muted);margin-bottom:3px;"> ' + advisor + (email ? ' · <a href="mailto:' + email + '" style="color:var(--purple-glow);text-decoration:none;" onclick="event.stopPropagation()">' + email + '</a>' : '') + '</div>' : '')
+ + meetLine
  + (reps ? '<div style="font-size:11px;color:var(--faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--line);"><strong style="color:var(--muted);">Student Reps:</strong> ' + reps + '</div>' : '')
  + (clickable ? '<div style="font-size:11px;color:var(--purple-glow);margin-top:10px;font-weight:600;">View details \u2192</div>' : '')
  + '</div>';
